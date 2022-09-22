@@ -2,4 +2,6 @@
     <string name="app_name">GoogleMapApp</string>
     <string name="google_maps_API_key">AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY</string>
     <string name="mapId">f98f922f818fe560</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
 </resources>
