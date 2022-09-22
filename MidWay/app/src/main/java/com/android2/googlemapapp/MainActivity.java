@@ -1,17 +1,26 @@
 package com.android2.googlemapapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,15 +32,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
+
+
+        int[] mResources = {R.drawable.page_one, R.drawable.page_two, R.drawable.page_three};
+
+
+        CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(this, mResources);
+
+        mViewPager.setAdapter(mCustomPagerAdapter);
 
         if(isServicesOK()){
             init();
         }
     }
 
+
+
+
     private void init() {
-        Button btnMap = (Button) findViewById(R.id.btnMap);
-        btnMap.setOnClickListener(new View.OnClickListener() {
+        //Temporarly setting the Sign In button to go directly to map (No login behind)
+        Button btnSignIn = (Button) findViewById(R.id.button_signIn);
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, MapActivity.class);
@@ -62,5 +84,46 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+
+}
+
+class CustomPagerAdapter extends PagerAdapter {
+
+    private Context mContext;
+    private LayoutInflater mLayoutInflater;
+    private int[] mResources;
+
+    public CustomPagerAdapter(Context context, int[] resources) {
+        mContext = context;
+        mResources = resources;
+        mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    @Override
+    public int getCount() {
+        return mResources.length;
+    }
+
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view == ((LinearLayout) object);
+    }
+
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
+
+        ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
+        imageView.setImageResource(mResources[position]);
+
+        container.addView(itemView);
+
+        return itemView;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        container.removeView((LinearLayout) object);
+    }
 
 }
