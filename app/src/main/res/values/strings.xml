@@ -1,0 +1,11 @@
+<resources>
+	<string name="app_name">ProjetIntegrateur</string>
+	<string name="title_activity_maps">MapsActivity</string>
+
+
+
+	<string name="mapId">f98f922f818fe560</string>
+	<string name="email">Email</string>
+	<string name="password">Password</string>
+
+</resources>
