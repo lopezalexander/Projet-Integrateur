@@ -13,4 +13,19 @@
 		<item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 		<!-- Customize your theme here. -->
 	</style>
+
+
+	<style name="style_form_signIn" parent="Theme.AppCompat.Light.Dialog.Alert">
+		<item name="android:background">@color/blue1</item>
+		<item name="android:windowFullscreen">true</item>
+		<item name="android:windowBackground">@null</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowIsFloating">false</item>
+	</style>
+	<style name="Theme.ProjetIntegrateur.NoActionBar">
+		<item name="windowActionBar">false</item>
+		<item name="windowNoTitle">true</item>
+	</style>
+	<style name="Theme.ProjetIntegrateur.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+	<style name="Theme.ProjetIntegrateur.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -1,11 +1,27 @@
 <resources>
+	<!-- GENERAL STRING  -->
 	<string name="app_name">ProjetIntegrateur</string>
 	<string name="title_activity_maps">MapsActivity</string>
-
-
-
 	<string name="mapId">f98f922f818fe560</string>
+
+
+	<string name="empty_value">" "</string>
+
+	<!-- LOGIN LAYOUT -->
 	<string name="email">Email</string>
 	<string name="password">Password</string>
+	<string name="signIn_button">Sign In</string>
+	<string name="login_OR_String">OR</string>
+	<string name="googlesigninlogo">googleSignInLogo</string>
+	<string name="facebooksigninlogo">FacebookSignInLogo</string>
 
+
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
+	<!-- XXXXXX LAYOUT -->
 </resources>
