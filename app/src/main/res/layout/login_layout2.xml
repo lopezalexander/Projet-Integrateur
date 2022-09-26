@@ -63,7 +63,7 @@
 				/>
 
 			<EditText
-				android:id="@+id/emailInput_signIn"
+				android:id="@+id/input_email"
 				android:layout_width="match_parent"
 				android:layout_height="40dp"
 				android:layout_marginStart="50dp"
@@ -96,7 +96,7 @@
 				/>
 
 			<EditText
-				android:id="@+id/passwordInput_signIn"
+				android:id="@+id/input_password"
 				android:layout_width="match_parent"
 				android:layout_height="40dp"
 				android:layout_marginStart="50dp"
@@ -120,7 +120,7 @@
 			>
 
 			<Button
-				android:id="@+id/button_signIn"
+				android:id="@+id/btn_signIn"
 				android:layout_width="200dp"
 				android:layout_height="wrap_content"
 				android:backgroundTint="@color/white"
@@ -148,7 +148,7 @@
 			>
 
 			<ImageView
-				android:id="@+id/googleIcon"
+				android:id="@+id/btn_google"
 				android:layout_width="55dp"
 				android:layout_height="55dp"
 				android:contentDescription="@string/googlesigninlogo"
@@ -162,7 +162,7 @@
 				/>
 
 			<ImageView
-				android:id="@+id/facebookIcon"
+				android:id="@+id/btn_facebook"
 				android:layout_width="55dp"
 				android:layout_height="55dp"
 				android:contentDescription="@string/facebooksigninlogo"

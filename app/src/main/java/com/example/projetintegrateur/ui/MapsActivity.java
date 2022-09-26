@@ -13,6 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
@@ -26,10 +29,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
     private final String TAG = "debug";
 
     //COPIED FROM MAIN ACTIVITY***********************************************************************************************************************************************
@@ -142,6 +146,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(this, carousel_Images);
         login_Carousel.setAdapter(mCustomPagerAdapter);
 
+
+        //GET VIEW ELEMENTS AND SETUP CLICKLISTENER AND HIDEKEYBOARD ON EDITTEXT
+        EditText email_input = myFormView.findViewById(R.id.input_email);
+        EditText password_input = myFormView.findViewById(R.id.input_password);
+        ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
+        Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
+
+        //SET HideKeyBoard() to EditText
+        ArrayList<EditText> editTextList = new ArrayList<>();
+        editTextList.add(email_input);
+        editTextList.add(password_input);
+
+        for (int i = 0; i < editTextList.size(); i++) {
+            editTextList.get(i).setOnFocusChangeListener((v, hasFocus) -> {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            });
+        }
+
+        //GOOGLE SIGN IN LOGIC
+        google_signIn_btn.setOnClickListener(view -> {
+            //INSERT GOOGLE SIGN IN LOGIC HERE
+        });
+
+
+        //FIREBASE SIGN IN LOGIC
+        firebase_signIn_btn.setOnClickListener(view -> {
+            //INSERT FIREBASE SIGN IN LOGIC HERE
+        });
+
+
         //Set View to Dialog Builder
         loginDialogBuilder.setView(myFormView);
 
@@ -151,32 +187,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Show Login Dialog
         loginDialog.show();
 
-
-//        // After some action
-//        alertDialog.dismiss();
-
-
-        //INSTANTIATE THE FORM AND INFLATE IT________________________________________________________________________________________________________________
-//        AlertDialog.Builder myForm = new AlertDialog.Builder(this, R.style.style_form_signIn);
-//        LayoutInflater inflater = LayoutInflater.from(this);
-//        View myFormView = inflater.inflate(R.layout.signup_layout, findViewById(R.id.rootContainer));
-//
-
-
-        //FORM ACTION ====CREATE / CANCEL======_______________________________________________________________________________________________________________
-//        myForm.setView(myFormView)
-//                .setPositiveButton("Create", (dialog, id) -> {
-//
-//                    Toast.makeText(this, "Toast!", Toast.LENGTH_LONG).show();
-//                })
-//
-//                .setNegativeButton("Cancel", (dialog, id) -> dialog.dismiss());
-
-//        //CREATE FORM
-//        myForm.create();
-//
-//        //DISPLAY THE FORM
-//        myForm.show();
     }
 
 

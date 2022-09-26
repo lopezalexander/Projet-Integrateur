@@ -17,17 +17,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // CACHER LE ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+        //CREATION D'UN HANDLER DE SYSTEME POUR CREER UN DELAI AVANT LE PASSAGE VERS LA PAGE PRINCIPAL --> MapsActivity
         final Handler handler = new Handler();
         final Runnable r = this::goToHome;
 
+        //CREATION DU DELAI AVEC LA FONCTION EN CALLBACK APRES 1000ms
         handler.postDelayed(r, 1000);
     }
 
     private void goToHome() {
+        //GO TO MapsActivity
         Intent intent = new Intent(MainActivity.this, MapsActivity.class);
         startActivity(intent);
+
+        //FERMER MainActivity POUR PREVENIR LE RETOUR EN ARRIERE
         finish();
     }
 
