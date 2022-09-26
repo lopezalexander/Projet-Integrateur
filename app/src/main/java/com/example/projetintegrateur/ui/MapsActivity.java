@@ -259,7 +259,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     //RESET LOGIN DIALOG ELEMENTS/VIEWS
                                                     email_input.setText("");
                                                     password_input.setText("");
-                                                    firebase_register_btn.setClickable(false);
                                                 } else {
                                                     Toast.makeText(this, "Could not register User!", Toast.LENGTH_LONG).show();
                                                 }
