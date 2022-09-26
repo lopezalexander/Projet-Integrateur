@@ -34,11 +34,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -161,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Create View for Dialog
         LayoutInflater inflater = LayoutInflater.from(this);
-        View myFormView = inflater.inflate(R.layout.login_layout2, findViewById(R.id.rootContainer));
+        View myFormView = inflater.inflate(R.layout.login_layout, findViewById(R.id.rootContainer));
 
         //Setup Login Carousel
         //********************
@@ -230,7 +227,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //****************\\
     //  FIREBASE AUTH  \\
     //*****************************************************************************************************************************
-
+    //
+    //
+    //  REGISTRATION EMAIL/PASSWORD
+    //************************************
     private void registerUserFirebase() {
         //GET LOGIN INPUT DATA
         String email = email_input.getText().toString().trim();
@@ -278,7 +278,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
+    //
+    //
+    //  LOGIN EMAIL/PASSWORD
+    //************************************
     private void loginUserFirebase() {
         //GET LOGIN INPUT DATA
         String email = email_input.getText().toString().trim();
@@ -324,36 +327,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                     );
         }
-    }
-
-    private boolean loginValidation(String email, String password) {
-        //VALIDATIONS
-        if (email.isEmpty()) {
-            email_input.setError("Email Required!");
-            email_input.requestFocus();
-            return false;
-        }
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            email_input.setError("Please provide valid email!");
-            email_input.requestFocus();
-            return false;
-        }
-
-        if (password.isEmpty()) {
-            password_input.setError("Password is Required!");
-            password_input.requestFocus();
-            return false;
-        }
-
-        if (password.length() < 6) {
-            password_input.setError("Password requires at least 6 characters!");
-            password_input.requestFocus();
-            return false;
-        }
-
-        //If no error, return TRUE
-        return true;
     }
 
 
@@ -424,12 +397,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    //****************\\
-    //  HIDE KEYBOARD   \\
+    //********************\\
+    //  UTILITY FUNCTIONS  \\
     //*******************************************************************************************************************************************
+    //
+    //
+    //  HIDE KEYBOARD
+    //************************************
     private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    //
+    //
+    //  LOGIN/REGISTRATION VALIDATION
+    //**************************************************************
+    private boolean loginValidation(String email, String password) {
+        //VALIDATIONS
+        if (email.isEmpty()) {
+            email_input.setError("Email Required!");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            email_input.setError("Please provide valid email!");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            password_input.setError("Password is Required!");
+            password_input.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            password_input.setError("Password requires at least 6 characters!");
+            password_input.requestFocus();
+            return false;
+        }
+
+        //If no error, return TRUE
+        return true;
     }
 
 
