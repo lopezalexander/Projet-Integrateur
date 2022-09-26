@@ -36,6 +36,7 @@
 	</LinearLayout><!--	END TOP CONTAINER-->
 
 	<ProgressBar
+		android:id="@+id/login_progressbar"
 		style="?android:attr/progressBarStyleLarge"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
@@ -153,19 +154,18 @@
 
 		</LinearLayout>  <!-- SIGN IN BUTTON -->
 
-
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="5dp"
-			android:text="@string/login_OR_String"
-			android:textColor="@color/white"
+ 
+		<View
+			android:layout_width="300dp"
+			android:layout_height="3dp"
+			android:layout_marginTop="15dp"
+			android:background="#c0c0c0"
 			/>
 
 		<LinearLayout
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_marginTop="5dp"
+			android:layout_marginTop="15dp"
 			android:gravity="center"
 			android:orientation="horizontal"
 			>

@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
@@ -49,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     EditText email_input;
     EditText password_input;
     Button firebase_register_btn;
+    ProgressBar login_progressBar;
 
 
     //COPIED FROM MAIN ACTIVITY***********************************************************************************************************************************************
@@ -82,7 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //SHOW LOGIN WHEN THE APP STARTS
-        Login_Dialog();
+        login_Dialog();
 
 
     }
@@ -145,7 +147,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  LOGIN DIALOG    \\
     //*****************************************************************************************************************************
 
-    private void Login_Dialog() {
+    private void login_Dialog() {
         // Dialog Builder
         AlertDialog.Builder loginDialogBuilder = new AlertDialog.Builder(this, R.style.style_form_signIn);
 
@@ -167,6 +169,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
         firebase_register_btn = myFormView.findViewById(R.id.btn_register);
+
+        login_progressBar = myFormView.findViewById(R.id.login_progressbar);
+
 
         //TextView google_register_web = myFormView.findViewById(R.id.webLink_google_register);
 
@@ -198,8 +203,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //FIREBASE REGISTER LOGIC
         firebase_register_btn.setOnClickListener(view -> {
             //INSERT FIREBASE SIGN IN LOGIC HERE
-            String email_String = email_input.getText().toString();
-            String password_String = password_input.getText().toString();
+            String email_String = email_input.getText().toString().trim();
+            String password_String = password_input.getText().toString().trim();
 
             registerUserFirebase(email_String, password_String, view);
         });
@@ -247,6 +252,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
 
+        //AFTER VALIDATION ARE GOOD, SET THE PROGRESS BAR TO VISIBLE
+        login_progressBar.setVisibility(View.VISIBLE);
+
         //CREATE AUTH USER IN AUTHENTICATION IN FIREBASE
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -261,17 +269,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     if (task1.isSuccessful()) {
                                         Toast.makeText(view.getContext(), "User is Registered!", Toast.LENGTH_LONG).show();
 
+                                        //RESET LOGIN DIALOG ELEMENTS/VIEWS
                                         email_input.setText("");
                                         password_input.setText("");
                                         firebase_register_btn.setClickable(false);
-
-                                        Log.d(TAG, "User is Registered!");
+                                        login_progressBar.setVisibility(View.GONE);
                                     } else {
+                                        login_progressBar.setVisibility(View.GONE);
                                         Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
-                                        Log.d(TAG, "Could not register User!");
                                     }
                                 });
                     } else {
+                        login_progressBar.setVisibility(View.GONE);
                         Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -355,7 +364,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //****************\\
     //  HIDE KEYBOARD   \\
     //*******************************************************************************************************************************************
-    public void hideKeyboard(View view) {
+    private void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
