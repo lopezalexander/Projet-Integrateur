@@ -4,6 +4,9 @@
 	<string name="title_activity_maps">MapsActivity</string>
 	<string name="mapId">f98f922f818fe560</string>
 
+	<string name="maps_key_alex">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
+	<string name="maps_key_adnan">xxxxx</string>
+
 
 	<string name="empty_value">" "</string>
 
