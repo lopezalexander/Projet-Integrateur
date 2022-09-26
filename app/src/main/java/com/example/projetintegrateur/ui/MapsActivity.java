@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
+import com.example.projetintegrateur.model.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,33 +31,44 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private final String TAG = "debug";
 
+    //FIREBASE
+    private FirebaseAuth mAuth;
+
+    //LOGIN PAGE VIEW ITEMS
+    EditText email_input;
+    EditText password_input;
+    Button firebase_register_btn;
+
+
     //COPIED FROM MAIN ACTIVITY***********************************************************************************************************************************************
     private static final int ERROR_DIALOG_REQUEST = 9001;
     //    private static final int RC_SIGN_IN = 666;
     //    private GoogleSignInClient mGoogleSignInClient;
-    //    private FirebaseAuth mAuth;
-
-    //*************************************************************************************************************************************************************************
-
-    //COPIED FROM MAPS ACTIVITY***********************************************************************************************************************************************
-    //    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
-    //    private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
-    //    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
 
     //*************************************************************************************************************************************************************************
 
 
+    //***********\\
+    //  OnCREATE  \\
+    //*****************************************************************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        //FIREBASE
+        mAuth = FirebaseAuth.getInstance();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -69,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //SHOW LOGIN WHEN THE APP STARTS
-        signIn_Dialog();
+        Login_Dialog();
 
 
     }
@@ -116,7 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "isServicesOK : an error occured but we can fix it");
 
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MapsActivity.this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
+            Objects.requireNonNull(dialog).show();
         } else {
             Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
         }
@@ -129,10 +142,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //*****************\\
-    //  Sign-In DIALOG  \\
+    //  LOGIN DIALOG    \\
     //*****************************************************************************************************************************
 
-    private void signIn_Dialog() {
+    private void Login_Dialog() {
         // Dialog Builder
         AlertDialog.Builder loginDialogBuilder = new AlertDialog.Builder(this, R.style.style_form_signIn);
 
@@ -141,17 +154,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         View myFormView = inflater.inflate(R.layout.login_layout2, findViewById(R.id.rootContainer));
 
         //Setup Login Carousel
-        ViewPager login_Carousel = (ViewPager) myFormView.findViewById(R.id.pager);
+        ViewPager login_Carousel = myFormView.findViewById(R.id.pager);
         int[] carousel_Images = {R.drawable.page_one, R.drawable.page_two, R.drawable.page_three};
         CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(this, carousel_Images);
         login_Carousel.setAdapter(mCustomPagerAdapter);
 
 
         //GET VIEW ELEMENTS AND SETUP CLICKLISTENER AND HIDEKEYBOARD ON EDITTEXT
-        EditText email_input = myFormView.findViewById(R.id.input_email);
-        EditText password_input = myFormView.findViewById(R.id.input_password);
+        email_input = myFormView.findViewById(R.id.input_email);
+        password_input = myFormView.findViewById(R.id.input_password);
+
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
+        firebase_register_btn = myFormView.findViewById(R.id.btn_register);
+
+        //TextView google_register_web = myFormView.findViewById(R.id.webLink_google_register);
+
 
         //SET HideKeyBoard() to EditText
         ArrayList<EditText> editTextList = new ArrayList<>();
@@ -177,6 +195,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //INSERT FIREBASE SIGN IN LOGIC HERE
         });
 
+        //FIREBASE REGISTER LOGIC
+        firebase_register_btn.setOnClickListener(view -> {
+            //INSERT FIREBASE SIGN IN LOGIC HERE
+            String email_String = email_input.getText().toString();
+            String password_String = password_input.getText().toString();
+
+            registerUserFirebase(email_String, password_String, view);
+        });
+
 
         //Set View to Dialog Builder
         loginDialogBuilder.setView(myFormView);
@@ -191,8 +218,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //****************\\
-    //  Firebase Auth  \\
+    //  FIREBASE AUTH  \\
     //*****************************************************************************************************************************
+
+    private void registerUserFirebase(String email, String password, View view) {
+        //VALIDATION
+        if (email.isEmpty()) {
+            email_input.setError("Email Required!");
+            email_input.requestFocus();
+            return;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            email_input.setError("Please provide valid email!");
+            email_input.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            password_input.setError("Password is Required!");
+            password_input.requestFocus();
+            return;
+        }
+
+        if (password.length() < 6) {
+            password_input.setError("Password requires at least 6 characters!");
+            password_input.requestFocus();
+            return;
+        }
+
+        //CREATE AUTH USER IN AUTHENTICATION IN FIREBASE
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()) {
+                        User user = new User(email, "", "");
+
+                        //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                        FirebaseDatabase.getInstance().getReference("Users")
+                                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                .setValue(user).addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful()) {
+                                        Toast.makeText(view.getContext(), "User is Registered!", Toast.LENGTH_LONG).show();
+
+                                        email_input.setText("");
+                                        password_input.setText("");
+                                        firebase_register_btn.setClickable(false);
+
+                                        Log.d(TAG, "User is Registered!");
+                                    } else {
+                                        Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
+                                        Log.d(TAG, "Could not register User!");
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+    }
+
+
+    private void loginUserFirebase() {
+
+    }
+
 
 //    private void firebaseAuthWithGoogle(String idToken) {
 //        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
@@ -268,5 +359,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
 
 }

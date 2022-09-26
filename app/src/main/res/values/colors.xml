@@ -10,5 +10,14 @@
 	<color name="blue1">#3785B0</color>
 	<color name="blue2">#4EBFFC</color>
 	<color name="blue3">#D8F2FA</color>
+	<color name="red">#ED6660</color>
 
+	<color name="theme_1">#0A090C</color>
+	<color name="theme_2">#F0EDEE</color>
+	<color name="theme_3">#07393C</color>
+	<color name="theme_4">#2C666E</color>
+	<color name="theme_5">#90DDF0</color>
+
+	<color name="flutterTheme1">#8c95e8</color>
+	<color name="flutterTheme2">#363F93</color>
 </resources>
