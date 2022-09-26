@@ -154,7 +154,7 @@
 
 		</LinearLayout>  <!-- SIGN IN BUTTON -->
 
- 
+
 		<View
 			android:layout_width="300dp"
 			android:layout_height="3dp"

@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
+import com.example.projetintegrateur.util.UserClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,7 +34,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -45,8 +50,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //FIREBASE
     private FirebaseAuth mAuth;
+    private FirebaseDatabase mFirebaseDB;
 
     //LOGIN PAGE VIEW ITEMS
+    AlertDialog loginDialog;
     EditText email_input;
     EditText password_input;
     Button firebase_register_btn;
@@ -71,6 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //FIREBASE
         mAuth = FirebaseAuth.getInstance();
+        mFirebaseDB = FirebaseDatabase.getInstance();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -156,6 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         View myFormView = inflater.inflate(R.layout.login_layout2, findViewById(R.id.rootContainer));
 
         //Setup Login Carousel
+        //********************
         ViewPager login_Carousel = myFormView.findViewById(R.id.pager);
         int[] carousel_Images = {R.drawable.page_one, R.drawable.page_two, R.drawable.page_three};
         CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(this, carousel_Images);
@@ -163,6 +172,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         //GET VIEW ELEMENTS AND SETUP CLICKLISTENER AND HIDEKEYBOARD ON EDITTEXT
+        //**********************************************************************
         email_input = myFormView.findViewById(R.id.input_email);
         password_input = myFormView.findViewById(R.id.input_password);
 
@@ -171,8 +181,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         firebase_register_btn = myFormView.findViewById(R.id.btn_register);
 
         login_progressBar = myFormView.findViewById(R.id.login_progressbar);
-
-
         //TextView google_register_web = myFormView.findViewById(R.id.webLink_google_register);
 
 
@@ -189,32 +197,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
         }
 
+        //SET BUTTON LISTENER FOR LOGIN IN OR REGISTERING USER
+        //*****************************************************
         //GOOGLE SIGN IN LOGIC
         google_signIn_btn.setOnClickListener(view -> {
             //INSERT GOOGLE SIGN IN LOGIC HERE
         });
 
 
-        //FIREBASE SIGN IN LOGIC
+        //FIREBASE LOGIN LOGIC
         firebase_signIn_btn.setOnClickListener(view -> {
-            //INSERT FIREBASE SIGN IN LOGIC HERE
+            //FIREBASE LOGIN FUNCTION
+            loginUserFirebase();
         });
 
-        //FIREBASE REGISTER LOGIC
-        firebase_register_btn.setOnClickListener(view -> {
-            //INSERT FIREBASE SIGN IN LOGIC HERE
-            String email_String = email_input.getText().toString().trim();
-            String password_String = password_input.getText().toString().trim();
-
-            registerUserFirebase(email_String, password_String, view);
-        });
+        //FIREBASE REGISTER FUNCTION
+        firebase_register_btn.setOnClickListener(view -> registerUserFirebase());
 
 
         //Set View to Dialog Builder
         loginDialogBuilder.setView(myFormView);
 
         //Create Login Dialog
-        AlertDialog loginDialog = loginDialogBuilder.create();
+        loginDialog = loginDialogBuilder.create();
 
         //Show Login Dialog
         loginDialog.show();
@@ -226,71 +231,129 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  FIREBASE AUTH  \\
     //*****************************************************************************************************************************
 
-    private void registerUserFirebase(String email, String password, View view) {
-        //VALIDATION
-        if (email.isEmpty()) {
-            email_input.setError("Email Required!");
-            email_input.requestFocus();
-            return;
+    private void registerUserFirebase() {
+        //GET LOGIN INPUT DATA
+        String email = email_input.getText().toString().trim();
+        String password = password_input.getText().toString().trim();
+        boolean valid = loginValidation(email, password);
+
+        if (valid) {
+            //AFTER VALIDATION ARE GOOD, SET THE PROGRESS BAR TO VISIBLE
+            login_progressBar.setVisibility(View.VISIBLE);
+
+            //CREATE AUTH USER IN AUTHENTICATION IN FIREBASE
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
+                                    String userID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                                    User user = new User(email, "", userID);
+
+                                    //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                                    mFirebaseDB.getReference("Users")
+                                            .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                            .setValue(user).addOnCompleteListener(task1 -> {
+                                                if (task1.isSuccessful()) {
+                                                    Toast.makeText(this, "User is Registered!", Toast.LENGTH_LONG).show();
+
+                                                    //RESET LOGIN DIALOG ELEMENTS/VIEWS
+                                                    email_input.setText("");
+                                                    password_input.setText("");
+                                                    firebase_register_btn.setClickable(false);
+                                                } else {
+                                                    Toast.makeText(this, "Could not register User!", Toast.LENGTH_LONG).show();
+                                                }
+
+                                            });
+                                } else {
+                                    Toast.makeText(this, "Could not register User!", Toast.LENGTH_LONG).show();
+                                }
+                                //REMOVE-HIDE PROGRESS BAR
+                                login_progressBar.setVisibility(View.GONE);
+                            }
+                    );
+
         }
-
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            email_input.setError("Please provide valid email!");
-            email_input.requestFocus();
-            return;
-        }
-
-        if (password.isEmpty()) {
-            password_input.setError("Password is Required!");
-            password_input.requestFocus();
-            return;
-        }
-
-        if (password.length() < 6) {
-            password_input.setError("Password requires at least 6 characters!");
-            password_input.requestFocus();
-            return;
-        }
-
-        //AFTER VALIDATION ARE GOOD, SET THE PROGRESS BAR TO VISIBLE
-        login_progressBar.setVisibility(View.VISIBLE);
-
-        //CREATE AUTH USER IN AUTHENTICATION IN FIREBASE
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-
-                    if (task.isSuccessful()) {
-                        User user = new User(email, "", "");
-
-                        //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
-                        FirebaseDatabase.getInstance().getReference("Users")
-                                .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                                .setValue(user).addOnCompleteListener(task1 -> {
-                                    if (task1.isSuccessful()) {
-                                        Toast.makeText(view.getContext(), "User is Registered!", Toast.LENGTH_LONG).show();
-
-                                        //RESET LOGIN DIALOG ELEMENTS/VIEWS
-                                        email_input.setText("");
-                                        password_input.setText("");
-                                        firebase_register_btn.setClickable(false);
-                                        login_progressBar.setVisibility(View.GONE);
-                                    } else {
-                                        login_progressBar.setVisibility(View.GONE);
-                                        Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                    } else {
-                        login_progressBar.setVisibility(View.GONE);
-                        Toast.makeText(view.getContext(), "Could not register User!", Toast.LENGTH_LONG).show();
-                    }
-                });
 
 
     }
 
 
     private void loginUserFirebase() {
+        //GET LOGIN INPUT DATA
+        String email = email_input.getText().toString().trim();
+        String password = password_input.getText().toString().trim();
+        boolean valid = loginValidation(email, password);
 
+        if (valid) {
+            //AFTER VALIDATION ARE GOOD, SET THE PROGRESS BAR TO VISIBLE
+            login_progressBar.setVisibility(View.VISIBLE);
+
+            //PERFORM LOGIN WITH CREDENTIAL SUPPLIED
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    //[RETRIEVE] CURRENT USER_ID FROM FIREBASE_AUTH ... TO FETCH IT FROM DATABASE IN NEXT STEPS
+                                    String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
+                                    //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+                                    DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
+
+                                    //[FETCH] THE USER IN DATABASE
+                                    ref.get().addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            User currentUser = task1.getResult().getValue(User.class);
+                                            ((UserClient) getApplicationContext()).setUser(currentUser);
+
+                                            //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                                            loginDialog.dismiss();
+
+                                            // Get the User Data
+                                            Toast.makeText(this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+
+                                        } else {
+                                            //HANDLE ERROR HERE if we cannot retrieve the user data
+                                            Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(this, "Failed to login! Check your credentials.", Toast.LENGTH_LONG).show();
+                                }
+                                //REMOVE-HIDE PROGRESS BAR
+                                login_progressBar.setVisibility(View.GONE);
+                            }
+                    );
+        }
+    }
+
+    private boolean loginValidation(String email, String password) {
+        //VALIDATIONS
+        if (email.isEmpty()) {
+            email_input.setError("Email Required!");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            email_input.setError("Please provide valid email!");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            password_input.setError("Password is Required!");
+            password_input.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            password_input.setError("Password requires at least 6 characters!");
+            password_input.requestFocus();
+            return false;
+        }
+
+        //If no error, return TRUE
+        return true;
     }
 
 
