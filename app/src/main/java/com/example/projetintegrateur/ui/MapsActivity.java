@@ -1,5 +1,7 @@
 package com.example.projetintegrateur.ui;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
@@ -24,8 +26,13 @@ import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,9 +40,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -58,9 +72,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //COPIED FROM MAIN ACTIVITY***********************************************************************************************************************************************
+    //GOOGLE LOGIN
     private static final int ERROR_DIALOG_REQUEST = 9001;
-    //    private static final int RC_SIGN_IN = 666;
-    //    private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInClient mGoogleSignInClient;
+    ActivityResultLauncher<Intent> activityResultLaunch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+
+        try {
+            // Google Sign In was successful, authenticate with Firebase
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+
+            //CONTINUER AVEC LE LOGIN AVEC FIREBASE
+            loginUserGoogleFirebase(account.getIdToken());
+        } catch (ApiException e) {
+            e.printStackTrace();
+        }
+    });
+
 
     //*************************************************************************************************************************************************************************
 
@@ -77,6 +105,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
+        //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
+        createSignInRequest();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
@@ -88,12 +119,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             init();
         }
 
-        //SHOW LOGIN WHEN THE APP STARTS
-        login_Dialog();
-
+        //CHECK IF User is already Connected
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            login_Dialog();
+        }
 
     }
-
 
     //********************\\
     //  Google Maps Setup  \\
@@ -199,6 +231,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //GOOGLE SIGN IN LOGIC
         google_signIn_btn.setOnClickListener(view -> {
             //INSERT GOOGLE SIGN IN LOGIC HERE
+            signIn_CreateGoogleIntent();
         });
 
 
@@ -245,25 +278,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
-                                    String userID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                                    User user = new User(email, "", userID);
+                                    //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+                                    String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                                    DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
 
-                                    //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
-                                    mFirebaseDB.getReference("Users")
-                                            .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                                            .setValue(user).addOnCompleteListener(task1 -> {
-                                                if (task1.isSuccessful()) {
-                                                    Toast.makeText(this, "User is Registered!", Toast.LENGTH_LONG).show();
 
-                                                    //RESET LOGIN DIALOG ELEMENTS/VIEWS
-                                                    email_input.setText("");
-                                                    password_input.setText("");
+                                    //Check if user exist
+                                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (!dataSnapshot.exists()) {
+                                                //****************************************************
+                                                //ADD USER TO USER TABLE IN FIREBASE REALTIME DATABASE
+                                                //****************************************************
+
+                                                //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
+                                                String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+                                                User newUserData = new User(email, "", currentUserKey);
+
+                                                //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                                                mFirebaseDB.getReference("Users")
+                                                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                                        .setValue(newUserData).addOnCompleteListener(task1 -> {
+                                                            //HANDLE ERROR, NOTHING ON SUCCESS...CONTINUE
+                                                            if (!task1.isSuccessful()) {
+                                                                Toast.makeText(MapsActivity.this, "Could not register User!", Toast.LENGTH_LONG).show();
+                                                            }
+                                                        });
+                                            } //END INSERT USER IN DB TABLE 'Users'
+
+                                            //************************
+                                            //FAIRE LE SINGLETON USER
+                                            //************************
+
+                                            //[FETCH] THE USER IN DATABASE
+                                            ref.get().addOnCompleteListener(task2 -> {
+                                                if (task2.isSuccessful()) {
+                                                    //[CREATE] SINGLETON
+                                                    User currentUser = task2.getResult().getValue(User.class);
+                                                    ((UserClient) getApplicationContext()).setUser(currentUser);
+
+                                                    //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                                                    loginDialog.dismiss();
+
+                                                    // Toast
+                                                    Toast.makeText(MapsActivity.this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+
                                                 } else {
-                                                    Toast.makeText(this, "Could not register User!", Toast.LENGTH_LONG).show();
+                                                    //HANDLE ERROR HERE if we cannot retrieve the user data
+                                                    Toast.makeText(MapsActivity.this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
                                                 }
+                                            }); //END CREATE SINGLETON
+                                        }//END onDataChanged
 
-                                            });
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        } //END onCancelled
+                                    }); //END DATABASE QUERY TO CHECK USER
                                 } else {
                                     Toast.makeText(this, "Could not register User!", Toast.LENGTH_LONG).show();
                                 }
@@ -271,10 +342,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 login_progressBar.setVisibility(View.GONE);
                             }
                     );
-
         }
-
-
     }
 
     //
@@ -304,13 +372,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     //[FETCH] THE USER IN DATABASE
                                     ref.get().addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
+                                            //[CREATE] SINGLETON
                                             User currentUser = task1.getResult().getValue(User.class);
                                             ((UserClient) getApplicationContext()).setUser(currentUser);
 
                                             //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
                                             loginDialog.dismiss();
 
-                                            // Get the User Data
+                                            // Toast
                                             Toast.makeText(this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
 
                                         } else {
@@ -328,71 +397,106 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //
+    //
+    //  LOGIN GOOGLE
+    //************************************
+    private void loginUserGoogleFirebase(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        //AFTER VALIDATION ARE GOOD, SET THE PROGRESS BAR TO VISIBLE
+        login_progressBar.setVisibility(View.VISIBLE);
 
-//    private void firebaseAuthWithGoogle(String idToken) {
-//        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-//        mAuth.signInWithCredential(credential)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//                            // Sign in success, update UI with the signed-in user's information
-//                            Log.d("TAG", "signInWithCredential:success");
-//                            // Toast.makeText(MainActivity.this, "Successfully Logged In", Toast.LENGTH_SHORT).show();
-//                            FirebaseUser user = mAuth.getCurrentUser();
-//                            //  Intent intent = new Intent(getApplicationContext(), MapActivity.class);
-//                            //   startActivity(intent);
-////                            updateUI(user);
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            Log.w("TAG", "signInWithCredential:failure", task.getException());
-//                            // Toast.makeText(MainActivity.this, "Sign In failed!", Toast.LENGTH_SHORT).show();
-////                            updateUI(null);
-//                        }
-//                    }
-//                });
-//    }
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+
+                        //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+                        String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                        DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
+
+                        //Check if user exist
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (!dataSnapshot.exists()) {
+                                    //****************************************************
+                                    //ADD USER TO USER TABLE IN FIREBASE REALTIME DATABASE
+                                    //****************************************************
+
+                                    //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
+                                    String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+                                    User newUserData = new User(email, "", currentUserKey);
+
+                                    //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                                    mFirebaseDB.getReference("Users")
+                                            .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                            .setValue(newUserData).addOnCompleteListener(task1 -> {
+                                                //HANDLE ERROR, NOTHING ON SUCCESS...CONTINUE
+                                                if (!task1.isSuccessful()) {
+                                                    Toast.makeText(MapsActivity.this, "Could not register User!", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                } //END INSERT USER IN DB TABLE 'Users'
+
+                                //************************
+                                //FAIRE LE SINGLETON USER
+                                //************************
+
+                                //[FETCH] THE USER IN DATABASE
+                                ref.get().addOnCompleteListener(task2 -> {
+                                    if (task2.isSuccessful()) {
+                                        //[CREATE] SINGLETON
+                                        User currentUser = task2.getResult().getValue(User.class);
+                                        ((UserClient) getApplicationContext()).setUser(currentUser);
+
+                                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                                        loginDialog.dismiss();
+
+                                        // Toast
+                                        Toast.makeText(MapsActivity.this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+
+                                    } else {
+                                        //HANDLE ERROR HERE if we cannot retrieve the user data
+                                        Toast.makeText(MapsActivity.this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
+                                    }
+                                }); //END CREATE SINGLETON
+                            }//END onDataChanged
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            } //END onCancelled
+                        }); //END DATABASE QUERY TO CHECK USER
 
 
-    //*****************\\
-    //  Google Sign-In  \\
-    //*****************************************************************************************************************************
-//
-//    // Configure Google Sign In
-//    private void createSignInRequest() {
-//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.default_web_client_id))
-//                .requestEmail()
-//                .build();
-//        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-//    }
-//
-//    private void signIn() {
-//        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-//        startActivityForResult(signInIntent, RC_SIGN_IN);
-//    }
+                    } else {
+                        Toast.makeText(MapsActivity.this, "Google error to Login", Toast.LENGTH_SHORT).show();
+                    }// END SUCCESS LOGIN
+                });//END GOOGLE SIGN IN  -----  END LISTENER SUCCESS LOGIN
+
+        //REMOVE-HIDE PROGRESS BAR
+        login_progressBar.setVisibility(View.GONE);
+    }
+
+    // Configure Google Sign In Request [SETUP]
+    //*********************************
+    private void createSignInRequest() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
 
 
-    //******************\\
-    //  INTENT RESULTS   \\
-    //*******************************************************************************************************************************************
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    //CREER INTENT POUR GOOGLE SIGN IN ACTIVITY [Quand on click sur le logo Google, check LoginDialog code]
+    //*****************************************************************************************************
+    private void signIn_CreateGoogleIntent() {
+        // CREER INTENT POUR GOOGLE SIGN IN ACTIVITY
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-//        if (requestCode == RC_SIGN_IN) {
-//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-//            try {
-//                // Google Sign In was successful, authenticate with Firebase
-//                GoogleSignInAccount account = task.getResult(ApiException.class);
-//                Log.d("TAG", "firebaseAuthWithGoogle:" + account.getId());
-//                firebaseAuthWithGoogle(account.getIdToken());
-//            } catch (ApiException e) {
-//                // Google Sign In failed, update UI appropriately
-//                Log.w("TAG", "Google sign in failed", e);
-//            }
-//        }
+
+        //LANCER L'ACTIVITY DE GOOGLE SIGN IN
+        activityResultLaunch.launch(signInIntent);
     }
 
 
