@@ -1,6 +1,6 @@
 <resources>
 	<!-- GENERAL STRING  -->
-	<string name="app_name">ProjetIntegrateur</string>
+	<string name="app_name">MidWay</string>
 	<string name="title_activity_maps">MapsActivity</string>
 	<string name="mapId">f98f922f818fe560</string>
 

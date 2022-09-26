@@ -10,12 +10,12 @@ import com.example.projetintegrateur.R;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_splash);
 
         // CACHER LE ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void goToHome() {
         //GO TO MapsActivity
-        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        Intent intent = new Intent(SplashActivity.this, MapsActivity.class);
         startActivity(intent);
 
         //FERMER MainActivity POUR PREVENIR LE RETOUR EN ARRIERE
