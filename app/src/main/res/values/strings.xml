@@ -21,6 +21,10 @@
 	<string name="login_google_signup1">Don\'t have an account?</string>
 	<string name="login_google_signup2">" Sign Up!"</string>
 
+	<string name="facebook_app_id">1533089473800999</string>
+	<string name="fb_login_protocol_scheme">fb1234</string>
+	<string name="facebook_client_token">56789</string>
+
 
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->

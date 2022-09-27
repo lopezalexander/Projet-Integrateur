@@ -26,6 +26,11 @@ import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -50,8 +55,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -63,11 +72,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDB;
 
+    //Facebook login
+    CallbackManager callbackManager;
+
     //LOGIN PAGE VIEW ITEMS
     AlertDialog loginDialog;
     EditText email_input;
     EditText password_input;
     Button firebase_register_btn;
+
     ProgressBar login_progressBar;
 
 
@@ -105,6 +118,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
+        //Facebook login
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                        loginDialog.dismiss();
+                        Log.d(TAG,"Compte Facebook est connecté");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+
+
         //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
         createSignInRequest();
 
@@ -126,6 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
 
     //********************\\
     //  Google Maps Setup  \\
@@ -206,6 +243,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         password_input = myFormView.findViewById(R.id.input_password);
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
+        ImageView facebook_signIn_btn = myFormView.findViewById(R.id.btn_facebook);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
         firebase_register_btn = myFormView.findViewById(R.id.btn_register);
 
@@ -234,6 +272,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             signIn_CreateGoogleIntent();
         });
 
+
+
+        //*****************************************************
+        //Facebook SIGN IN LOGIC
+        facebook_signIn_btn.setOnClickListener(view -> {
+                    LoginManager.getInstance().logInWithReadPermissions(MapsActivity.this, Arrays.asList("public_profile"));
+        });
 
         //FIREBASE LOGIN LOGIC
         firebase_signIn_btn.setOnClickListener(view -> {
@@ -497,6 +542,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //LANCER L'ACTIVITY DE GOOGLE SIGN IN
         activityResultLaunch.launch(signInIntent);
+    }
+
+
+    //********Facebook Login*********\\
+   //*********************************\\
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 
