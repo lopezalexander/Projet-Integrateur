@@ -1,61 +1,45 @@
 package com.example.projetintegrateur.ui;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.ViewPager;
 
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.Manifest;
 import android.app.Dialog;
-import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
-import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.adapter.LoginDialog;
-import com.example.projetintegrateur.model.User;
-import com.example.projetintegrateur.util.UserClient;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,9 +48,10 @@ import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+
     //VIEW xml
     private EditText mSearchText;
+    private ImageView mGps;
     private final String TAG = "debug";
 
     //FIREBASE
@@ -75,6 +60,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
+    private GoogleMap mMap;
+
+    private Boolean mLocationPermissionsGranted = false;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private static final float DEFAULT_ZOOM = 15f;
 
 
     //***********\\
@@ -85,46 +79,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        //FIREBASE
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDB = FirebaseDatabase.getInstance();
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-        // Initializes the maps system and the view.
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
         if (isServicesOK()) {
-            init();
-        }
+            //GET PERMISSION
+            getLocationPermission();
 
-        //VIEW
-        mSearchText = (EditText) findViewById(R.id.input_addresses);
-        mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (keyEvent != null) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-                    //execute our method for searching
-                    geoLocate();
-                    mSearchText.getText().clear();
-                    //mSearchText.setText(null);
-                    mSearchText.clearFocus();
-                }
+
+            //SET VIEW BUTTON, FIREBASE, etc
+            initView();
+
+
+            //CHECK IF User is already Connected
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+
+            if (currentUser == null) {
+                LoginDialog loginDialog = new LoginDialog();
+                loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
             }
-            return false;
-        });
-
-
-        //CHECK IF User is already Connected
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser == null) {
-            LoginDialog loginDialog = new LoginDialog();
-            loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
         }
 
     }
@@ -145,29 +115,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        //Style pour le Map
+        mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
+                "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
+                "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
+                "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
+                "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
+                "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
+        );
+
+        //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
+        if (mLocationPermissionsGranted) {
+            getDeviceLocation();
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            //Disables the native button for getting current location, we will need to create
+            //our own, because we need to add the seach bar
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+            mMap.getUiSettings().isCompassEnabled();
+            mMap.getUiSettings().isRotateGesturesEnabled();
+        }
+
+
         //GET CURRENT LOCATION
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        LatLng montreal = new LatLng(45.5019, -73.5674);
+//        mMap.addMarker(new MarkerOptions().position(montreal).title("Marker in Montreal"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(montreal));
 
 
     }
 
     // Verify if Google Play Service are installed, if not, request to install Google Play Service
     public boolean isServicesOK() {
-        Log.d("TAG", "isServicesOK : checking google services version");
+        //Log.d("TAG", "isServicesOK : checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MapsActivity.this);
 
         if (available == ConnectionResult.SUCCESS) {
             //Everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK : Google Play Services is working");
+            //Log.d(TAG, "isServicesOK : Google Play Services is working");
 
             return true;
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //An error occured but we can resolve it
-            Log.d(TAG, "isServicesOK : an error occured but we can fix it");
+            //Log.d(TAG, "isServicesOK : an error occured but we can fix it");
 
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MapsActivity.this, available, ERROR_DIALOG_REQUEST);
             Objects.requireNonNull(dialog).show();
@@ -177,28 +175,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
-    private void init() {
-        //TODO:: CHECK DOCUMENTATION FOR FURTHER ACTION HERE
-    }
 
-
-    //********************\\
+    //*****************************\\
     //  SEARCH ADDRESSES FUNCTIONS  \\
     //*****************************************************************************************************************************
     private void geoLocate() {
-        Log.d(TAG, "geoLocate: geoLocating");
+        //Get Search Input
         String searchString = mSearchText.getText().toString();
 
-        Geocoder geocoder = new Geocoder(MapActivity.this);
+        //Initiate GEOCODER
+        Geocoder geocoder = new Geocoder(this);
+
+        //Container for Address Results
         List<Address> list = new ArrayList<>();
+
         try {
-            list = geocoder.getFromLocationName(searchString, 1);
-            Log.d(TAG, "------------------" + String.valueOf(list));
+            list = geocoder.getFromLocationName(searchString, 1, 0, 0, 0, 0);
+            // list = geocoder.getFromLocationName(searchString, 1);
+            Log.d(TAG, "SEARCH INPUT == " + searchString);
+            Log.d(TAG, "GEOLOCATE DATA == " + list.get(0));
         } catch (IOException e) {
             Log.d(TAG, "geoLocate: IOException: " + e.getMessage());
         }
 
-        if (list.size() > 0) {
+
+        if (!list.isEmpty()) {
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
@@ -207,6 +208,146 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     address.getAddressLine(0));
         }
 
+    }
+
+    private void getDeviceLocation() {
+        Log.d(TAG, "2) getDeviceLocation: getting the devices current location");
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        try {
+            if (mLocationPermissionsGranted) {
+                final Task location = fusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "3) onComplete: found location!");
+                            Location currentLocation = (Location) task.getResult();
+
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM, "My Location");
+                        } else {
+                            Log.d(TAG, "3) onComplete: current location is null");
+                            String str = "unable to get current location";
+                            Toast.makeText(MapsActivity.this, str, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+            }
+
+        } catch (SecurityException e) {
+            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
+        }
+    }
+
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
+        if (!title.equals("My Location")) {
+            MarkerOptions options = new MarkerOptions()
+                    .position(latLng)
+                    .title(title);
+            mMap.addMarker(options);
+        }
+
+        hideSoftKeyboard();
+    }
+
+
+    private void getLocationPermission() {
+        Log.d(TAG, "1) getLocationPermission: getting location permissions");
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mLocationPermissionsGranted = true;
+                initMap();
+            } else {
+                ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, "onRequestPermissionResults: called.");
+        mLocationPermissionsGranted = false;
+
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST_CODE: {
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < grantResults.length; i++) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            mLocationPermissionsGranted = false;
+                            Log.d(TAG, "onRequestPermissionResults: permission failed.");
+                            return;
+                        }
+                    }
+                    Log.d(TAG, "onRequestPermissionResults: permissions granted.");
+                    mLocationPermissionsGranted = true;
+                    //initialize our Map
+                    initMap();
+                }
+            }
+        }
+    }
+
+
+    private void initView() {
+        //FIREBASE
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDB = FirebaseDatabase.getInstance();
+
+        //VIEW
+        mSearchText = findViewById(R.id.input_addresses);
+        mSearchText.setHint(R.string.search_address_1);
+        mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            if (keyEvent != null) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+
+
+                    //execute our method for searching
+                    geoLocate();
+                    mSearchText.getText().clear();
+                    mSearchText.clearFocus();
+                }
+            }
+            return false;
+        });
+
+
+        mGps = (ImageView) findViewById(R.id.ic_gps);
+        mGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClicked: clicked gps icon");
+                getDeviceLocation();
+            }
+        });
+    }
+
+    private void initMap() {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        //mapFragment.newInstance(new GoogleMapOptions().mapId(getResources().getString(R.string.mapId)));
+
+        // Initializes the maps system and the view.
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+    }
+
+    //  HIDE KEYBOARD
+    //************************************
+    private void hideSoftKeyboard() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
 
