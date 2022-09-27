@@ -10,16 +10,21 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
@@ -52,19 +57,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    //VIEW xml
+    private EditText mSearchText;
     private final String TAG = "debug";
 
     //FIREBASE
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDB;
 
-    //  //GOOGLE LOGIN
+    //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
 
@@ -80,9 +89,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
-        //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
-        //   createSignInRequest();
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
@@ -93,6 +99,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (isServicesOK()) {
             init();
         }
+
+        //VIEW
+        mSearchText = (EditText) findViewById(R.id.input_addresses);
+        mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            if (keyEvent != null) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    //execute our method for searching
+                    geoLocate();
+                    mSearchText.getText().clear();
+                    //mSearchText.setText(null);
+                    mSearchText.clearFocus();
+                }
+            }
+            return false;
+        });
+
 
         //CHECK IF User is already Connected
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -120,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-
+        //GET CURRENT LOCATION
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -154,6 +179,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void init() {
         //TODO:: CHECK DOCUMENTATION FOR FURTHER ACTION HERE
+    }
+
+
+    //********************\\
+    //  SEARCH ADDRESSES FUNCTIONS  \\
+    //*****************************************************************************************************************************
+    private void geoLocate() {
+        Log.d(TAG, "geoLocate: geoLocating");
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(MapActivity.this);
+        List<Address> list = new ArrayList<>();
+        try {
+            list = geocoder.getFromLocationName(searchString, 1);
+            Log.d(TAG, "------------------" + String.valueOf(list));
+        } catch (IOException e) {
+            Log.d(TAG, "geoLocate: IOException: " + e.getMessage());
+        }
+
+        if (list.size() > 0) {
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+//            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
+                    address.getAddressLine(0));
+        }
+
     }
 
 
