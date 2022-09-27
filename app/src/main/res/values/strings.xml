@@ -7,7 +7,6 @@
 	<string name="maps_key_alex">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
 	<string name="maps_key_adnan">xxxxx</string>
 
-
 	<string name="empty_value">" "</string>
 
 	<!-- LOGIN LAYOUT -->
@@ -22,7 +21,8 @@
 	<string name="login_google_signup2">" Sign Up!"</string>
 
 
-	<!-- XXXXXX LAYOUT -->
+	<!-- MAPS LAYOUT -->
+	<string name="search_address_1">Entrer votre addresse de départ</string>
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
