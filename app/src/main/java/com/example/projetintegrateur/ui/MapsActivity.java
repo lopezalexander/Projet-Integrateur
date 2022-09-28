@@ -25,6 +25,7 @@ import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.LoginDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,12 +38,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //VIEW xml
     private EditText mSearchText;
     private ImageView mGps;
+
     private final String TAG = "debug";
 
     //FIREBASE
@@ -83,20 +90,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //GET PERMISSION
             getLocationPermission();
 
-
             //SET VIEW BUTTON, FIREBASE, etc
             initView();
+            Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
 
+            setUpPlacesAutocomplete();
 
-            //CHECK IF User is already Connected
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-
-            if (currentUser == null) {
-                LoginDialog loginDialog = new LoginDialog();
-                loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
-            }
+            //CHECK IF User is already Connected or Display Login Dialog
+            checkUserAuth();
         }
+    }
 
+    private void checkUserAuth() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser == null) {
+            LoginDialog loginDialog = new LoginDialog();
+            loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
+        }
     }
 
     //********************\\
@@ -127,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
+            //GET CURRENT LOCATION
             getDeviceLocation();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -141,15 +153,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.getUiSettings().isCompassEnabled();
             mMap.getUiSettings().isRotateGesturesEnabled();
         }
-
-
-        //GET CURRENT LOCATION
-        // Add a marker in Sydney and move the camera
-//        LatLng montreal = new LatLng(45.5019, -73.5674);
-//        mMap.addMarker(new MarkerOptions().position(montreal).title("Marker in Montreal"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(montreal));
-
-
     }
 
     // Verify if Google Play Service are installed, if not, request to install Google Play Service
@@ -190,10 +193,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Address> list = new ArrayList<>();
 
         try {
-            list = geocoder.getFromLocationName(searchString, 1, 0, 0, 0, 0);
-            // list = geocoder.getFromLocationName(searchString, 1);
-            Log.d(TAG, "SEARCH INPUT == " + searchString);
-            Log.d(TAG, "GEOLOCATE DATA == " + list.get(0));
+            list = geocoder.getFromLocationName(searchString, 1);
         } catch (IOException e) {
             Log.d(TAG, "geoLocate: IOException: " + e.getMessage());
         }
@@ -249,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .position(latLng)
                     .title(title);
             mMap.addMarker(options);
+
         }
 
         hideSoftKeyboard();
@@ -305,6 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //VIEW
         mSearchText = findViewById(R.id.input_addresses);
         mSearchText.setHint(R.string.search_address_1);
+
         mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (keyEvent != null) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH
@@ -342,6 +344,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+    }
+
+
+    private void setUpPlacesAutocomplete() {
+        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        // Specify the types of place data to return.
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        // Set up a PlaceSelectionListener to handle the response.
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                // TODO: Get info about the selected place.
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+            }
+
+
+            @Override
+            public void onError(@NonNull Status status) {
+                // TODO: Handle the error.
+                Log.i(TAG, "An error occurred: " + status);
+            }
+        });
     }
 
     //  HIDE KEYBOARD

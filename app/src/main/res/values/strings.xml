@@ -5,7 +5,7 @@
 	<string name="mapId">f98f922f818fe560</string>
 
 	<string name="maps_key_alex">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
-	<string name="maps_key_adnan">xxxxx</string>
+	<string name="maps_key_adnan">AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY</string>
 
 	<string name="empty_value">" "</string>
 
@@ -23,7 +23,6 @@
 
 	<!-- MAPS LAYOUT -->
 	<string name="search_address_1">Entrer votre addresse de départ</string>
-	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
