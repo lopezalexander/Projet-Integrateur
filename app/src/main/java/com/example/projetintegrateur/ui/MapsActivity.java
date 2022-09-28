@@ -92,7 +92,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //SET VIEW BUTTON, FIREBASE, etc
             initView();
-            Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
 
             setUpPlacesAutocomplete();
 
@@ -255,7 +254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         hideSoftKeyboard();
     }
 
-
     private void getLocationPermission() {
         Log.d(TAG, "1) getLocationPermission: getting location permissions");
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -299,6 +297,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void initView() {
+
+        //INITIALIZE PLACES API
+        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+
         //FIREBASE
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
