@@ -8,8 +8,6 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,13 +22,10 @@ import com.example.projetintegrateur.adapter.LoginDialog;
 import com.example.projetintegrateur.adapter.PlaceAutoCompleteAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,20 +41,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
@@ -73,12 +64,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Dynamic List of LatLng from SearchBar
     private ArrayList<LatLng> locationArrayList;
 
+    private ArrayList<Marker> markerArrayList;
+
     //Place API Autocomplete
     AutocompleteSupportFragment autocompleteFragment;
 
     PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
 
-    private GoogleApiClient mGoogleApiClient;
+//    private GoogleApiClient mGoogleApiClient;
 
     //FIREBASE
     private FirebaseAuth mAuth;
@@ -96,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 13.5f;
 
-    private static final  LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40,-168), new LatLng(71,136));
+//    private static final  LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40,-168), new LatLng(71,136));
 
 
     //***********\\
@@ -108,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         locationArrayList = new ArrayList<>();
+        markerArrayList = new ArrayList<Marker>();
 
         if (isServicesOK()) {
             //GET PERMISSION
@@ -228,37 +222,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    //*****************************\\
-    //  SEARCH ADDRESSES FUNCTIONS  \\
-    //*****************************************************************************************************************************
-    private void geoLocate() {
-        //Get Search Input
-        String searchString = mSearchText.getText().toString();
-
-
-        //Initiate GEOCODER
-        Geocoder geocoder = new Geocoder(this);
-
-        //Container for Address Results
-        List<Address> list = new ArrayList<>();
-
-        try {
-            list = geocoder.getFromLocationName(searchString, 1);
-        } catch (IOException e) {
-            Log.d(TAG, "geoLocate: IOException: " + e.getMessage());
-        }
-
-
-        if (!list.isEmpty()) {
-            Address address = list.get(0);
-
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
-                    address.getAddressLine(0));
-        }
-
-    }
+//    //*****************************\\
+//    //  SEARCH ADDRESSES FUNCTIONS  \\
+//    //*****************************************************************************************************************************
+//    private void geoLocate() {
+//        //Get Search Input
+//        String searchString = mSearchText.getText().toString();
+//
+//
+//        //Initiate GEOCODER
+//        Geocoder geocoder = new Geocoder(this);
+//
+//        //Container for Address Results
+//        List<Address> list = new ArrayList<>();
+//
+//        try {
+//            list = geocoder.getFromLocationName(searchString, 1);
+//        } catch (IOException e) {
+//            Log.d(TAG, "geoLocate: IOException: " + e.getMessage());
+//        }
+//
+//
+//        if (!list.isEmpty()) {
+//            Address address = list.get(0);
+//
+//            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+//            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+//            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
+//                    address.getAddressLine(0));
+//        }
+//
+//    }
 
     private void getDeviceLocation() {
         Log.d(TAG, "2) getDeviceLocation: getting the devices current location");
@@ -273,8 +267,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             Log.d(TAG, "3) onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
-
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM, "My Location");
+                            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                            moveCamera(latLng, DEFAULT_ZOOM);
                         } else {
                             Log.d(TAG, "3) onComplete: current location is null");
                             String str = "unable to get current location";
@@ -290,48 +284,92 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title) {
+    private void getDeviceCoordinates() {
+        final LatLng[] latLng = new LatLng[1];
+        Log.d(TAG, "2) getDeviceCoordinates: getting the devices current location");
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        try {
+            if (mLocationPermissionsGranted) {
+                final Task location = fusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "3) onComplete: found location!");
+                        Location currentLocation = (Location) task.getResult();
+                        latLng[0] = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        locationArrayList.add(latLng[0]);
+                        moveCamera(latLng[0], DEFAULT_ZOOM);
+                        addMarker(latLng[0],"Current Location");
+                    } else {
+                        Log.d(TAG, "3) onComplete: current location is null");
+                        String str = "unable to get current location";
+                        Toast.makeText(MapsActivity.this, str, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+        } catch (SecurityException e) {
+            Log.e(TAG, "getDeviceLocation: SecurityException: " + e.getMessage());
+        }
+    }
+
+    private void moveCamera(LatLng latLng, float zoom) {
         Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    }
 
-        if (!title.equals("My Location")) {
-            MarkerOptions options = new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            mMap.addMarker(options);
+    private void addMarker(LatLng latLng ,String title) {
 
-            //onClick Listener pour Supprimer Marker
-            mMap.setOnMarkerClickListener(marker -> {
-                //EFFACER MARKER
-                marker.remove();
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(latLng)
+                .title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
-                //EFFACER le LatLng de la liste
-                for (int i=0; i<locationArrayList.size();i++) {
-                    if (locationArrayList.get(i).equals(marker.getPosition()))    {
-                        locationArrayList.remove(i);
-                    }
-                }
 
-                //REINITIALISER BAR DE RECHERCHE
+        markerArrayList.add(mMap.addMarker(markerOptions));
+
+        autocompleteFragment.setText("");
+
+        //onClick Listener pour Supprimer Marker
+        mMap.setOnMarkerClickListener(marker -> {
+            //EFFACER le LatLng de la liste
+            for (int i=0; i<locationArrayList.size();i++) {
+                System.out.println("---------" + marker.getPosition());
+                System.out.println("---------" + locationArrayList.get(i).toString());
+                locationArrayList.remove(marker.getPosition());
+                markerArrayList.remove(marker);
                 autocompleteFragment.setText("");
+                setHints();
+            }
 
-                //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
-                autocompleteFragment.getView().setVisibility(View.VISIBLE);
+            //EFFACER MARKER
+            marker.remove();
 
-                //SET HINTS
-                if (locationArrayList.size() == 1) {
-                    autocompleteFragment.setHint("Entrez la 2ème addresse");
-                } else if (locationArrayList.size() == 0) {
-                    autocompleteFragment.setHint("Entrez votre addresse");
-                }
+            //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
+            autocompleteFragment.getView().setVisibility(View.VISIBLE);
+            findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
 
-                return false;
-            });
+            if (locationArrayList.isEmpty()) {
+                getDeviceLocation();
+            }
+            return false;
+        });
 
-        }
 
+        setHints();
         hideSoftKeyboard();
+    }
+
+    //SET HINTS
+    private void setHints() {
+        if (locationArrayList.size() == 1) {
+            autocompleteFragment.setHint("Entrez la 2ème addresse");
+        } else if (locationArrayList.size() == 0) {
+            autocompleteFragment.setHint("Entrez votre addresse");
+        } else if (locationArrayList.size() == 2) {
+            autocompleteFragment.getView().setVisibility(View.GONE);
+            findViewById(R.id.ic_gps2).setVisibility(View.GONE);
+        }
     }
 
     private void getLocationPermission() {
@@ -416,6 +454,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
+
+
 //        mGoogleApiClient = Places.getGeoDataClient(this, null);
 
 //        mGoogleApiClient = new GoogleApiClient
@@ -447,8 +487,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Initialize the AutocompleteSupportFragment.
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         // Specify the types of place data to return.
+        assert autocompleteFragment != null;
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
+
+        //SET SPECIFIC COUNTRY BASED SEARCH
+        autocompleteFragment.setCountries("CA","US");
+
+        //SET LOCATION BOUNDS FOR BETTER SEARCH RESULTS
+        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLng(45.508888,-73.561668),
+                new LatLng(45.508888,-73.561668)
+        ));
+
+        ImageView mGps2 = findViewById(R.id.ic_gps2);
+        mGps2.setOnClickListener(view -> {
+            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
+            getDeviceCoordinates();
+            if (locationArrayList.size() == 2) {
+                autocompleteFragment.getView().setVisibility(View.GONE);
+                findViewById(R.id.ic_gps2).setVisibility(View.GONE);
+            }
+        });
 
 
         // Set up a PlaceSelectionListener to handle the response.
@@ -461,11 +523,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 locationArrayList.add(place.getLatLng());
 
                 //CENTRER LA VUE????????
-                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName());
-
-                //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM);
+                addMarker(place.getLatLng(), place.getName());
+//                CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                 if (locationArrayList.size() == 2) {
                     autocompleteFragment.getView().setVisibility(View.GONE);
+                    findViewById(R.id.ic_gps2).setVisibility(View.GONE);
                 }
             }
 

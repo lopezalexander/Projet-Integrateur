@@ -24,41 +24,50 @@
 		android:layout_marginTop="20dp"
 		android:layout_marginRight="25dp"
 		android:background="@color/blue3"
-		android:elevation="10dp"
-		>
+		android:elevation="10dp">
 
-<!--		<ImageView-->
-<!--			android:id="@+id/ic_magnify"-->
-<!--			android:layout_width="35dp"-->
-<!--			android:layout_height="35dp"-->
-<!--			android:layout_centerVertical="true"-->
-<!--			android:layout_marginLeft="10dp"-->
-<!--			android:src="@drawable/ic_magnify_foreground"-->
-<!--			/>-->
+		<!--		<ImageView-->
+		<!--			android:id="@+id/ic_magnify"-->
+		<!--			android:layout_width="35dp"-->
+		<!--			android:layout_height="35dp"-->
+		<!--			android:layout_centerVertical="true"-->
+		<!--			android:layout_marginLeft="10dp"-->
+		<!--			android:src="@drawable/ic_magnify_foreground"-->
+		<!--			/>-->
 
-<!--		<EditText-->
-<!--			android:id="@+id/input_addresses"-->
-<!--			android:layout_width="match_parent"-->
-<!--			android:layout_height="match_parent"-->
-<!--			android:layout_centerVertical="true"-->
-<!--			android:layout_toRightOf="@+id/ic_magnify"-->
-<!--			android:background="@null"-->
-<!--			android:hint="@string/empty_value"-->
-<!--			android:imeOptions="actionDone"-->
-<!--			android:inputType="text"-->
-<!--			android:textColor="@color/blue1"-->
-<!--			android:textColorHint="@color/blue1"-->
-<!--			android:textFontWeight="700"-->
-<!--			android:textSize="17sp"-->
-<!--			/>-->
+		<!--		<EditText-->
+		<!--			android:id="@+id/input_addresses"-->
+		<!--			android:layout_width="match_parent"-->
+		<!--			android:layout_height="match_parent"-->
+		<!--			android:layout_centerVertical="true"-->
+		<!--			android:layout_toRightOf="@+id/ic_magnify"-->
+		<!--			android:background="@null"-->
+		<!--			android:hint="@string/empty_value"-->
+		<!--			android:imeOptions="actionDone"-->
+		<!--			android:inputType="text"-->
+		<!--			android:textColor="@color/blue1"-->
+		<!--			android:textColorHint="@color/blue1"-->
+		<!--			android:textFontWeight="700"-->
+		<!--			android:textSize="17sp"-->
+		<!--			/>-->
 
 
 		<fragment
 			android:id="@+id/autocomplete_fragment"
 			android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			/>
+			android:layout_height="wrap_content" />
+
+		<ImageView
+			android:id="@+id/ic_gps2"
+			android:layout_width="35dp"
+			android:layout_height="35dp"
+			android:layout_marginBottom="9dp"
+			android:layout_marginLeft="33dp"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentBottom="true"
+			android:scaleType="centerCrop"
+			android:src="@drawable/ic_gps_foreground" />
 
 	</RelativeLayout>
 
