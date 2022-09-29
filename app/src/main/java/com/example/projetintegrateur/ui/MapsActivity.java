@@ -13,27 +13,33 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.LoginDialog;
+import com.example.projetintegrateur.adapter.PlaceAutoCompleteAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,13 +52,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.FileDescriptor;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
 
 
     //VIEW xml
@@ -60,6 +69,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageView mGps;
 
     private final String TAG = "debug";
+
+    //Dynamic List of LatLng from SearchBar
+    private ArrayList<LatLng> locationArrayList;
+
+    //Place API Autocomplete
+    AutocompleteSupportFragment autocompleteFragment;
+
+    PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
+
+    private GoogleApiClient mGoogleApiClient;
 
     //FIREBASE
     private FirebaseAuth mAuth;
@@ -75,7 +94,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
-    private static final float DEFAULT_ZOOM = 15f;
+    private static final float DEFAULT_ZOOM = 13.5f;
+
+    private static final  LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40,-168), new LatLng(71,136));
 
 
     //***********\\
@@ -86,6 +107,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        locationArrayList = new ArrayList<>();
+
         if (isServicesOK()) {
             //GET PERMISSION
             getLocationPermission();
@@ -93,10 +116,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //SET VIEW BUTTON, FIREBASE, etc
             initView();
 
+            //GET CURRENT LOCATION
+            getDeviceLocation();
+
             setUpPlacesAutocomplete();
 
             //CHECK IF User is already Connected or Display Login Dialog
-            checkUserAuth();
+//            checkUserAuth();
+
         }
     }
 
@@ -137,8 +164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
-            //GET CURRENT LOCATION
-            getDeviceLocation();
+
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
@@ -151,6 +177,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
             mMap.getUiSettings().isCompassEnabled();
             mMap.getUiSettings().isRotateGesturesEnabled();
+
+        }
+
+        for (int i = 0; i < locationArrayList.size(); i++) {
+
+            // below line is use to add marker to each location of our array list.
+            mMap.addMarker(new MarkerOptions().position(locationArrayList.get(i)).title("Marker"));
+
+//            // below lin is use to zoom our camera on map.
+//            mMap.animateCamera(CameraUpdateFactory.zoomTo(18.0f));
+//
+//            // below line is use to move our camera to the specific location.
+//            mMap.moveCamera(CameraUpdateFactory.newLatLng(locationArrayList.get(i)));
+        }
+
+        if (!locationArrayList.isEmpty()) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            LatLng position;
+            for (int i = 0; i < locationArrayList.size(); i++) {
+                position = locationArrayList.get(i);
+                builder.include(new LatLng(position.latitude, position.longitude));
+            }
+            LatLngBounds bounds = builder.build();
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 15));
         }
     }
 
@@ -185,6 +235,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Get Search Input
         String searchString = mSearchText.getText().toString();
 
+
         //Initiate GEOCODER
         Geocoder geocoder = new Geocoder(this);
 
@@ -202,7 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
-//            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
                     address.getAddressLine(0));
         }
@@ -246,8 +297,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!title.equals("My Location")) {
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
-                    .title(title);
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             mMap.addMarker(options);
+
+            //onClick Listener pour Supprimer Marker
+            mMap.setOnMarkerClickListener(marker -> {
+                //EFFACER MARKER
+                marker.remove();
+
+                //EFFACER le LatLng de la liste
+                for (int i=0; i<locationArrayList.size();i++) {
+                    if (locationArrayList.get(i).equals(marker.getPosition()))    {
+                        locationArrayList.remove(i);
+                    }
+                }
+
+                //REINITIALISER BAR DE RECHERCHE
+                autocompleteFragment.setText("");
+
+                //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
+                autocompleteFragment.getView().setVisibility(View.VISIBLE);
+
+                //SET HINTS
+                if (locationArrayList.size() == 1) {
+                    autocompleteFragment.setHint("Entrez la 2ème addresse");
+                } else if (locationArrayList.size() == 0) {
+                    autocompleteFragment.setHint("Entrez votre addresse");
+                }
+
+                return false;
+            });
 
         }
 
@@ -299,32 +379,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initView() {
 
         //INITIALIZE PLACES API
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), "AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY");
 
         //FIREBASE
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
         //VIEW
-        mSearchText = findViewById(R.id.input_addresses);
-        mSearchText.setHint(R.string.search_address_1);
-
-        mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-            if (keyEvent != null) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-
-
-                    //execute our method for searching
-                    geoLocate();
-                    mSearchText.getText().clear();
-                    mSearchText.clearFocus();
-                }
-            }
-            return false;
-        });
+//        mSearchText = findViewById(R.id.input_addresses);
+//        mSearchText.setHint(R.string.search_address_1)
+//        mSearchText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+//            if (keyEvent != null) {
+//                if (actionId == EditorInfo.IME_ACTION_SEARCH
+//                        || actionId == EditorInfo.IME_ACTION_DONE
+//                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+//                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+//
+//
+//                    //execute our method for searching
+//                    geoLocate();
+//                    mSearchText.getText().clear();
+//                    mSearchText.clearFocus();
+//                }
+//            }
+//            return false;
+//        });
 
 
         mGps = (ImageView) findViewById(R.id.ic_gps);
@@ -335,6 +414,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getDeviceLocation();
             }
         });
+
+
+//        mGoogleApiClient = Places.getGeoDataClient(this, null);
+
+//        mGoogleApiClient = new GoogleApiClient
+//                .Builder(this)
+//                .addApi(Places.GEO_DATA_API)
+//                .addApi(Places.PLACE_DETECTION_API)
+//                .enableAutoManage(this, this)
+//                .build();
+//
+//        placeAutoCompleteAdapter = new PlaceAutoCompleteAdapter(this, mGoogleApiClient ,LAT_LNG_BOUNDS,null);
+
     }
 
     private void initMap() {
@@ -353,15 +445,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
 
         // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+        autocompleteFragment.setHint(getString(R.string.search_address_1));
+
+
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                // TODO: Get info about the selected place.
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+
+                //AJOUTER LES COORDONNEES DANS LA LISTE DES LatLng
+                locationArrayList.add(place.getLatLng());
+
+                //CENTRER LA VUE????????
+                moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName());
+
+                //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
+                if (locationArrayList.size() == 2) {
+                    autocompleteFragment.getView().setVisibility(View.GONE);
+                }
             }
 
 
@@ -370,7 +475,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
+
+
         });
+
     }
 
     //  HIDE KEYBOARD
@@ -380,4 +488,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }
