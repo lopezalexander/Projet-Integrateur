@@ -22,8 +22,11 @@
 
 
 	<!-- MAPS LAYOUT -->
-	<string name="search_address_1">Entrer votre addresse</string>
-	<!-- XXXXXX LAYOUT -->
+<string name="search_address_1">Entrer votre addresse</string>
+	<string name="restaurants">Restaurants</string>
+	<string name="bars">Bars</string>
+	<string name="caf_s">Cafés</string>
+	<string name="disco">Disco</string><!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
