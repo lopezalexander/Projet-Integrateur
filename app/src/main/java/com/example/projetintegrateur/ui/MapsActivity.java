@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,7 +21,6 @@ import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.LoginDialog;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
@@ -32,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -61,10 +62,8 @@ import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -78,10 +77,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Place API Autocomplete
     AutocompleteSupportFragment autocompleteFragment;
 
-
     //FIREBASE
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDB;
+
+    //SEARCH VARIABLE, NEEDED TO STORE IN DB 
+    LatLng midPointLatLng;
+    LatLng origintLatLng;
+    LatLng destinationLatLng;
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -259,20 +262,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //
     //
-    //  DRAW THE POLYLINE BETWEEN TWO LOCATION/COORDINATE
+    //  FIND THE MIDDLE DISTANCE POINT FOR THE SEARCH ADDRESSES
     //*****************************************************************************************************************************
-    private void drawPolyline() throws IOException {
+    private void findMiddleDistancePoint() throws IOException {
 
-        LatLng origin = locationArrayList.get(0);
-        double originLat = origin.latitude;
-        double originLng = origin.longitude;
-        String originCoordinate = originLat + "," + originLng;
+        //SET ORIGIN STRING
+        origintLatLng = locationArrayList.get(0);
+        String originCoordinate = origintLatLng.latitude + "," + origintLatLng.longitude;
 
-        LatLng destination = locationArrayList.get(1);
-        double destinationLat = destination.latitude;
-        double destinationLng = destination.longitude;
-        String destinationCoordinate = destinationLat + "," + destinationLng;
 
+        //SET DESTINATION STRING
+        destinationLatLng = locationArrayList.get(1);
+        String destinationCoordinate = destinationLatLng.latitude + "," + destinationLatLng.longitude;
+
+
+        //SET URL STRING
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
@@ -281,18 +285,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .appendQueryParameter("key", getString(R.string.maps_key_alex))
                 .toString();
 
-        //LOGS+++++++++++++++++++++++++++++++++++++++++++++
-//        for (LatLng unique : locationArrayList) {
-//            Log.d("coord", "======COORDONNEE=====");
-//            Log.d("coord", String.valueOf(unique.latitude));
-//            Log.d("coord", String.valueOf(unique.longitude));
-//        }
-//        Log.d("coord", "origin ==> " + origin.toString());
-//        Log.d("coord", "destination ==> " + destination.toString());
-//        Log.d("coord", url);
 
-        //LOGS+++++++++++++++++++++++++++++++++++++++++++++
-
+        //MAKE THE REQUEST TO DIRECTION API
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
@@ -301,17 +295,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .method("GET", null)
                 .build();
 
+        //HANDLE THE RESPONSE IN THIS CALLBACK()
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-            }
-
-            @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
                 if (response.isSuccessful()) {
-
                     try {
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
@@ -322,71 +310,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         JSONArray stepssArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
 
                         //EXTRACT DISTANCES BETWEEN ORIGIN/DESTINATION AND POYLINE STRING
-                        int distance_value = legsArray.getJSONObject(0).getJSONObject("distance").getInt("value");
+                        int total_distance_value = legsArray.getJSONObject(0).getJSONObject("distance").getInt("value");
                         String polyline = routeObject.getJSONObject("overview_polyline").getString("points");
 
-//                        Log.d("test", "------******[  ROUTE  ]*****--------");
-//                        Log.d("test", "POLYLINE ====> " + polyline);
-//                        Log.d("test", "-");
-//
-//                        Log.d("test", "------******[  LEGS  ]*****--------");
-//                        Log.d("test", "DISTANCE KM ====> " + distance);
-//                        Log.d("test", "DISTANCE VALUE ====> " + String.valueOf(distance_value));
-//                        Log.d("test", "DISTANCE MIDPOINT ====> " + String.valueOf(distance_value / 2));
-//                        Log.d("test", "-");
-//                        Log.d("test", "------******[  STEPS  ]*****--------");
-
+                        //SET COUNTER TO IDENTIFY INDEX OF THE STEPS WE NEED THE DATA
                         int distanceCounter = 0;
-//                        Log.d("test", "ARRAY LENGTH-------- " + String.valueOf(stepssArray.length()));
+                        boolean notPassed = true;
 
+
+                        //ITERATE THROUGH
                         for (int i = 0; i < stepssArray.length(); i++) {
-//                            Log.d("test", "===[ " + i + " ]===");
-                            String step_distance_temp = stepssArray.getJSONObject(i).getJSONObject("distance").getString("text");
-                            int step_distance_value_temp = stepssArray.getJSONObject(i).getJSONObject("distance").getInt("value");
-                            distanceCounter += step_distance_value_temp;
-//
-//                            Log.d("test", "DISTANCE KM ====> " + step_distance_temp);
-//                            Log.d("test", "DISTANCE VALUE ====> " + String.valueOf(distance_value));
-//                            Log.d("test", "DISTANCE VALUE ====> " + String.valueOf(distanceCounter) + "  //  " + distance_value / 2);
+                            //GET DISTANCE OF STEPS, THIS WILL BE THE INDEX AT WHICH IT WILL BE OVER THE MIDDLE DISTANCE POINT
+                            int step_distance_value_over = stepssArray.getJSONObject(i).getJSONObject("distance").getInt("value");
 
-                            if (distanceCounter >= distance_value / 2) {
-//                                Log.d("test", "-------PASSED MID POINT-------");
-//                                Log.d("test", "Index ==> " + i);
-                                double lat = stepssArray.getJSONObject(i).getJSONObject("start_location").getInt("lat");
-                                double lng = stepssArray.getJSONObject(i).getJSONObject("start_location").getInt("lng");
+                            //ADD DISTANCE TO THE COUNTER TO VERIFY AGAINST TOTAL DISTANCE OF ROUTE
+                            distanceCounter += step_distance_value_over;
 
-//                                Log.d("test", "DISTANCE VALUE ====> " + String.valueOf(distance_value));
-//                                Log.d("test", "DISTANCE VALUE ====> " + String.valueOf(distanceCounter));
-//                                Log.d("test", "LatLng         ====> " + String.valueOf(lat) + "," + String.valueOf(lng));
 
-                            }
-                        }
+                            //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
+                            if ((distanceCounter >= total_distance_value / 2) && notPassed) {
+                                //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
+                                double latOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lat");
+                                double lngOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lng");
 
-                        MapsActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                //Handle UI here
-                                List<LatLng> polylineList = PolyUtil.decode(polyline);
-                                Polyline polyline1 = mMap.addPolyline(new PolylineOptions()
-                                        .clickable(true)
-                                        .width(10)
-                                        .addAll(polylineList));
-                            }
+                                //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
+                                double latAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lat");
+                                double lngAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lng");
+
+                                //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
+                                LatLng start_mid_point = new LatLng(latOver, lngOver);
+                                LatLng end_mid_point = new LatLng(latAfter, lngAfter);
+
+                                //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
+                                midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+
+                                //WE FOUND THE MIDDLE POINT, SET TO FALSE TO NOT ENTER THE IF() AGAIN
+                                notPassed = false;
+                            }//END FORLOOP CHECK DISTANCE
+                        }//END ITERATE THROUGH STEPS
+
+
+                        //CREATE A Runnable, TO GET INTO THE MAIN THREAD TO HANDLE UI CHANGES 
+                        MapsActivity.this.runOnUiThread(() -> {
+                            //DECODE POLYLINE
+                            List<LatLng> polylineList = PolyUtil.decode(polyline);
+
+                            //DRAW POLYLINE ON MAP
+                            mMap.addPolyline(new PolylineOptions()
+                                    .clickable(true)
+                                    .width(10)
+                                    .addAll(polylineList));
+
+                            //ADD MIDDLE DISTANCE POINT MARKER
+                            addMarker(midPointLatLng, "MidPoint_Fine");
                         });
-
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-                    //mMap.addPolyline()
                 }
-
-
             }
-        });
 
-
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            }
+        }); //END  [REQUEST-RESPONSE]
     }
 
 
@@ -406,6 +393,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //
     //  GETS CALLED WHEN MAP IS READY TO BE LOADED
     //*****************************************************************************************************************************
+
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         //Instantiate GoogleMap
@@ -442,57 +431,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET onClickListener on Map Markers
         //*************************************************************************************************
         mMap.setOnMarkerClickListener(marker -> {
+            //EFFACER le LatLng de la liste
             for (int i = 0; i < locationArrayList.size(); i++) {
-                //REMOVE LatLng entry from locationArrayList && REMOVE Marker from markerArrayList
+                System.out.println("---------" + marker.getPosition());
+                System.out.println("---------" + locationArrayList.get(i).toString());
                 locationArrayList.remove(marker.getPosition());
                 markerArrayList.remove(marker);
-
-                //CLEAR SearchBar text
                 autocompleteFragment.setText("");
-
-                //Set the SearchBar hint accordingly to
                 setHints();
             }
 
-            //REMOVE MARKER
+            //EFFACER MARKER
             marker.remove();
 
             //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
             autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+            findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
 
-            //IF THE locationArrayList is empty, recenter to the user current location
             if (locationArrayList.isEmpty()) {
                 getCurrentLocation();
             }
             return false;
         });
-
-
-//        for (int i = 0; i < locationArrayList.size(); i++) {
-//            // below line is use to add marker to each location of our array list.
-//            Log.d(TAG, locationArrayList.get(1).toString());
-//            mMap.addMarker(new MarkerOptions().position(locationArrayList.get(i)).title("Marker"));
-//
-////            // below lin is use to zoom our camera on map.
-////            mMap.animateCamera(CameraUpdateFactory.zoomTo(18.0f));
-////
-////            // below line is use to move our camera to the specific location.
-////            mMap.moveCamera(CameraUpdateFactory.newLatLng(locationArrayList.get(i)));
-//        }
-
-//        if (!locationArrayList.isEmpty()) {
-//            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//            LatLng position;
-//            for (int i = 0; i < locationArrayList.size(); i++) {
-//                position = locationArrayList.get(i);
-//                builder.include(new LatLng(position.latitude, position.longitude));
-//            }
-//            LatLngBounds bounds = builder.build();
-//            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 15));
-//        }
-
-
     }
 
     //
@@ -500,17 +460,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Verify if Google Play Service are installed, if not, request to install Google Play Service
     //*****************************************************************************************************************************
     public boolean isServicesOK() {
-        //Log.d("TAG", "isServicesOK : checking google services version");
+        Log.d("TAG", "isServicesOK : checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MapsActivity.this);
 
         if (available == ConnectionResult.SUCCESS) {
             //Everything is fine and the user can make map requests
-            //Log.d(TAG, "isServicesOK : Google Play Services is working");
+            Log.d(TAG, "isServicesOK : Google Play Services is working");
             return true;
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //An error occured but we can resolve it
-            //Log.d(TAG, "isServicesOK : an error occured but we can fix it");
+            Log.d(TAG, "isServicesOK : an error occured but we can fix it");
 
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MapsActivity.this, available, ERROR_DIALOG_REQUEST);
             Objects.requireNonNull(dialog).show();
@@ -623,30 +583,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     autocompleteFragment.requireView().setVisibility(View.GONE);
                     btn_SearchBar_GPS.setVisibility(View.GONE);
 
-
-                    //TODO:: GET COORDINATE AND DRAW A POLYLINE
+                    //INITIATE LOGIC FOR SEARCH RESULTS
                     try {
-                        drawPolyline();
+                        //FIND MIDDLE DISTANCE POINT
+                        findMiddleDistancePoint();
+
+                        //QUERY LIST OF AVENUES AROUND MIDDLE DISTANCE POINT
+
+                        //SHOW RESULT IN LISTvIEW
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    //TODO:: GET THE DISTANCE AND DIVIDE BY TWO
-
-
                 }
             }
-
 
             @Override
             public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
-
-
         });
-
     }
 
 
