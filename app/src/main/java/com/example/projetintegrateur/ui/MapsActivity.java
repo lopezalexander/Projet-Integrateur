@@ -9,6 +9,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,12 @@ import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.LoginDialog;
+import com.example.projetintegrateur.model.DirectionResponse;
+import com.example.projetintegrateur.model.directionAPI.Leg;
+import com.example.projetintegrateur.model.directionAPI.Route;
+import com.example.projetintegrateur.model.directionAPI.Step;
+import com.example.projetintegrateur.model.NearbyBusiness;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
@@ -31,13 +38,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -85,6 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng midPointLatLng;
     LatLng origintLatLng;
     LatLng destinationLatLng;
+    ArrayList<NearbyBusiness> allBusinessList;
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -101,6 +110,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //VIEW
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
+
+    //UTILS
+    ObjectMapper mapper;
 
 
     //***********\\
@@ -150,12 +162,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*********************\\
     //  MAP FUNCTIONS       \\
     //******************************************************************************************************************************************************************************
+
     //
     //
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
+//        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -163,7 +176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 final Task<Location> location = fusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, "3) onComplete: found location!");
+//                        Log.d(TAG, "3) onComplete: found location!");
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
@@ -174,7 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //MoveCamera to LatLng
                         moveCamera(latLng, DEFAULT_ZOOM);
                     } else {
-                        Log.d(TAG, "3) onComplete: current location is null");
+//                        Log.d(TAG, "3) onComplete: current location is null");
                         String err = "unable to get current location";
                         Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
                     }
@@ -192,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void getSearchBarCurrentLocation() {
         final LatLng[] latLng = new LatLng[1];
-        Log.d(TAG, "2.B) getDeviceCoordinates: getting the devices current location FROM SEARCH BAR GPS BUTTON");
+//        Log.d(TAG, "2.B) getDeviceCoordinates: getting the devices current location FROM SEARCH BAR GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -200,7 +213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 final Task<Location> location = fusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, "3) onComplete: found location!");
+//                        Log.d(TAG, "3) onComplete: found location!");
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
@@ -215,7 +228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         moveCamera(latLng[0], DEFAULT_ZOOM);
                         addMarker(latLng[0], "Current Location");
                     } else {
-                        Log.d(TAG, "3) onComplete: current location is null");
+//                        Log.d(TAG, "3) onComplete: current location is null");
                         String err = "unable to get current location";
                         Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
                     }
@@ -232,7 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  MOVE CAMERO TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void moveCamera(LatLng latLng, float zoom) {
-        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
+//        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
@@ -259,7 +272,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         hideSoftKeyboard();
     }
 
-
     //
     //
     //  FIND THE MIDDLE DISTANCE POINT FOR THE SEARCH ADDRESSES
@@ -276,7 +288,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String destinationCoordinate = destinationLatLng.latitude + "," + destinationLatLng.longitude;
 
 
-        //SET URL STRING
+        //BUILD URL STRING
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
@@ -304,14 +316,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
+                        //TRANSFORM OUR JSON RESPONSE TO AN DirectionResponse Object, which we can use later if needed and easier to traverse
+                        DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
+
                         //EXTRACT ROUTE OBJECT -- LEGS ARRAY -- STEPS ARRAY
-                        JSONObject routeObject = resultJSON.getJSONArray("routes").getJSONObject(0);
-                        JSONArray legsArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs");
-                        JSONArray stepssArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
+//                        JSONObject routeObject = resultJSON.getJSONArray("routes").getJSONObject(0);
+                        Route routeObject = directionResponseObject.getRoutes().get(0);
+//                        JSONArray legsArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs");
+                        Leg legsArray = routeObject.getLegs().get(0);
+//                        JSONArray stepssArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
+                        ArrayList<Step> stepssArray = legsArray.getSteps();
+
 
                         //EXTRACT DISTANCES BETWEEN ORIGIN/DESTINATION AND POYLINE STRING
-                        int total_distance_value = legsArray.getJSONObject(0).getJSONObject("distance").getInt("value");
-                        String polyline = routeObject.getJSONObject("overview_polyline").getString("points");
+//                        int total_distance_value = legsArray.getJSONObject(0).getJSONObject("distance").getInt("value");
+                        int total_distance_value = legsArray.getDistance().getValue();
+//                        String polyline = routeObject.getJSONObject("overview_polyline").getString("points");
+                        String polyline = routeObject.getOverview_polyline().getPoints();
 
                         //SET COUNTER TO IDENTIFY INDEX OF THE STEPS WE NEED THE DATA
                         int distanceCounter = 0;
@@ -319,9 +340,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                         //ITERATE THROUGH
-                        for (int i = 0; i < stepssArray.length(); i++) {
+                        for (int i = 0; i < stepssArray.size(); i++) {
                             //GET DISTANCE OF STEPS, THIS WILL BE THE INDEX AT WHICH IT WILL BE OVER THE MIDDLE DISTANCE POINT
-                            int step_distance_value_over = stepssArray.getJSONObject(i).getJSONObject("distance").getInt("value");
+//                            int step_distance_value_over = stepssArray.getJSONObject(i).getJSONObject("distance").getInt("value");
+                            int step_distance_value_over = stepssArray.get(i).getDistance().getValue();
 
                             //ADD DISTANCE TO THE COUNTER TO VERIFY AGAINST TOTAL DISTANCE OF ROUTE
                             distanceCounter += step_distance_value_over;
@@ -330,12 +352,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
                             if ((distanceCounter >= total_distance_value / 2) && notPassed) {
                                 //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
-                                double latOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lat");
-                                double lngOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lng");
+//                                double latOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lat");
+                                double latOver = stepssArray.get(i).getStart_location().getLat();
+//                                double lngOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lng");
+                                double lngOver = stepssArray.get(i).getStart_location().getLng();
 
                                 //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
-                                double latAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lat");
-                                double lngAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lng");
+//                                double latAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lat");
+                                double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
+//                                double lngAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lng");
+                                double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
 
                                 //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
                                 LatLng start_mid_point = new LatLng(latOver, lngOver);
@@ -363,7 +389,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //ADD MIDDLE DISTANCE POINT MARKER
                             addMarker(midPointLatLng, "MidPoint_Fine");
+
+                            //ADD CIRCLE AROUND MIDPOINT
+                            Circle circle = mMap.addCircle(new CircleOptions()
+                                    .center(midPointLatLng)
+                                    .radius(1000)
+                                    .strokeColor(Color.CYAN));
+                            circle.setVisible(true);
+
+                            //MOVE THE CAMERA ONTO THE MIDPOINT
+                            moveCamera(midPointLatLng, 14);
                         });
+
+                        //QUERY LIST OF AVENUES AROUND MIDDLE DISTANCE POINT
+                        getNearbyBusiness();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -379,6 +419,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //
     //
+    //  FIND THE MIDDLE POINT PLACE_ID
+    //*****************************************************************************************************************************
+    private void getNearbyBusiness() {
+        //BUILD URL STRING
+        String midPointLatLng_String = midPointLatLng.latitude + "," + midPointLatLng.longitude;
+        String url = Uri.parse("https://maps.googleapis.com/maps/api/place/nearbysearch/json")
+                .buildUpon()
+                .appendQueryParameter("location", midPointLatLng_String)
+                .appendQueryParameter("radius", "1000")
+                .appendQueryParameter("type", "restaurant")
+                .appendQueryParameter("key", getString(R.string.maps_key_alex))
+                .toString();
+
+
+        //MAKE THE REQUEST TO DIRECTION API
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+
+        //HANDLE THE RESPONSE IN THIS CALLBACK()
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        //CREATE JSON OBJECT WITH RESPONSE
+                        JSONObject respJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
+
+                        //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
+                        JSONArray results = respJSON.getJSONArray("results");
+
+                        //INSTANTIATE OUR ARRAYLIST OF Nearby Business
+                        allBusinessList = new ArrayList<>();
+
+                        //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
+                        for (int i = 0; i < results.length(); i++) {
+                            NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
+                            allBusinessList.add(uniqueBusinnes);
+                        }
+                        //TODO:: CREATE BUSINESS LISTVIEW DIALOG HERE
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+        });
+
+    }
+
+    //
+    //
     //
     //
     //
@@ -389,11 +490,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************\\
     //      SETUP FUNCTIONS         \\
     //******************************************************************************************************************************************************************************
+
     //
     //
     //  GETS CALLED WHEN MAP IS READY TO BE LOADED
     //*****************************************************************************************************************************
-
     @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -460,17 +561,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Verify if Google Play Service are installed, if not, request to install Google Play Service
     //*****************************************************************************************************************************
     public boolean isServicesOK() {
-        Log.d("TAG", "isServicesOK : checking google services version");
+//        Log.d("TAG", "isServicesOK : checking google services version");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MapsActivity.this);
 
         if (available == ConnectionResult.SUCCESS) {
             //Everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK : Google Play Services is working");
+//            Log.d(TAG, "isServicesOK : Google Play Services is working");
             return true;
         } else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)) {
             //An error occured but we can resolve it
-            Log.d(TAG, "isServicesOK : an error occured but we can fix it");
+//            Log.d(TAG, "isServicesOK : an error occured but we can fix it");
 
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MapsActivity.this, available, ERROR_DIALOG_REQUEST);
             Objects.requireNonNull(dialog).show();
@@ -495,11 +596,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
+        //UTILS --> ObjectMapper to Map JSON response to Model Class
+        //*************************************************************************************************
+        mapper = new ObjectMapper();
+
 
         // SET OnClickListener to MAP_GPS Button to center on CurrentLocation
         //*************************************************************************************************
         btn_MapCurrentLocation_GPS.setOnClickListener(view -> {
-            Log.d(TAG, "onClicked: clicked gps icon");
+//            Log.d(TAG, "onClicked: clicked gps icon");
             //Center to CurrentLocation
             getCurrentLocation();
         });
@@ -508,7 +613,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //*************************************************************************************************
 
         btn_SearchBar_GPS.setOnClickListener(view -> {
-            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
+//            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
 
             //Add marker on CurrentLocation
             getSearchBarCurrentLocation();
@@ -568,7 +673,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+                //Log.d(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
 
                 //AJOUTER LES COORDONNEES DANS LA LISTE DES LatLng
                 locationArrayList.add(place.getLatLng());
@@ -588,7 +693,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //FIND MIDDLE DISTANCE POINT
                         findMiddleDistancePoint();
 
-                        //QUERY LIST OF AVENUES AROUND MIDDLE DISTANCE POINT
 
                         //SHOW RESULT IN LISTvIEW
 
@@ -601,7 +705,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onError(@NonNull Status status) {
                 // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
+//                Log.d(TAG, "An error occurred: " + status);
             }
         });
     }
@@ -619,6 +723,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************\\
     //      PERMISSIONS CODE        \\
     //******************************************************************************************************************************************************************************
+
     //
     //
     //  CHECK IF DEVICE HAVE FINE/COARSE LOCATION PERMISSIONS
@@ -645,7 +750,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, "onRequestPermissionResults: called.");
+//        Log.d(TAG, "onRequestPermissionResults: called.");
         mLocationPermissionsGranted = false;
 
         switch (requestCode) {
@@ -656,7 +761,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     for (int grantResult : grantResults) {
                         if (grantResult != PackageManager.PERMISSION_GRANTED) {
                             mLocationPermissionsGranted = false;
-                            Log.d(TAG, "onRequestPermissionResults: permission failed.");
+//                            Log.d(TAG, "onRequestPermissionResults: permission failed.");
                             return;
                         }
                     }
@@ -682,6 +787,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************\\
     //      UTILITY FUNCTIONS         \\
     //******************************************************************************************************************************************************************************
+
     //
     //
     //  CHECK IF USER IS CONNECTED ALREADY, IF NOT, SHOW LOGIN DIALOG
