@@ -320,18 +320,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
                         //EXTRACT ROUTE OBJECT -- LEGS ARRAY -- STEPS ARRAY
-//                        JSONObject routeObject = resultJSON.getJSONArray("routes").getJSONObject(0);
                         Route routeObject = directionResponseObject.getRoutes().get(0);
-//                        JSONArray legsArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs");
                         Leg legsArray = routeObject.getLegs().get(0);
-//                        JSONArray stepssArray = resultJSON.getJSONArray("routes").getJSONObject(0).getJSONArray("legs").getJSONObject(0).getJSONArray("steps");
                         ArrayList<Step> stepssArray = legsArray.getSteps();
 
 
                         //EXTRACT DISTANCES BETWEEN ORIGIN/DESTINATION AND POYLINE STRING
-//                        int total_distance_value = legsArray.getJSONObject(0).getJSONObject("distance").getInt("value");
                         int total_distance_value = legsArray.getDistance().getValue();
-//                        String polyline = routeObject.getJSONObject("overview_polyline").getString("points");
                         String polyline = routeObject.getOverview_polyline().getPoints();
 
                         //SET COUNTER TO IDENTIFY INDEX OF THE STEPS WE NEED THE DATA
@@ -342,7 +337,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //ITERATE THROUGH
                         for (int i = 0; i < stepssArray.size(); i++) {
                             //GET DISTANCE OF STEPS, THIS WILL BE THE INDEX AT WHICH IT WILL BE OVER THE MIDDLE DISTANCE POINT
-//                            int step_distance_value_over = stepssArray.getJSONObject(i).getJSONObject("distance").getInt("value");
                             int step_distance_value_over = stepssArray.get(i).getDistance().getValue();
 
                             //ADD DISTANCE TO THE COUNTER TO VERIFY AGAINST TOTAL DISTANCE OF ROUTE
@@ -352,15 +346,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
                             if ((distanceCounter >= total_distance_value / 2) && notPassed) {
                                 //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
-//                                double latOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lat");
                                 double latOver = stepssArray.get(i).getStart_location().getLat();
-//                                double lngOver = stepssArray.getJSONObject(i).getJSONObject("start_location").getDouble("lng");
                                 double lngOver = stepssArray.get(i).getStart_location().getLng();
 
                                 //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
-//                                double latAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lat");
                                 double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
-//                                double lngAfter = stepssArray.getJSONObject(i + 1).getJSONObject("start_location").getDouble("lng");
                                 double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
 
                                 //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
@@ -692,10 +682,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     try {
                         //FIND MIDDLE DISTANCE POINT
                         findMiddleDistancePoint();
-
-
-                        //SHOW RESULT IN LISTvIEW
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
