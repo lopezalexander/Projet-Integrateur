@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -579,7 +580,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //INITIALIZE PLACES API
         //*************************************************************************************************
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), "AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY");
 
         //FIREBASE
         //*************************************************************************************************
@@ -615,6 +616,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        ImageView profil = findViewById(R.id.ic_perso);
+        profil.setOnClickListener(view -> {
+            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+            MapsActivity.this.startActivity(intent);
+        });
+
 
     }
 
@@ -637,7 +644,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  SET THE AUTOCOMPLETE FOR THE SEARCHBAR
     //*****************************************************************************************************************************
     private void setUpPlacesAutocomplete() {
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), "AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY");
 
         // Initialize the AutocompleteSupportFragment.
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
