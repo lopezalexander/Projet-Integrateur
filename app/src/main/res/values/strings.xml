@@ -1,37 +1,41 @@
 <resources>
-	<!-- GENERAL STRING  -->
-	<string name="app_name">MidWay</string>
-	<string name="title_activity_maps">MapsActivity</string>
-	<string name="mapId">f98f922f818fe560</string>
+    <!-- GENERAL STRING  -->
+    <string name="app_name">MidWay</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="mapId">f98f922f818fe560</string>
 
-	<string name="maps_key_alex">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
-	<string name="maps_key_adnan">xxxxx</string>
-
-
-	<string name="empty_value">" "</string>
-
-	<!-- LOGIN LAYOUT -->
-	<string name="email">Email</string>
-	<string name="password">Password</string>
-	<string name="signIn_button">Sign In</string>
-	<string name="login_OR_String">OR</string>
-	<string name="googlesigninlogo">googleSignInLogo</string>
-	<string name="facebooksigninlogo">FacebookSignInLogo</string>
-	<string name="login_register">Register</string>
-	<string name="login_google_signup1">Don\'t have an account?</string>
-	<string name="login_google_signup2">" Sign Up!"</string>
-
-	<string name="facebook_app_id">1533089473800999</string>
-	<string name="fb_login_protocol_scheme">fb1234</string>
-	<string name="facebook_client_token">56789</string>
+    <string name="maps_key_alex">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
+    <string name="maps_key_adnan">xxxxx</string>
 
 
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
+    <string name="empty_value">" "</string>
+
+    <!-- LOGIN LAYOUT -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="signIn_button">Sign In</string>
+    <string name="login_OR_String">OR</string>
+    <string name="googlesigninlogo">googleSignInLogo</string>
+    <string name="facebooksigninlogo">FacebookSignInLogo</string>
+    <string name="login_register">Register</string>
+    <string name="login_google_signup1">Don\'t have an account?</string>
+    <string name="login_google_signup2">" Sign Up!"</string>
+
+    <string name="facebook_app_id">1533089473800999</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">56789</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="historique_de_rencontres">Historique de rencontres</string>
+    <string name="changer_le_mot_de_passe">Changer le mot de passe</string>
+    <string name="param_tres">Paramètres</string>
+    <string name="propos">À propos</string>
+
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
 </resources>

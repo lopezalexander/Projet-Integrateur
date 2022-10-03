@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -22,13 +23,17 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.projetintegrateur.ui.ProfileActivity;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -57,7 +62,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.squareup.picasso.Picasso;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,6 +112,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     });
 
 
+
+
+
     //*************************************************************************************************************************************************************************
 
 
@@ -118,27 +130,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
+
         //Facebook login
-        callbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
-                        loginDialog.dismiss();
-                        Log.d(TAG,"Compte Facebook est connecté");
-                    }
+        loginUserFacebook();
 
-                    @Override
-                    public void onCancel() {
-                        // App code
-                    }
 
-                    @Override
-                    public void onError(FacebookException exception) {
-                        // App code
-                    }
-                });
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && accessToken.isExpired() == false) {
+//            loginDialog.dismiss();
+        }
+
+        ImageView perso = findViewById(R.id.ic_perso);
+        perso.setOnClickListener(view -> {
+            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+
+            MapsActivity.this.startActivity(intent);
+        });
+
 
 
         //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
@@ -161,6 +169,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             login_Dialog();
         }
 
+    }
+
+    private void loginUserFacebook() {
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                        loginDialog.dismiss();
+                        Log.d(TAG,"Compte Facebook est connecté");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
     }
 
 
@@ -277,7 +308,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //*****************************************************
         //Facebook SIGN IN LOGIC
         facebook_signIn_btn.setOnClickListener(view -> {
-                    LoginManager.getInstance().logInWithReadPermissions(MapsActivity.this, Arrays.asList("public_profile"));
+            LoginManager.getInstance().logInWithReadPermissions(MapsActivity.this, Arrays.asList("public_profile"));
         });
 
         //FIREBASE LOGIN LOGIC
@@ -546,11 +577,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //********Facebook Login*********\\
-   //*********************************\\
+    //*********************************\\
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+
     }
 
 

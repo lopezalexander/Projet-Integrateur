@@ -57,7 +57,7 @@ dependencies {
 
     //Facebook sdk
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
-
+    implementation 'com.squareup.picasso:picasso:2.8'
 
     //Carousel
 //    implementation 'com.synnapps:carouselview:0.1.5'
