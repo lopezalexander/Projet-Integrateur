@@ -26,7 +26,10 @@
 	<string name="restaurants">Restaurants</string>
 	<string name="bars">Bars</string>
 	<string name="caf_s">Cafés</string>
-	<string name="disco">Disco</string><!-- XXXXXX LAYOUT -->
+	<string name="disco">Disco</string>
+	<string name="businessRow_address">address</string>
+	<string name="businessRow_name">name</string>
+	<string name="businessRow_rating">rating</string><!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->

@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 
 import com.example.projetintegrateur.R;
-import com.example.projetintegrateur.adapter.LoginDialog;
+import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
@@ -91,9 +91,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //SEARCH VARIABLE, NEEDED TO STORE IN DB 
     LatLng midPointLatLng;
-    LatLng origintLatLng;
-    LatLng destinationLatLng;
-    ArrayList<NearbyBusiness> allBusinessList;
+    LatLng origintLatLng; //address A ou 1
+    LatLng destinationLatLng; // Address B ou 2
+    LatLng selectedBusiness;
+
+    ArrayList<NearbyBusiness> allNearbyBusinessList;
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -110,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //VIEW
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
+    BusinessDialog businessDialog;
 
     //UTILS
     ObjectMapper mapper;
@@ -282,11 +285,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         origintLatLng = locationArrayList.get(0);
         String originCoordinate = origintLatLng.latitude + "," + origintLatLng.longitude;
 
-
         //SET DESTINATION STRING
         destinationLatLng = locationArrayList.get(1);
         String destinationCoordinate = destinationLatLng.latitude + "," + destinationLatLng.longitude;
-
 
         //BUILD URL STRING
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
@@ -334,7 +335,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         boolean notPassed = true;
 
 
-                        //ITERATE THROUGH
+                        //ITERATE THROUGH TO CALCULATE MIDDLE DISTANCE POINT
                         for (int i = 0; i < stepssArray.size(); i++) {
                             //GET DISTANCE OF STEPS, THIS WILL BE THE INDEX AT WHICH IT WILL BE OVER THE MIDDLE DISTANCE POINT
                             int step_distance_value_over = stepssArray.get(i).getDistance().getValue();
@@ -409,11 +410,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //
     //
-    //  FIND THE MIDDLE POINT PLACE_ID
+    //  GET NEARBY BUSINESS AROUND MIDDLE POINT
     //*****************************************************************************************************************************
     private void getNearbyBusiness() {
         //BUILD URL STRING
         String midPointLatLng_String = midPointLatLng.latitude + "," + midPointLatLng.longitude;
+
         String url = Uri.parse("https://maps.googleapis.com/maps/api/place/nearbysearch/json")
                 .buildUpon()
                 .appendQueryParameter("location", midPointLatLng_String)
@@ -445,14 +447,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         JSONArray results = respJSON.getJSONArray("results");
 
                         //INSTANTIATE OUR ARRAYLIST OF Nearby Business
-                        allBusinessList = new ArrayList<>();
+                        allNearbyBusinessList = new ArrayList<>();
 
                         //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
                         for (int i = 0; i < results.length(); i++) {
                             NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
-                            allBusinessList.add(uniqueBusinnes);
+                            allNearbyBusinessList.add(uniqueBusinnes);
                         }
-                        //TODO:: CREATE BUSINESS LISTVIEW DIALOG HERE
+
+
+                        // DISPLAY THE BUSINESS LIST ON A DIALOG FOR USER TO CHOOSE FROM
+                        //******************************************************************
+
+                        //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
+                        ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
+                        for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
+                            //CREATE UNIQUE BusinessModel OBJECT
+                            BusinessModel business = new BusinessModel();
+
+                            //SET NAME AND ADDRESS
+                            business.setName(uniqueBusiness.getName());
+                            business.setAddress(uniqueBusiness.getVicinity());
+                            business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
+
+                            //ADD BUSINESS TO THE LIST
+                            recyclerBusinessList.add(business);
+                        }
+
+                        MapsActivity.this.runOnUiThread(() -> {
+
+                            //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
+
+                            //CREATE THE DIALOG AND SHOW ON THE UI
+                            businessDialog = new BusinessDialog(recyclerBusinessList);
+                            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
+                        });
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -601,7 +631,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
-
         btn_SearchBar_GPS.setOnClickListener(view -> {
 //            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
 
@@ -690,7 +719,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onError(@NonNull Status status) {
-                // TODO: Handle the error.
 //                Log.d(TAG, "An error occurred: " + status);
             }
         });

@@ -12,14 +12,15 @@
 		<!-- Status bar color. -->
 		<item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 		<!-- Customize your theme here. -->
+		<item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
 	</style>
 
 
 	<style name="style_form_signIn" parent="Theme.AppCompat.Light.Dialog.Alert">
 		<item name="android:background">@color/blue1</item>
-				<item name="android:windowFullscreen">true</item>
-				<item name="android:windowBackground">@null</item>
-				<item name="android:windowNoTitle">true</item>
+		<item name="android:windowFullscreen">true</item>
+		<item name="android:windowBackground">@null</item>
+		<item name="android:windowNoTitle">true</item>
 		<item name="android:windowIsFloating">true</item>
 	</style>
 
@@ -31,4 +32,16 @@
 	<style name="Theme.ProjetIntegrateur.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
 	<style name="Theme.ProjetIntegrateur.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+	<!--	BottomSheetDialog Style	-->
+
+	<style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+		<item name="bottomSheetStyle">@style/AppModalStyle</item>
+	</style>
+
+	<style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+		<item name="android:background">@drawable/business_dialog_style</item>
+	</style>
+
+
 </resources>
