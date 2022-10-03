@@ -1,4 +1,4 @@
-package com.example.projetintegrateur.adapter;
+package com.example.projetintegrateur.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +23,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -258,7 +259,7 @@ public class LoginDialog extends DialogFragment {
                                         if (task1.isSuccessful()) {
                                             //[CREATE] SINGLETON
                                             User currentUser = task1.getResult().getValue(User.class);
-                                            ((UserClient) getActivity().getApplicationContext()).setUser(currentUser);
+                                            ((UserClient) Objects.requireNonNull(getActivity()).getApplicationContext()).setUser(currentUser);
 
                                             //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
                                             dismiss();

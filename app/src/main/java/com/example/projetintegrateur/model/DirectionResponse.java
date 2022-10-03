@@ -10,6 +10,11 @@ public class DirectionResponse {
     public ArrayList<Route> routes;
     public String status;
 
+
+
+
+
+
     public ArrayList<GeocodedWaypoint> getGeocoded_waypoints() {
         return geocoded_waypoints;
     }

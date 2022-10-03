@@ -4,6 +4,16 @@ public class BusinessModel {
 
     private String name;
     private String address;
+    private String rating;
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
 
     public String getName() {
         return name;
