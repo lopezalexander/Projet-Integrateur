@@ -28,6 +28,12 @@ import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -90,6 +96,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDB;
 
+    //Facebook login
+    CallbackManager callbackManager;
+
     //SEARCH VARIABLE, NEEDED TO STORE IN DB 
     LatLng midPointLatLng;
     LatLng origintLatLng;
@@ -131,6 +140,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
 
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && accessToken.isExpired() == false) {
+//            loginDialog.dismiss();
+        }
+
+
         if (isServicesOK()) {
             //GET PERMISSION
             getLocationPermission();
@@ -146,10 +162,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             //CHECK IF User is already Connected or Display Login Dialog
-//            checkUserAuth();
+            checkUserAuth();
 
         }
     }
+
+
 
     //
     //
@@ -767,6 +785,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
+
+
+
+
+
 
     //
     //

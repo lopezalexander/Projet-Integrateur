@@ -1,9 +1,14 @@
 package com.example.projetintegrateur.adapter;
 
+import static android.content.ContentValues.TAG;
+
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,24 +29,42 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.User;
+import com.example.projetintegrateur.ui.MapsActivity;
 import com.example.projetintegrateur.util.UserClient;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 public class LoginDialog extends DialogFragment {
 
@@ -49,6 +72,9 @@ public class LoginDialog extends DialogFragment {
     //FIREBASE
     private FirebaseAuth mAuth;
     private FirebaseDatabase mFirebaseDB;
+
+//    //Facebook login
+    CallbackManager callbackManager;
 
     //LOGIN PAGE VIEW ITEMS
     AlertDialog loginDialog;
@@ -68,12 +94,17 @@ public class LoginDialog extends DialogFragment {
         View myFormView = inflater.inflate(R.layout.login_layout, container, false);
 
 
+
+
         //FIREBASE
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 
         //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
         createSignInRequest();
+
+        //Facebook login
+        loginUserFacebook();
 
         activityResultLaunch = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
@@ -88,6 +119,40 @@ public class LoginDialog extends DialogFragment {
                 e.printStackTrace();
             }
         });
+
+        final String[] fullname = new String[1];
+        final String[] email = new String[1];
+        final String[] id = new String[1];
+        final String[] pictureUrl = new String[1];
+
+
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+//        GraphRequest request = GraphRequest.newMeRequest(
+//                accessToken,
+//                (object, response) -> {
+//                    try {
+//                        //GET PROFILE INFOS
+//                        fullname[0] = Objects.requireNonNull(object).getString("name");
+//                        email[0] = Objects.requireNonNull(object).getString("email");
+//                        id[0] = Objects.requireNonNull(object).getString("id");
+//                        pictureUrl[0] = object.getJSONObject("picture").getJSONObject("data").getString("url");
+//                        User currentUser = new User(email[0],"",id[0]);
+//                        ((UserClient) getApplicationContext()).setUser(currentUser);
+//                        Log.d("TAG8", "onCreate: " + fullname[0]);
+//                        Log.d("TAG8", "onCreate: " + email[0]);
+//
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//        );
+//            Bundle parameters = new Bundle();
+//            parameters.putString("fields", "id,name,link,picture.type(large)");
+//            request.setParameters(parameters);
+//            request.executeAsync();
+
 
 
         //Setup Login Carousel
@@ -104,6 +169,7 @@ public class LoginDialog extends DialogFragment {
         password_input = myFormView.findViewById(R.id.input_password);
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
+        ImageView facebook_signIn_btn = myFormView.findViewById(R.id.btn_facebook);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
         firebase_register_btn = myFormView.findViewById(R.id.btn_register);
 
@@ -127,6 +193,12 @@ public class LoginDialog extends DialogFragment {
         google_signIn_btn.setOnClickListener(view -> {
             //INSERT GOOGLE SIGN IN LOGIC HERE
             signIn_CreateGoogleIntent();
+        });
+
+        //*****************************************************
+        //Facebook SIGN IN LOGIC
+        facebook_signIn_btn.setOnClickListener(view -> {
+            LoginManager.getInstance().logInWithReadPermissions(requireActivity(), Arrays.asList("email","public_profile"));
         });
 
 
@@ -359,6 +431,128 @@ public class LoginDialog extends DialogFragment {
 
     }
 
+
+    private void loginUserFacebook() {
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.d(TAG,"Compte Facebook est connecté");
+                        handleFacebookAccessToken(loginResult.getAccessToken());
+                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                        dismiss();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+    }
+
+//    private void handleFacebookAccessToken(AccessToken accessToken) {
+//        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+//        mAuth.signInWithCredential(credential)
+//                .addOnCompleteListener(getActivity(), task -> {
+//                            if (task.isSuccessful())    {
+//                                Log.d(TAG, "sign in with credential: Successful");
+//                                FirebaseUser user = mAuth.getCurrentUser();
+//                                dismiss();
+//                                Log.d(TAG, "handleFacebookAccessToken----------: "+user.getEmail());
+//                            } else {
+//                                Log.w(TAG, "signInWithCredential:failure: ", task.getException());
+////                        Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                );
+//    }
+
+
+
+
+    private void handleFacebookAccessToken(AccessToken accessToken) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), task -> {
+                    if (task.isSuccessful())    {
+
+                        //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Log.d(TAG, "handleFacebookAccessToken: ------------"+user.getEmail()+user.getDisplayName());
+                        String currentUserKey = Objects.requireNonNull(user).getUid();
+                        DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
+
+                        //Check if user exist
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (!snapshot.exists()) {
+                                    //****************************************************
+                                    //ADD USER TO USER TABLE IN FIREBASE REALTIME DATABASE
+                                    //****************************************************
+
+                                    //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
+                                    String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
+                                    Log.d(TAG, "onDataChange: ==========="+email);
+
+                                    User newUserData = new User(email, "", currentUserKey);
+
+                                    //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                                    mFirebaseDB.getReference("Users")
+                                            .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                                            .setValue(newUserData).addOnCompleteListener(task1 -> {
+                                                //HANDLE ERROR, NOTHING ON SUCCESS...CONTINUE
+                                                if (!task1.isSuccessful()) {
+                                                    Toast.makeText(getActivity(), "Could not register User!", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                } //END INSERT USER IN DB TABLE 'Users'
+
+                                //************************
+                                //FAIRE LE SINGLETON USER
+                                //************************
+
+                                //[FETCH] THE USER IN DATABASE
+                                ref.get().addOnCompleteListener(task2 -> {
+                                    if (task2.isSuccessful()) {
+                                        //[CREATE] SINGLETON
+                                        User currentUser = task2.getResult().getValue(User.class);
+                                        ((UserClient) requireActivity().getApplicationContext()).setUser(currentUser);
+                                        Log.d(TAG, "onDataChange: "+ Objects.requireNonNull(currentUser).getEmail());
+                                        //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
+                                        dismiss();
+
+                                        // Toast
+                                        Toast.makeText(getActivity(), "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+
+                                    } else {
+                                        //HANDLE ERROR HERE if we cannot retrieve the user data
+                                        Toast.makeText(getActivity(), "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
+                                    }
+                                }); //END CREATE SINGLETON
+                            }//END onDataChanged
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+                    } else {
+                        Log.w(TAG, "signInWithCredential:failure: ", task.getException());
+//                        Toast.makeText(getActivity(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                );
+    }
+
+
     // Configure Google Sign In Request [SETUP]
     //*********************************
     private void createSignInRequest() {
@@ -380,6 +574,15 @@ public class LoginDialog extends DialogFragment {
         //LANCER L'ACTIVITY DE GOOGLE SIGN IN
         activityResultLaunch.launch(signInIntent);
     }
+
+//    //********Facebook Login*********\\
+//    //*********************************\\
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        callbackManager.onActivityResult(requestCode, resultCode, data);
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//    }
 
 
     //********************\\
@@ -426,5 +629,14 @@ public class LoginDialog extends DialogFragment {
 
         //If no error, return TRUE
         return true;
+    }
+
+    //********Facebook Login*********\\
+    //*********************************\\
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 }

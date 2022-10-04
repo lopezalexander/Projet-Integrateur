@@ -30,14 +30,31 @@
         android:layout_height="40dp"
         android:background="@color/blue1"
         android:gravity="center"
-        android:text="Full Name"
+        android:text="@string/nom_complet"
         android:textColor="@color/red"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textview_email"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:background="@color/blue1"
+        android:gravity="center"
+        android:text="@string/email"
+        android:textColor="@color/blue3"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
+        app:layout_constraintVertical_bias="0.65" />
 
     <!--    BOUTON HISTORIQUE DE RENCONTRES     -->
     <LinearLayout
@@ -48,7 +65,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55">
 
         <ImageView
             android:layout_width="60dp"
@@ -79,7 +97,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.060000002">
+        app:layout_constraintVertical_bias="0.06999999">
 
         <ImageView
             android:layout_width="60dp"
@@ -109,7 +127,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.07999998">
+        app:layout_constraintVertical_bias="0.110000014">
 
         <ImageView
             android:layout_width="60dp"
@@ -119,8 +137,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingEnd="20dp"
             android:gravity="center"
+            android:paddingEnd="20dp"
             android:text="@string/param_tres"
             android:textColor="@color/blue1"
             android:textSize="22sp"
@@ -137,7 +155,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
-        app:layout_constraintVertical_bias="0.120000005">
+        app:layout_constraintVertical_bias="0.19999999">
 
         <ImageView
             android:layout_width="60dp"
@@ -147,8 +165,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingEnd="20dp"
             android:gravity="center"
+            android:paddingEnd="20dp"
             android:text="@string/propos"
             android:textColor="@color/blue1"
             android:textSize="22sp"
