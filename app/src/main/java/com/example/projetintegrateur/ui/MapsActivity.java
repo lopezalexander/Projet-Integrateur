@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
+import com.example.projetintegrateur.model.directionAPI.Bounds;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
@@ -33,6 +34,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -402,7 +404,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             circle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
-                            moveCamera(midPointLatLng, 14);
+                            moveCamera(midPointLatLng, 13);
+                            centerAllMarkers();
+
                         });
 
                         //QUERY LIST OF AVENUES AROUND MIDDLE DISTANCE POINT
@@ -418,6 +422,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         }); //END  [REQUEST-RESPONSE]
+    }
+
+    //CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
+    private void centerAllMarkers() {
+        //Create Latlng Bounds Builder
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        //Add Markers Positions in Builder
+        for (Marker marker : markerArrayList) {
+            builder.include(marker.getPosition());
+        }
+        //Create Latlng Bounds
+        LatLngBounds bounds = builder.build();
+
+        int padding = 300; // offset from edges of the map in pixels
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.moveCamera(cu);
     }
 
 
@@ -732,7 +754,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //CENTER CAMERA ON THE LOCATION ENTERED
                 moveCamera(Objects.requireNonNull(place.getLatLng()), DEFAULT_ZOOM);
                 addMarker(place.getLatLng(), place.getName());
-
+                centerAllMarkers();
 
                 //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                 if (locationArrayList.size() == 2) {
