@@ -1,7 +1,6 @@
 package com.example.projetintegrateur.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -12,7 +11,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,6 +24,11 @@ import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -44,6 +47,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
+
 public class LoginDialog extends DialogFragment {
 
 
@@ -52,15 +59,14 @@ public class LoginDialog extends DialogFragment {
     private FirebaseDatabase mFirebaseDB;
 
     //LOGIN PAGE VIEW ITEMS
-    AlertDialog loginDialog;
     EditText email_input;
     EditText password_input;
-    Button firebase_register_btn;
 
 
     //GOOGLE LOGIN
     private GoogleSignInClient mGoogleSignInClient;
     ActivityResultLauncher<Intent> activityResultLaunch;
+
 
     @Nullable
     @Override
@@ -72,6 +78,7 @@ public class LoginDialog extends DialogFragment {
         //FIREBASE
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
+
 
         //GOOGLE CREER LE SIGNIN REQUEST ET LE LAUNCHER DE L'ACTIVITY POUR LE SignIn INTENT
         createSignInRequest();
@@ -106,7 +113,9 @@ public class LoginDialog extends DialogFragment {
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
-        firebase_register_btn = myFormView.findViewById(R.id.btn_register);
+
+        ImageView facebook_btn = myFormView.findViewById(R.id.btn_facebook);
+        Button firebase_register_btn = myFormView.findViewById(R.id.btn_register);
 
 
         //SET HideKeyBoard() to EditText
@@ -137,7 +146,16 @@ public class LoginDialog extends DialogFragment {
             loginUserFirebase();
         });
 
+        //FACEBOOK
+        facebook_btn.setOnClickListener(view -> {
+            Intent facebookIntent = new Intent(myFormView.getContext(), FacebookActivity.class);
+            facebookIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(facebookIntent);
+        });
+
+
         //FIREBASE REGISTER FUNCTION
+        //*****************************************************
         firebase_register_btn.setOnClickListener(view -> registerUserFirebase());
 
 
@@ -203,7 +221,7 @@ public class LoginDialog extends DialogFragment {
                                                 if (task2.isSuccessful()) {
                                                     //[CREATE] SINGLETON
                                                     User currentUser = task2.getResult().getValue(User.class);
-                                                    ((UserClient) getActivity().getApplicationContext()).setUser(currentUser);
+                                                    ((UserClient) requireActivity().getApplicationContext()).setUser(currentUser);
 
                                                     //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
                                                     dismiss();
@@ -259,7 +277,7 @@ public class LoginDialog extends DialogFragment {
                                         if (task1.isSuccessful()) {
                                             //[CREATE] SINGLETON
                                             User currentUser = task1.getResult().getValue(User.class);
-                                            ((UserClient) Objects.requireNonNull(getActivity()).getApplicationContext()).setUser(currentUser);
+                                            ((UserClient) requireActivity().getApplicationContext()).setUser(currentUser);
 
                                             //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
                                             dismiss();
@@ -290,7 +308,7 @@ public class LoginDialog extends DialogFragment {
 
 
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(getActivity(), task -> {
+                .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
 
                         //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
@@ -330,7 +348,7 @@ public class LoginDialog extends DialogFragment {
                                     if (task2.isSuccessful()) {
                                         //[CREATE] SINGLETON
                                         User currentUser = task2.getResult().getValue(User.class);
-                                        ((UserClient) getActivity().getApplicationContext()).setUser(currentUser);
+                                        ((UserClient) requireActivity().getApplicationContext()).setUser(currentUser);
 
                                         //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
 
@@ -367,7 +385,7 @@ public class LoginDialog extends DialogFragment {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
     }
 
 
@@ -391,7 +409,7 @@ public class LoginDialog extends DialogFragment {
     //  HIDE KEYBOARD
     //************************************
     private void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -428,4 +446,6 @@ public class LoginDialog extends DialogFragment {
         //If no error, return TRUE
         return true;
     }
+
+
 }
