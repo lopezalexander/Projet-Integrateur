@@ -7,7 +7,7 @@
 	>
 
 	<ImageView
-		android:id="@+id/wItem_icon"
+		android:id="@+id/businessImage"
 		android:layout_width="60dp"
 		android:layout_height="60dp"
 		android:background="@drawable/list_item_component_border"

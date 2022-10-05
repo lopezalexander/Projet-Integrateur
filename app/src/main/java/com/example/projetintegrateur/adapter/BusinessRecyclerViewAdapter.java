@@ -56,7 +56,7 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-            businesImage = itemView.findViewById(R.id.listviewItem_icon);
+            businesImage = itemView.findViewById(R.id.businessImage);
             businessName = itemView.findViewById(R.id.businessName);
             businessAddress = itemView.findViewById(R.id.businessAddress);
             businessRating = itemView.findViewById(R.id.businessRating);
