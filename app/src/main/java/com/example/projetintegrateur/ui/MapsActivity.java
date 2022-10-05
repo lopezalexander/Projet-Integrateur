@@ -23,10 +23,13 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
+import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
+import com.example.projetintegrateur.util.UserClient;
+import com.facebook.AccessToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -151,6 +154,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //CHECK IF User is already Connected or Display Login Dialog
             checkUserAuth();
+
 
         }
     }
@@ -843,7 +847,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (currentUser == null) {
             loginDialog = new LoginDialog();
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
+        } else {
+            //TODO:: RETRIEVE USER DATA AND RESTORE IT INTO USER SINGLETON
+            //  AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//            Log.d("USER", mAuth.getCurrentUser().getUid());
+//            Log.d("USER", String.valueOf(accessToken));
         }
+
+
     }
 
     //
