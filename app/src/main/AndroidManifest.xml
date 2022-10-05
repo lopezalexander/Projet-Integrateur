@@ -7,7 +7,11 @@
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- FACEBOOK -->
+	<uses-permission
+		android:name="com.google.android.gms.permission.AD_ID"
+		tools:node="remove"
+		/>
 
 	<application
 		android:name=".util.UserClient"
@@ -21,8 +25,10 @@
 		android:theme="@style/Theme.ProjetIntegrateur"
 		tools:targetApi="31"
 		>
-
-
+		<activity
+			android:name=".FacebookActivity"
+			android:exported="false"
+			/>
 		<!--
 			 TODO: Before you run your application, you need a Google Maps API key.
 
@@ -33,30 +39,44 @@
 			 Once you have your API key (it starts with "AIza"), define a new property in your
 			 project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
 			 "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
-		-->
+        -->
 		<meta-data
 			android:name="com.google.android.geo.API_KEY"
 			android:value="@string/maps_key_alex"
+			/> <!-- FACEBOOK -->
+		<meta-data
+			android:name="com.facebook.sdk.ApplicationId"
+			android:value="@string/facebook_app_id"
 			/>
-
+		<meta-data
+			android:name="com.facebook.sdk.ClientToken"
+			android:value="@string/facebook_client_token"
+			/> <!-- APP ACTIVITIES -->
 		<activity
 			android:name=".ui.SplashActivity"
 			android:exported="true"
-			android:label="MainActivity"
+			android:label="MidWay"
 			>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+
 
 		<activity
 			android:name=".ui.MapsActivity"
 			android:exported="true"
 			android:label="@string/title_activity_maps"
-			>
+			/>
 
-		</activity>
+		<activity
+			android:name=".ui.FacebookActivity"
+			android:exported="true"
+			android:label="FacebookActivity"
+			/>
+
 	</application>
 
 </manifest>

@@ -22,7 +22,7 @@
 
 
 	<!-- MAPS LAYOUT -->
-<string name="search_address_1">Entrer votre addresse</string>
+	<string name="search_address_1">Entrer votre addresse</string>
 	<string name="restaurants">Restaurants</string>
 	<string name="bars">Bars</string>
 	<string name="caf_s">Cafés</string>
@@ -30,7 +30,14 @@
 	<string name="businessRow_address">address</string>
 	<string name="businessRow_name">name</string>
 	<string name="businessRow_rating">rating</string><!-- XXXXXX LAYOUT -->
-	<!-- XXXXXX LAYOUT -->
+
+
+	<!-- FACEBOOK LOGIN -->
+	<string name="facebook_app_id">1369837933544502</string>
+	<string name="fb_login_protocol_scheme">fb1234</string>
+	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
+
+
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->

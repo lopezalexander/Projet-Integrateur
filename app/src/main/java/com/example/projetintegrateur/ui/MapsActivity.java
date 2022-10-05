@@ -86,8 +86,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     AutocompleteSupportFragment autocompleteFragment;
 
     //FIREBASE
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase mFirebaseDB;
+    public FirebaseAuth mAuth;
+    public FirebaseDatabase mFirebaseDB;
 
     //SEARCH VARIABLE, NEEDED TO STORE IN DB 
     LatLng midPointLatLng;
@@ -114,8 +114,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_MapCurrentLocation_GPS;
     BusinessDialog businessDialog;
 
+
     //UTILS
     ObjectMapper mapper;
+    LoginDialog loginDialog;
 
 
     //***********\\
@@ -146,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             //CHECK IF User is already Connected or Display Login Dialog
-//            checkUserAuth();
+            checkUserAuth();
 
         }
     }
@@ -283,10 +285,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET ORIGIN STRING
         origintLatLng = locationArrayList.get(0);
         String originCoordinate = origintLatLng.latitude + "," + origintLatLng.longitude;
-
+        Log.d("Test", "First ADDRESS");
+        Log.d("Test", String.valueOf(origintLatLng.latitude));
+        Log.d("Test", String.valueOf(origintLatLng.longitude));
         //SET DESTINATION STRING
         destinationLatLng = locationArrayList.get(1);
         String destinationCoordinate = destinationLatLng.latitude + "," + destinationLatLng.longitude;
+        Log.d("Test", "First ADDRESS");
+        Log.d("Test", String.valueOf(destinationLatLng.latitude));
+        Log.d("Test", String.valueOf(destinationLatLng.longitude));
 
         //BUILD URL STRING
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
@@ -316,6 +323,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
+                        Log.d("Test", resultJSON.toString());
                         //TRANSFORM OUR JSON RESPONSE TO AN DirectionResponse Object, which we can use later if needed and easier to traverse
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
@@ -345,21 +353,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
                             if ((distanceCounter >= total_distance_value / 2) && notPassed) {
-                                //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
-                                double latOver = stepssArray.get(i).getStart_location().getLat();
-                                double lngOver = stepssArray.get(i).getStart_location().getLng();
+                                //WE NEED TAKE INTO ACCOUNT THAT IF THE LAST STEP IS THE ONE GOING OVER THE MID DISTANCE POINT,
+                                // THERE IS NO ENTRY OF .get(i + 1) IN THE ARRAYLIST. HENCE, WE TAKE THE LAST STEP AS THE MIDDLE POINT
+                                if (i != (stepssArray.size() - 1)) {
+                                    //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
+                                    double latOver = stepssArray.get(i).getStart_location().getLat();
+                                    double lngOver = stepssArray.get(i).getStart_location().getLng();
 
-                                //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
-                                double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
-                                double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
+                                    //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
+                                    double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
+                                    double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
 
-                                //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
-                                LatLng start_mid_point = new LatLng(latOver, lngOver);
-                                LatLng end_mid_point = new LatLng(latAfter, lngAfter);
 
-                                //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
-                                midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+                                    //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
+                                    LatLng start_mid_point = new LatLng(latOver, lngOver);
+                                    LatLng end_mid_point = new LatLng(latAfter, lngAfter);
 
+                                    //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
+                                    midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+                                } else {
+                                    double midLat = stepssArray.get(i).getStart_location().getLat();
+                                    double midLng = stepssArray.get(i).getStart_location().getLng();
+                                    midPointLatLng = new LatLng(midLat, midLng);
+                                }
                                 //WE FOUND THE MIDDLE POINT, SET TO FALSE TO NOT ENTER THE IF() AGAIN
                                 notPassed = false;
                             }//END FORLOOP CHECK DISTANCE
@@ -423,6 +439,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .appendQueryParameter("key", getString(R.string.maps_key_alex))
                 .toString();
 
+        Log.d("Test", "**************************");
+        Log.d("Test", url);
 
         //MAKE THE REQUEST TO DIRECTION API
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -442,6 +460,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject respJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
+                        Log.d("Test", "**************************");
+                        Log.d("Test", respJSON.toString());
                         //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
                         JSONArray results = respJSON.getJSONArray("results");
 
@@ -815,7 +835,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
-            LoginDialog loginDialog = new LoginDialog();
+            loginDialog = new LoginDialog();
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
         }
     }

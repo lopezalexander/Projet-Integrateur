@@ -60,6 +60,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-auth:21.0.8'
 
+    //Facebook sdk
+    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+    implementation 'com.squareup.picasso:picasso:2.8'
 
     //OkHTTPClient
     implementation 'com.squareup.okhttp3:okhttp:4.9.2'
