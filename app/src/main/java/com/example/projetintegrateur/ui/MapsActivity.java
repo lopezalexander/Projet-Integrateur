@@ -503,6 +503,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             });
                         } else {
                             MapsActivity.this.runOnUiThread(() -> {
+                                //TODO:: RESET EVERYTHING HERE
                                 Toast.makeText(MapsActivity.this, "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
                             });
                         }
