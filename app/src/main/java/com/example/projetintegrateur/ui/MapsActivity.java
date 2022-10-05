@@ -274,18 +274,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  ADD MARKER TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void addMarker(LatLng latLng, String title) {
+        MarkerOptions markerOptions;
 
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        if (!title.equals("MidPoint_Fine")) {
+            markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
+        }else {
+            markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        }
+
 
 
         //Add the new marker to the markerArrayList
         markerArrayList.add(mMap.addMarker(markerOptions));
+//        markerArrayList.get(0).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_perso_foreground));
 
         //Clear the Search Bar text
         autocompleteFragment.setText("");
+
 
 
         setHints();
