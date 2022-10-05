@@ -90,9 +90,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public FirebaseDatabase mFirebaseDB;
 
     //SEARCH VARIABLE, NEEDED TO STORE IN DB 
-    LatLng midPointLatLng;
+    LatLng midPointLatLng; // middle distance point
     LatLng origintLatLng; //address A ou 1
     LatLng destinationLatLng; // Address B ou 2
+    LatLng start_mid_point; //Testing purpopses for now
+    LatLng end_mid_point;   //Testing purpopses for now
     LatLng selectedBusiness;
 
     ArrayList<NearbyBusiness> allNearbyBusinessList;
@@ -285,15 +287,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET ORIGIN STRING
         origintLatLng = locationArrayList.get(0);
         String originCoordinate = origintLatLng.latitude + "," + origintLatLng.longitude;
-        Log.d("Test", "First ADDRESS");
-        Log.d("Test", String.valueOf(origintLatLng.latitude));
-        Log.d("Test", String.valueOf(origintLatLng.longitude));
+
         //SET DESTINATION STRING
         destinationLatLng = locationArrayList.get(1);
         String destinationCoordinate = destinationLatLng.latitude + "," + destinationLatLng.longitude;
-        Log.d("Test", "First ADDRESS");
-        Log.d("Test", String.valueOf(destinationLatLng.latitude));
-        Log.d("Test", String.valueOf(destinationLatLng.longitude));
 
         //BUILD URL STRING
         String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
@@ -323,7 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
-                        Log.d("Test", resultJSON.toString());
+
                         //TRANSFORM OUR JSON RESPONSE TO AN DirectionResponse Object, which we can use later if needed and easier to traverse
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
@@ -366,8 +363,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                     //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
-                                    LatLng start_mid_point = new LatLng(latOver, lngOver);
-                                    LatLng end_mid_point = new LatLng(latAfter, lngAfter);
+                                    start_mid_point = new LatLng(latOver, lngOver);
+                                    end_mid_point = new LatLng(latAfter, lngAfter);
+
 
                                     //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
                                     midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
@@ -386,6 +384,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MapsActivity.this.runOnUiThread(() -> {
                             //DECODE POLYLINE
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
+
+                            //TESTING TO SHOW THE START AND END OF MIDPOINT
+//                            addMarker(start_mid_point, "test");
+//                            addMarker(end_mid_point, "test2");
 
                             //DRAW POLYLINE ON MAP
                             mMap.addPolyline(new PolylineOptions()
@@ -439,8 +441,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .appendQueryParameter("key", getString(R.string.maps_key_alex))
                 .toString();
 
-        Log.d("Test", "**************************");
-        Log.d("Test", url);
 
         //MAKE THE REQUEST TO DIRECTION API
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -460,47 +460,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject respJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
-                        Log.d("Test", "**************************");
-                        Log.d("Test", respJSON.toString());
-                        //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
-                        JSONArray results = respJSON.getJSONArray("results");
+                        String resultStatus = respJSON.getString("status");
+                        if (!resultStatus.equals("ZERO_RESULTS")) {
+                            //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
+                            JSONArray results = respJSON.getJSONArray("results");
 
-                        //INSTANTIATE OUR ARRAYLIST OF Nearby Business
-                        allNearbyBusinessList = new ArrayList<>();
+                            //INSTANTIATE OUR ARRAYLIST OF Nearby Business
+                            allNearbyBusinessList = new ArrayList<>();
 
-                        //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
-                        for (int i = 0; i < results.length(); i++) {
-                            NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
-                            allNearbyBusinessList.add(uniqueBusinnes);
+                            //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
+                            for (int i = 0; i < results.length(); i++) {
+                                NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
+                                allNearbyBusinessList.add(uniqueBusinnes);
+                            }
+
+
+                            // DISPLAY THE BUSINESS LIST ON A DIALOG FOR USER TO CHOOSE FROM
+                            //******************************************************************
+
+                            //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
+                            ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
+                            for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
+                                //CREATE UNIQUE BusinessModel OBJECT
+                                BusinessModel business = new BusinessModel();
+
+                                //SET NAME AND ADDRESS
+                                business.setName(uniqueBusiness.getName());
+                                business.setAddress(uniqueBusiness.getVicinity());
+                                business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
+
+                                //ADD BUSINESS TO THE LIST
+                                recyclerBusinessList.add(business);
+                            }
+
+                            MapsActivity.this.runOnUiThread(() -> {
+
+                                //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
+
+                                //CREATE THE DIALOG AND SHOW ON THE UI
+                                businessDialog = new BusinessDialog(recyclerBusinessList);
+                                businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
+                            });
+                        } else {
+                            MapsActivity.this.runOnUiThread(() -> {
+                                Toast.makeText(MapsActivity.this, "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
+                            });
                         }
-
-
-                        // DISPLAY THE BUSINESS LIST ON A DIALOG FOR USER TO CHOOSE FROM
-                        //******************************************************************
-
-                        //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
-                        ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
-                        for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
-                            //CREATE UNIQUE BusinessModel OBJECT
-                            BusinessModel business = new BusinessModel();
-
-                            //SET NAME AND ADDRESS
-                            business.setName(uniqueBusiness.getName());
-                            business.setAddress(uniqueBusiness.getVicinity());
-                            business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
-
-                            //ADD BUSINESS TO THE LIST
-                            recyclerBusinessList.add(business);
-                        }
-
-                        MapsActivity.this.runOnUiThread(() -> {
-
-                            //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
-
-                            //CREATE THE DIALOG AND SHOW ON THE UI
-                            businessDialog = new BusinessDialog(recyclerBusinessList);
-                            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
-                        });
 
 
                     } catch (JSONException e) {
