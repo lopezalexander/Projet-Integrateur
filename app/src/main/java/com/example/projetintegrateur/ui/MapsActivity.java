@@ -115,6 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
     ImageView btn_resetSearchBar;
+    ImageView btn_showBusinessList;
     BusinessDialog businessDialog;
 
     //UTILS
@@ -136,6 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
         btn_resetSearchBar = findViewById(R.id.ic_reset);
+        btn_showBusinessList = findViewById(R.id.ic_show_listview_btn);
 
         if (isServicesOK()) {
             //GET PERMISSION
@@ -516,6 +518,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //CREATE THE DIALOG AND SHOW ON THE UI
                             businessDialog = new BusinessDialog(recyclerBusinessList);
                             businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
+                            btn_showBusinessList.setVisibility(View.VISIBLE);
                         });
 
 
@@ -666,7 +669,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
         btn_SearchBar_GPS.setOnClickListener(view -> {
@@ -683,6 +685,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 autocompleteFragment.requireView().setVisibility(View.GONE);
                 btn_SearchBar_GPS.setVisibility(View.GONE);
             }
+        });
+
+        btn_showBusinessList.setOnClickListener(view -> {
+            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
         });
 
 
