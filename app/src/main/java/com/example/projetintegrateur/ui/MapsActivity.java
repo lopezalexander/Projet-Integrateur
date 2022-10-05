@@ -112,6 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //VIEW
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
+    ImageView btn_resetSearchBar;
     BusinessDialog businessDialog;
 
     //UTILS
@@ -132,6 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
+        btn_resetSearchBar = findViewById(R.id.ic_reset);
 
         if (isServicesOK()) {
             //GET PERMISSION
@@ -225,6 +227,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         //Add to locationArrayList
                         locationArrayList.add(latLng[0]);
+
+                        //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
+                        if (locationArrayList.size() == 2) {
+
+                            //INITIATE LOGIC FOR SEARCH RESULTS
+                            try {
+                                //FIND MIDDLE DISTANCE POINT
+                                findMiddleDistancePoint();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         //MoveCamera to LatLng && Add Marker
                         moveCamera(latLng[0], DEFAULT_ZOOM);
@@ -628,6 +642,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getCurrentLocation();
         });
 
+
+
+
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
         btn_SearchBar_GPS.setOnClickListener(view -> {
@@ -635,6 +652,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             //Add marker on CurrentLocation
             getSearchBarCurrentLocation();
+
+            //HIDE WHEN USED ONCE
+            btn_SearchBar_GPS.setVisibility(View.INVISIBLE);
 
             //If the locationArrayList has 2 value in it( when the User enters a second address), Remove SearchBar
             if (locationArrayList.size() == 2) {
@@ -685,6 +705,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(-40, -168),
                 new LatLng(71, 136)
         ));
+
+        // SET OnClickListener to reset search bar and to empty addresses
+        //*************************************************************************************************
+        btn_resetSearchBar.setOnClickListener(view -> {
+            locationArrayList.clear();
+            markerArrayList.clear();
+            mMap.clear();
+            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+//            setUpPlacesAutocomplete();
+            autocompleteFragment.setText("");
+            setHints();
+        });
 
 
         // Set up a PlaceSelectionListener to handle the response.
