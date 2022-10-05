@@ -137,8 +137,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //GET PERMISSION
             getLocationPermission();
 
-            //GET CURRENT LOCATION
-            getCurrentLocation();
 
             //SETUP PLACES AUTOCOMPLETION
             setUpPlacesAutocomplete();
@@ -186,6 +184,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         //Set LatLng
                         LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+
 
                         //MoveCamera to LatLng
                         moveCamera(latLng, DEFAULT_ZOOM);
@@ -749,6 +748,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ContextCompat.checkSelfPermission(this.getApplicationContext(), COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mLocationPermissionsGranted = true;
                 initMap();
+
+                //GET CURRENT LOCATION
+                getCurrentLocation();
             } else {
                 ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
             }
@@ -784,6 +786,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mLocationPermissionsGranted = true;
                     //Initialize the Map
                     initMap();
+
+                    //GET CURRENT LOCATION
+                    getCurrentLocation();
                 }
             }
         }
