@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -671,6 +672,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
+        // SET OnClickListener for the PROFILE BUTTON
+        //*************************************************************************************************
+        ImageView profil = findViewById(R.id.ic_perso);
+        profil.setOnClickListener(view -> {
+            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+            MapsActivity.this.startActivity(intent);
+        });
     }
 
     //
