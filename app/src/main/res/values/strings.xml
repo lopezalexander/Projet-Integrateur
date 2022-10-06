@@ -23,13 +23,15 @@
 
 	<!-- MAPS LAYOUT -->
 	<string name="search_address_1">Entrer votre addresse</string>
+
+	<!-- BUSINESS DIALOG LAYOUT -->
 	<string name="restaurants">Restaurants</string>
 	<string name="bars">Bars</string>
 	<string name="caf_s">Cafés</string>
 	<string name="disco">Disco</string>
 	<string name="businessRow_address">address</string>
 	<string name="businessRow_name">name</string>
-	<string name="businessRow_rating">rating</string><!-- XXXXXX LAYOUT -->
+	<string name="businessRow_rating">rating</string>
 
 
 	<!-- FACEBOOK LOGIN -->
@@ -38,7 +40,16 @@
 	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
 
 
+	<!-- PROFILE LAYOUT -->
+	<string name="profile_picture">Profile Picture</string>
+	<string name="historique_de_rencontres">Historique de rencontres</string>
+	<string name="changer_le_mot_de_passe">Changer le mot de passe</string>
+	<string name="param_tres">Paramètres</string>
+	<string name="propos">À propos</string>
+	<string name="nom_complet">Nom Complet</string>
+
 	<!-- XXXXXX LAYOUT -->
+
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
