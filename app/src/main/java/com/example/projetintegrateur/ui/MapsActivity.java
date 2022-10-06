@@ -1,6 +1,7 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -30,6 +31,8 @@ import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
 import com.example.projetintegrateur.util.UserClient;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.login.LoginManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -77,8 +80,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
-
     private final String TAG = "debug";
 
     //Dynamic List of LatLng from SearchBar
@@ -144,18 +145,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //GET PERMISSION
             getLocationPermission();
 
-
             //SETUP PLACES AUTOCOMPLETION
             setUpPlacesAutocomplete();
 
             //SET VIEW BUTTON, FIREBASE, etc
             initView();
 
-
             //CHECK IF User is already Connected or Display Login Dialog
             checkUserAuth();
-
-
         }
     }
 
@@ -848,10 +845,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             loginDialog = new LoginDialog();
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
         } else {
-            //TODO:: RETRIEVE USER DATA AND RESTORE IT INTO USER SINGLETON
-            //  AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//            Log.d("USER", mAuth.getCurrentUser().getUid());
-//            Log.d("USER", String.valueOf(accessToken));
+            //TODO:: RETRIEVE USER DATA FROM FIREBASE AND RESTORE IT INTO USER SINGLETON
+            //THIS IS NEEDED FOR WHEN THE USER CLOSES THE APP AND OPENS IT.. THE SINGLETON USER IS NOT KEPT WHEN THIS FLOW OCCURS,
+            // HENCE WE NEED TO QUERY IT BACK FROM THE DATABASE
+
         }
 
 
