@@ -13,8 +13,7 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		map:mapId="@string/mapId"
-		tools:context=".MapsActivity"
-		/>
+		tools:context=".MapsActivity" />
 
 	<RelativeLayout
 		android:id="@+id/relLayout1"
@@ -48,6 +47,21 @@
 			/>
 
 	</RelativeLayout>
+
+	<ImageView
+		android:id="@+id/ic_reset"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginStart="-40dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginEnd="15dp"
+		android:layout_marginBottom="590dp"
+		android:contentDescription="@string/empty_value"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_reset_foreground"
+		/>
 
 
 	<!--	<ImageView-->
@@ -109,6 +123,23 @@
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_perso_foreground"
+		/>
+
+	<ImageView
+		android:id="@+id/ic_show_listview_btn"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginStart="-54dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginEnd="340dp"
+		android:layout_marginBottom="130dp"
+		android:layout_toStartOf="@id/ic_gps"
+		android:visibility="invisible"
+		android:contentDescription="@string/empty_value"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_restaurant2_foreground"
 		/>
 
 	<!--	<ImageView-->

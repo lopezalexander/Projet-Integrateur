@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
-import com.example.projetintegrateur.model.User;
+import com.example.projetintegrateur.model.directionAPI.Bounds;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
@@ -39,6 +39,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -118,6 +119,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //VIEW
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
+    ImageView btn_resetSearchBar;
+    ImageView btn_showBusinessList;
     BusinessDialog businessDialog;
 
 
@@ -140,6 +143,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
+        btn_resetSearchBar = findViewById(R.id.ic_reset);
+        btn_showBusinessList = findViewById(R.id.ic_show_listview_btn);
 
         if (isServicesOK()) {
             //GET PERMISSION
@@ -231,6 +236,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //Add to locationArrayList
                         locationArrayList.add(latLng[0]);
 
+                        //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
+                        if (locationArrayList.size() == 2) {
+
+                            //INITIATE LOGIC FOR SEARCH RESULTS
+                            try {
+                                //FIND MIDDLE DISTANCE POINT
+                                findMiddleDistancePoint();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         //MoveCamera to LatLng && Add Marker
                         moveCamera(latLng[0], DEFAULT_ZOOM);
                         addMarker(latLng[0], "Current Location");
@@ -261,18 +278,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  ADD MARKER TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void addMarker(LatLng latLng, String title) {
+        MarkerOptions markerOptions;
 
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        if (!title.equals("MidPoint_Fine")) {
+            markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
+        }else {
+            markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .title(title)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        }
+
 
 
         //Add the new marker to the markerArrayList
         markerArrayList.add(mMap.addMarker(markerOptions));
+//        markerArrayList.get(0).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_perso_foreground));
 
         //Clear the Search Bar text
         autocompleteFragment.setText("");
+
 
 
         setHints();
@@ -407,7 +435,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             circle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
-                            moveCamera(midPointLatLng, 14);
+                            moveCamera(midPointLatLng, 13);
+                            centerAllMarkers();
+
                         });
 
                         //QUERY LIST OF AVENUES AROUND MIDDLE DISTANCE POINT
@@ -423,6 +453,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
             }
         }); //END  [REQUEST-RESPONSE]
+    }
+
+    //CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
+    private void centerAllMarkers() {
+        //Create Latlng Bounds Builder
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        //Add Markers Positions in Builder
+        for (Marker marker : markerArrayList) {
+            builder.include(marker.getPosition());
+        }
+        //Create Latlng Bounds
+        LatLngBounds bounds = builder.build();
+
+        int padding = 300; // offset from edges of the map in pixels
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.moveCamera(cu);
     }
 
 
@@ -498,16 +546,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
 
-                                //CREATE THE DIALOG AND SHOW ON THE UI
-                                businessDialog = new BusinessDialog(recyclerBusinessList);
-                                businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
-                            });
+                            //CREATE THE DIALOG AND SHOW ON THE UI
+                            businessDialog = new BusinessDialog(recyclerBusinessList);
+                            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
+                            btn_showBusinessList.setVisibility(View.VISIBLE);
+                        });
+
+
                         } else {
                             MapsActivity.this.runOnUiThread(() -> {
                                 //TODO:: RESET EVERYTHING HERE
                                 Toast.makeText(MapsActivity.this, "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
                             });
                         }
+
 
 
                     } catch (JSONException e) {
@@ -655,6 +707,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getCurrentLocation();
         });
 
+
+
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
         btn_SearchBar_GPS.setOnClickListener(view -> {
@@ -663,11 +717,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Add marker on CurrentLocation
             getSearchBarCurrentLocation();
 
+            //HIDE WHEN USED ONCE
+            btn_SearchBar_GPS.setVisibility(View.INVISIBLE);
+
             //If the locationArrayList has 2 value in it( when the User enters a second address), Remove SearchBar
             if (locationArrayList.size() == 2) {
                 autocompleteFragment.requireView().setVisibility(View.GONE);
                 btn_SearchBar_GPS.setVisibility(View.GONE);
             }
+        });
+
+        btn_showBusinessList.setOnClickListener(view -> {
+            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
         });
 
 
@@ -713,6 +774,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(71, 136)
         ));
 
+        // SET OnClickListener to reset search bar and to empty addresses
+        //*************************************************************************************************
+        btn_resetSearchBar.setOnClickListener(view -> {
+            locationArrayList.clear();
+            markerArrayList.clear();
+            mMap.clear();
+            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+//            setUpPlacesAutocomplete();
+            autocompleteFragment.setText("");
+            setHints();
+        });
+
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -726,7 +800,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //CENTER CAMERA ON THE LOCATION ENTERED
                 moveCamera(Objects.requireNonNull(place.getLatLng()), DEFAULT_ZOOM);
                 addMarker(place.getLatLng(), place.getName());
-
+                centerAllMarkers();
 
                 //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                 if (locationArrayList.size() == 2) {
