@@ -26,12 +26,9 @@ import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -49,12 +46,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONObject;
-
+ 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 
@@ -321,6 +315,7 @@ public class LoginDialog extends DialogFragment {
                         String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                         DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
 
+
                         //Check if user exist
                         ref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -390,6 +385,7 @@ public class LoginDialog extends DialogFragment {
     //*******************************************************************************************************
     private void loginUserFacebookFirebase(AccessToken token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+
 
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
@@ -562,20 +558,7 @@ public class LoginDialog extends DialogFragment {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 //ONCE WE HAVE A SUCCESSFULL LOGIN AT FACEBOOK, TAKE THE TOKEN AND PROCEED WITH FIREBASE mAUTH SIGNIN
-
-                GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
-                        Log.d("FACEBOOK", jsonObject.toString());
-                        loginUserFacebookFirebase(loginResult.getAccessToken());
-                    }
-                });
-
-                Bundle bundle = new Bundle();
-                bundle.putString("fields", "first_name,last_name, gender, picture");
-                request.setParameters(bundle);
-                request.executeAsync();
-
+                loginUserFacebookFirebase(loginResult.getAccessToken());
             }
 
             @Override
