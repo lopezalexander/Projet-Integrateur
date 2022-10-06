@@ -30,6 +30,8 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -48,7 +50,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -150,7 +155,7 @@ public class LoginDialog extends DialogFragment {
         //FACEBOOK
         facebook_btn.setOnClickListener(view -> {
             //LAUNCH THE REQUEST/INTENT TO CONNECT TO FACEBOOK
-            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Collections.singletonList("email"));
+            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Arrays.asList("email", "public_profile"));
         });
 
         //
@@ -557,7 +562,20 @@ public class LoginDialog extends DialogFragment {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 //ONCE WE HAVE A SUCCESSFULL LOGIN AT FACEBOOK, TAKE THE TOKEN AND PROCEED WITH FIREBASE mAUTH SIGNIN
-                loginUserFacebookFirebase(loginResult.getAccessToken());
+
+                GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(@Nullable JSONObject jsonObject, @Nullable GraphResponse graphResponse) {
+                        Log.d("FACEBOOK", jsonObject.toString());
+                        loginUserFacebookFirebase(loginResult.getAccessToken());
+                    }
+                });
+
+                Bundle bundle = new Bundle();
+                bundle.putString("fields", "first_name,last_name, gender, picture");
+                request.setParameters(bundle);
+                request.executeAsync();
+
             }
 
             @Override
