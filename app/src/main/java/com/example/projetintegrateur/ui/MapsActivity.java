@@ -1,6 +1,7 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -28,6 +29,10 @@ import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
+import com.example.projetintegrateur.util.UserClient;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.login.LoginManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -76,8 +81,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-
-
     private final String TAG = "debug";
 
     //Dynamic List of LatLng from SearchBar
@@ -88,13 +91,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     AutocompleteSupportFragment autocompleteFragment;
 
     //FIREBASE
-    private FirebaseAuth mAuth;
-    private FirebaseDatabase mFirebaseDB;
+    public FirebaseAuth mAuth;
+    public FirebaseDatabase mFirebaseDB;
 
     //SEARCH VARIABLE, NEEDED TO STORE IN DB 
-    LatLng midPointLatLng;
+    LatLng midPointLatLng; // middle distance point
     LatLng origintLatLng; //address A ou 1
     LatLng destinationLatLng; // Address B ou 2
+    LatLng start_mid_point; //Testing purpopses for now
+    LatLng end_mid_point;   //Testing purpopses for now
     LatLng selectedBusiness;
 
     ArrayList<NearbyBusiness> allNearbyBusinessList;
@@ -118,8 +123,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_showBusinessList;
     BusinessDialog businessDialog;
 
+
     //UTILS
     ObjectMapper mapper;
+    LoginDialog loginDialog;
 
 
     //***********\\
@@ -143,17 +150,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //GET PERMISSION
             getLocationPermission();
 
-
             //SETUP PLACES AUTOCOMPLETION
             setUpPlacesAutocomplete();
 
             //SET VIEW BUTTON, FIREBASE, etc
             initView();
 
-
             //CHECK IF User is already Connected or Display Login Dialog
-//            checkUserAuth();
-
+            checkUserAuth();
         }
     }
 
@@ -345,6 +349,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
+
                         //TRANSFORM OUR JSON RESPONSE TO AN DirectionResponse Object, which we can use later if needed and easier to traverse
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
@@ -374,21 +379,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
                             if ((distanceCounter >= total_distance_value / 2) && notPassed) {
-                                //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
-                                double latOver = stepssArray.get(i).getStart_location().getLat();
-                                double lngOver = stepssArray.get(i).getStart_location().getLng();
+                                //WE NEED TAKE INTO ACCOUNT THAT IF THE LAST STEP IS THE ONE GOING OVER THE MID DISTANCE POINT,
+                                // THERE IS NO ENTRY OF .get(i + 1) IN THE ARRAYLIST. HENCE, WE TAKE THE LAST STEP AS THE MIDDLE POINT
+                                if (i != (stepssArray.size() - 1)) {
+                                    //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
+                                    double latOver = stepssArray.get(i).getStart_location().getLat();
+                                    double lngOver = stepssArray.get(i).getStart_location().getLng();
 
-                                //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
-                                double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
-                                double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
+                                    //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
+                                    double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
+                                    double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
 
-                                //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
-                                LatLng start_mid_point = new LatLng(latOver, lngOver);
-                                LatLng end_mid_point = new LatLng(latAfter, lngAfter);
 
-                                //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
-                                midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+                                    //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
+                                    start_mid_point = new LatLng(latOver, lngOver);
+                                    end_mid_point = new LatLng(latAfter, lngAfter);
 
+
+                                    //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
+                                    midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+                                } else {
+                                    double midLat = stepssArray.get(i).getStart_location().getLat();
+                                    double midLng = stepssArray.get(i).getStart_location().getLng();
+                                    midPointLatLng = new LatLng(midLat, midLng);
+                                }
                                 //WE FOUND THE MIDDLE POINT, SET TO FALSE TO NOT ENTER THE IF() AGAIN
                                 notPassed = false;
                             }//END FORLOOP CHECK DISTANCE
@@ -399,6 +413,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MapsActivity.this.runOnUiThread(() -> {
                             //DECODE POLYLINE
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
+
+                            //TESTING TO SHOW THE START AND END OF MIDPOINT
+//                            addMarker(start_mid_point, "test");
+//                            addMarker(end_mid_point, "test2");
 
                             //DRAW POLYLINE ON MAP
                             mMap.addPolyline(new PolylineOptions()
@@ -491,46 +509,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //CREATE JSON OBJECT WITH RESPONSE
                         JSONObject respJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
 
-                        //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
-                        JSONArray results = respJSON.getJSONArray("results");
+                        String resultStatus = respJSON.getString("status");
+                        if (!resultStatus.equals("ZERO_RESULTS")) {
+                            //ONLY RETRIEVE THE Results Array in the response to convert to Model Class NearbySearch
+                            JSONArray results = respJSON.getJSONArray("results");
 
-                        //INSTANTIATE OUR ARRAYLIST OF Nearby Business
-                        allNearbyBusinessList = new ArrayList<>();
+                            //INSTANTIATE OUR ARRAYLIST OF Nearby Business
+                            allNearbyBusinessList = new ArrayList<>();
 
-                        //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
-                        for (int i = 0; i < results.length(); i++) {
-                            NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
-                            allNearbyBusinessList.add(uniqueBusinnes);
-                        }
+                            //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
+                            for (int i = 0; i < results.length(); i++) {
+                                NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
+                                allNearbyBusinessList.add(uniqueBusinnes);
+                            }
 
 
-                        // DISPLAY THE BUSINESS LIST ON A DIALOG FOR USER TO CHOOSE FROM
-                        //******************************************************************
+                            // DISPLAY THE BUSINESS LIST ON A DIALOG FOR USER TO CHOOSE FROM
+                            //******************************************************************
 
-                        //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
-                        ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
-                        for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
-                            //CREATE UNIQUE BusinessModel OBJECT
-                            BusinessModel business = new BusinessModel();
+                            //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
+                            ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
+                            for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
+                                //CREATE UNIQUE BusinessModel OBJECT
+                                BusinessModel business = new BusinessModel();
 
-                            //SET NAME AND ADDRESS
-                            business.setName(uniqueBusiness.getName());
-                            business.setAddress(uniqueBusiness.getVicinity());
-                            business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
+                                //SET NAME AND ADDRESS
+                                business.setName(uniqueBusiness.getName());
+                                business.setAddress(uniqueBusiness.getVicinity());
+                                business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
 
-                            //ADD BUSINESS TO THE LIST
-                            recyclerBusinessList.add(business);
-                        }
+                                //ADD BUSINESS TO THE LIST
+                                recyclerBusinessList.add(business);
+                            }
 
-                        MapsActivity.this.runOnUiThread(() -> {
+                            MapsActivity.this.runOnUiThread(() -> {
 
-                            //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
+                                //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
 
                             //CREATE THE DIALOG AND SHOW ON THE UI
                             businessDialog = new BusinessDialog(recyclerBusinessList);
                             businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
                             btn_showBusinessList.setVisibility(View.VISIBLE);
                         });
+
+
+                        } else {
+                            MapsActivity.this.runOnUiThread(() -> {
+                                //TODO:: RESET EVERYTHING HERE
+                                Toast.makeText(MapsActivity.this, "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
+                            });
+                        }
+
 
 
                     } catch (JSONException e) {
@@ -887,9 +916,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
-            LoginDialog loginDialog = new LoginDialog();
+            loginDialog = new LoginDialog();
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
+        } else {
+            //TODO:: RETRIEVE USER DATA FROM FIREBASE AND RESTORE IT INTO USER SINGLETON
+            //THIS IS NEEDED FOR WHEN THE USER CLOSES THE APP AND OPENS IT.. THE SINGLETON USER IS NOT KEPT WHEN THIS FLOW OCCURS,
+            // HENCE WE NEED TO QUERY IT BACK FROM THE DATABASE
+
         }
+
+
     }
 
     //

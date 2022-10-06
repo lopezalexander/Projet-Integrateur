@@ -186,6 +186,9 @@
 				android:scaleType="fitXY"
 				android:src="@drawable/ic_facebook_icon_background"
 				/>
+
+
+
 		</LinearLayout>
 
 		<LinearLayout
