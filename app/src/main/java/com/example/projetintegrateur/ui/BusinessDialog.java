@@ -27,10 +27,10 @@ public class BusinessDialog extends BottomSheetDialogFragment implements Busines
 
     DataTransferInterfaceDialog mListener;
 
-    public BusinessDialog(ArrayList<BusinessModel> businessData) {
+    public BusinessDialog(ArrayList<BusinessModel> businessData, DataTransferInterfaceDialog mListener) {
 
         this.businessData = businessData;
-//        mListener
+        this.mListener = mListener;
 
     }
 
@@ -56,7 +56,11 @@ public class BusinessDialog extends BottomSheetDialogFragment implements Busines
     @Override
     public void getSelectedBusinnes(LatLng businessCoordinate) {
         selectedBusinnesCoordinates = businessCoordinate;
+
+        Log.d("TEST", "============BUSINESSDIALOG===============");
         Log.d("TEST", String.valueOf(selectedBusinnesCoordinates.latitude) + ", " + String.valueOf(selectedBusinnesCoordinates.longitude));
+        mListener.getSelectedBusinnes(businessCoordinate);
+
 
     }
 
