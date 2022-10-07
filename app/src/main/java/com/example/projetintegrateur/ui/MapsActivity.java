@@ -76,7 +76,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, BusinessDialog.DataTransferInterfaceDialog {
     private final String TAG = "debug";
 
     //Dynamic List of LatLng from SearchBar
@@ -553,7 +553,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                                 //CREATE THE DIALOG AND SHOW ON THE UI
-                                businessDialog = new BusinessDialog(recyclerBusinessList);
+                                businessDialog = new BusinessDialog(recyclerBusinessList, MapsActivity.this);
                                 businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
                                 btn_showBusinessList.setVisibility(View.VISIBLE);
                             });
@@ -972,5 +972,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    @Override
+    public void getSelectedBusinnes(LatLng businessCoordinate) {
+        selectedBusiness = businessCoordinate;
 
+        Log.d("TEST", "============MAPSACTIVITY===============");
+        Log.d("TEST", String.valueOf(selectedBusiness.latitude) + ", " + String.valueOf(selectedBusiness.longitude));
+    }
 }//END MAPACTIVITY  //==============================================================================================================================================================
