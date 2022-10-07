@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.ui.MapsActivity;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -21,10 +22,12 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
     Context context;
     ArrayList<BusinessModel> businessData;
+    DataTransferInterfaceRecycler mListener;
 
-    public BusinessRecyclerViewAdapter(Context context, ArrayList<BusinessModel> businessData) {
+    public BusinessRecyclerViewAdapter(Context context, ArrayList<BusinessModel> businessData, DataTransferInterfaceRecycler mListener) {
         this.context = context;
         this.businessData = businessData;
+        this.mListener = mListener;
     }
 
     @NonNull
@@ -33,7 +36,7 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.business_recycler_view_row, parent, false);
 
-        return new BusinessRecyclerViewAdapter.MyViewHolder(view);
+        return new BusinessRecyclerViewAdapter.MyViewHolder(view, mListener);
     }
 
     @Override
@@ -45,8 +48,9 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
         holder.btn_chooseBusiness.setOnClickListener(v -> {
             //test
-            Toast.makeText(v.getContext(), "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
-
+//            Toast.makeText(v.getContext(), "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
+            LatLng businessCoordinate = businessData.get(position).getCoordinatesLatlng();
+            mListener.getSelectedBusinnes(businessCoordinate);
 
 
         });
@@ -62,9 +66,9 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
         ImageView businesImage, btn_chooseBusiness;
         TextView businessName, businessAddress, businessRating;
+        DataTransferInterfaceRecycler mListener;
 
-
-        public MyViewHolder(@NonNull View itemView) {
+        public MyViewHolder(@NonNull View itemView, DataTransferInterfaceRecycler mListener) {
             super(itemView);
             businesImage = itemView.findViewById(R.id.businessImage);
             btn_chooseBusiness = itemView.findViewById(R.id.chooseBusiness);
@@ -72,7 +76,13 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
             businessAddress = itemView.findViewById(R.id.businessAddress);
             businessRating = itemView.findViewById(R.id.businessRating);
 
+            this.mListener = mListener;
+
 
         }
+    }
+
+    public interface DataTransferInterfaceRecycler {
+        public void getSelectedBusinnes(LatLng businessCoordinate);
     }
 }

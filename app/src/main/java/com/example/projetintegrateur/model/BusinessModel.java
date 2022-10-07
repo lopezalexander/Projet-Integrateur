@@ -1,10 +1,22 @@
 package com.example.projetintegrateur.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class BusinessModel {
 
     private String name;
     private String address;
     private String rating;
+    private LatLng coordinatesLatlng;
+
+    public LatLng getCoordinatesLatlng() {
+        return coordinatesLatlng;
+    }
+
+    public void setCoordinatesLatlng(LatLng coordinatesLatlng) {
+        this.coordinatesLatlng = coordinatesLatlng;
+    }
+
 
     public String getRating() {
         return rating;
