@@ -543,6 +543,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setName(uniqueBusiness.getName());
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
+                                business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
 
                                 //ADD BUSINESS TO THE LIST
                                 recyclerBusinessList.add(business);
@@ -969,6 +970,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             btn_SearchBar_GPS.setVisibility(View.GONE);
         }
     }
+
 
 
 }//END MAPACTIVITY  //==============================================================================================================================================================
