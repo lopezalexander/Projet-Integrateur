@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
+import com.example.projetintegrateur.ui.MapsActivity;
 
 import java.util.ArrayList;
 
@@ -41,6 +43,14 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
         holder.businessAddress.setText(businessData.get(position).getAddress());
         holder.businessRating.setText(businessData.get(position).getRating());
 
+        holder.btn_chooseBusiness.setOnClickListener(v -> {
+            //test
+            Toast.makeText(v.getContext(), "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
+
+
+
+        });
+
     }
 
     @Override
@@ -50,13 +60,14 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView businesImage;
+        ImageView businesImage, btn_chooseBusiness;
         TextView businessName, businessAddress, businessRating;
 
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             businesImage = itemView.findViewById(R.id.businessImage);
+            btn_chooseBusiness = itemView.findViewById(R.id.chooseBusiness);
             businessName = itemView.findViewById(R.id.businessName);
             businessAddress = itemView.findViewById(R.id.businessAddress);
             businessRating = itemView.findViewById(R.id.businessRating);

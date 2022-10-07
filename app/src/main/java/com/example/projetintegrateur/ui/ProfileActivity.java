@@ -19,4 +19,10 @@ public class ProfileActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
 
     }
+
+
+
+
+
+
 }
