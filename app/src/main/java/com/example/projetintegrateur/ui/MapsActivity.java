@@ -1,10 +1,10 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentResultListener;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -25,15 +25,10 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
-import com.example.projetintegrateur.model.directionAPI.Bounds;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
-import com.example.projetintegrateur.util.UserClient;
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-import com.facebook.login.LoginManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -185,26 +180,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             if (mLocationPermissionsGranted) {
-                final Task<Location> location = fusedLocationProviderClient.getLastLocation();
+                Task<Location> location = fusedLocationProviderClient.getLastLocation();
+
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-//                        Log.d(TAG, "3) onComplete: found location!");
+
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
 
-                        //Set LatLng
-                        LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        if (currentLocation != null) {
+                            //Set LatLng
+                            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
+                            //MoveCamera to LatLng
+                            moveCamera(latLng, DEFAULT_ZOOM);
+                        } else {
+                            String err = "unable to get current location";
+                            Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
+                        }
 
-                        //MoveCamera to LatLng
-                        moveCamera(latLng, DEFAULT_ZOOM);
                     } else {
-//                        Log.d(TAG, "3) onComplete: current location is null");
                         String err = "unable to get current location";
                         Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
             }
 
         } catch (SecurityException e) {
@@ -224,6 +226,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
             if (mLocationPermissionsGranted) {
                 final Task<Location> location = fusedLocationProviderClient.getLastLocation();
+
+
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
 //                        Log.d(TAG, "3) onComplete: found location!");
@@ -258,6 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
                     }
                 });
+
             }
 
         } catch (SecurityException e) {
@@ -286,13 +291,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .position(latLng)
                     .title(title)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
-        }else {
+        } else {
             markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         }
-
 
 
         //Add the new marker to the markerArrayList
@@ -301,7 +305,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Clear the Search Bar text
         autocompleteFragment.setText("");
-
 
 
         setHints();
@@ -456,7 +459,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }); //END  [REQUEST-RESPONSE]
     }
 
-    //CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
+    //
+    //  CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
+    //*****************************************************************************************************************************
     private void centerAllMarkers() {
         //Create Latlng Bounds Builder
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -545,13 +550,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             MapsActivity.this.runOnUiThread(() -> {
 
-                                //TODO::SET TO VISIBLE THE BUTTON TO CHECK THE DIALOG
 
-                            //CREATE THE DIALOG AND SHOW ON THE UI
-                            businessDialog = new BusinessDialog(recyclerBusinessList);
-                            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
-                            btn_showBusinessList.setVisibility(View.VISIBLE);
-                        });
+                                //CREATE THE DIALOG AND SHOW ON THE UI
+                                businessDialog = new BusinessDialog(recyclerBusinessList);
+                                businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
+                                btn_showBusinessList.setVisibility(View.VISIBLE);
+                            });
 
 
                         } else {
@@ -560,7 +564,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast.makeText(MapsActivity.this, "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
                             });
                         }
-
 
 
                     } catch (JSONException e) {
@@ -648,9 +651,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             autocompleteFragment.requireView().setVisibility(View.VISIBLE);
             findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
 
-            if (locationArrayList.isEmpty()) {
-                getCurrentLocation();
-            }
+//            if (locationArrayList.isEmpty()) {
+//                getCurrentLocation();
+//            }
             return false;
         });
     }
@@ -709,7 +712,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
         btn_SearchBar_GPS.setOnClickListener(view -> {
@@ -728,9 +730,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        btn_showBusinessList.setOnClickListener(view -> {
-            businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
-        });
+        // SET OnClickListener TO DISPLAY THE BUSINESS DIALOG AFTER ITS BEEN CLOSED (BTN APPEARS WHEN SEARCH IS DONE)
+        //*************************************************************************************************
+        btn_showBusinessList.setOnClickListener(view -> businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment"));
 
 
         // SET OnClickListener for the PROFILE BUTTON
@@ -739,6 +741,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         profil.setOnClickListener(view -> {
             Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
             MapsActivity.this.startActivity(intent);
+        });
+
+
+        //test
+        getSupportFragmentManager().setFragmentResultListener("BusinessResult", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                //GET DATA HERE
+
+            }
         });
     }
 
@@ -878,27 +890,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        Log.d(TAG, "onRequestPermissionResults: called.");
         mLocationPermissionsGranted = false;
 
-        switch (requestCode) {
-            case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0) {
 
-                    //CHECK RESULTS --> IF FALSE, RETURN WITHOUT InitMap(), PERMISSION NOT GRANTED
-                    for (int grantResult : grantResults) {
-                        if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                            mLocationPermissionsGranted = false;
+                //CHECK RESULTS --> IF FALSE, RETURN WITHOUT InitMap(), PERMISSION NOT GRANTED
+                for (int grantResult : grantResults) {
+                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                        mLocationPermissionsGranted = false;
 //                            Log.d(TAG, "onRequestPermissionResults: permission failed.");
-                            return;
-                        }
+                        return;
                     }
-
-                    //PERMISSION WERE GRANTED, INITIALIZE THE MAP
-                    mLocationPermissionsGranted = true;
-                    //Initialize the Map
-                    initMap();
-
-                    //GET CURRENT LOCATION
-                    getCurrentLocation();
                 }
+
+                //PERMISSION WERE GRANTED, INITIALIZE THE MAP
+                mLocationPermissionsGranted = true;
+                //Initialize the Map
+                initMap();
+
+                //GET CURRENT LOCATION
+                getCurrentLocation();
             }
         }
     }

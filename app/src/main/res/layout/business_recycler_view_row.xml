@@ -73,7 +73,7 @@
 			/>
 
 		<ImageView
-			android:id="@+id/chooseDestination"
+			android:id="@+id/chooseBusiness"
 			android:layout_width="0dp"
 			android:layout_height="35dp"
 			android:layout_gravity="center"

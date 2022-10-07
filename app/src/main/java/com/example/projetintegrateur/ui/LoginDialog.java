@@ -46,7 +46,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
- 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -149,7 +149,7 @@ public class LoginDialog extends DialogFragment {
         //FACEBOOK
         facebook_btn.setOnClickListener(view -> {
             //LAUNCH THE REQUEST/INTENT TO CONNECT TO FACEBOOK
-            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Arrays.asList("email", "public_profile"));
+            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Arrays.asList("email"));
         });
 
         //
