@@ -1,7 +1,6 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -61,11 +60,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -1044,7 +1040,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 selectedBusinessCoordinate,
                 selectedBusinessAddressName,
                 selectedBusinessName,
-                mAuth.getCurrentUser().getUid()
+                Objects.requireNonNull(mAuth.getCurrentUser()).getUid()
         );
 
         //SAVE INTO THE DATABASE
@@ -1061,12 +1057,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //ADD ITINERARY TO FIREBASE
         DatabaseReference newItineraryPush = mFirebaseDB.getReference("Itinerary").push();
-        newItineraryPush.setValue(itineraryToAdd, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show();
-            }
-        });
+        newItineraryPush.setValue(itineraryToAdd, (error, ref) -> Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show());
     }
 
 
@@ -1084,7 +1075,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //DISPLAY RESULTS
 
         DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
-
+        
 
     }
 
