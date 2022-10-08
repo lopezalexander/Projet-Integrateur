@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        map:mapId="@string/mapId"
+        tools:context=".MapsActivity" />
+
+    <RelativeLayout
+        android:id="@+id/relLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="25dp"
+        android:background="@color/blue3"
+        android:elevation="10dp"
+        >
+
+
+    </RelativeLayout>
+
+
+    >
+
+    <ImageView
+        android:id="@+id/ic_gps"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-54dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="170dp"
+        android:contentDescription="@string/empty_value"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_gps_foreground"
+        />
+
+    <ImageView
+        android:id="@+id/ic_perso"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-54dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="130dp"
+        android:layout_toStartOf="@id/ic_gps"
+        android:contentDescription="@string/empty_value"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_perso_foreground"
+        />
+
+
+
+
+</RelativeLayout>

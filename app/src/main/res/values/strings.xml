@@ -37,15 +37,15 @@
 
 
 	<!-- FACEBOOK LOGIN -->
-	<!--================= ADNAN ================== -->
-	<!--	<string name="facebook_app_id">1533089473800999</string>-->
-	<!--	<string name="fb_login_protocol_scheme">fb1234</string>-->
-	<!--	<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>-->
+	<!--	================= ADNAN ================== -->
+<!--	<string name="facebook_app_id">1533089473800999</string>-->
+<!--	<string name="fb_login_protocol_scheme">fb1234</string>-->
+<!--	<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>-->
 
-	<!--================= ALEX ================== -->
-	<string name="facebook_app_id">1369837933544502</string>
-	<string name="fb_login_protocol_scheme">fb1234</string>
-	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
+	<!--	================= ALEX ================== -->
+		<string name="facebook_app_id">1369837933544502</string>
+		<string name="fb_login_protocol_scheme">fb1234</string>
+		<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
 
 
 	<!-- PROFILE LAYOUT -->
