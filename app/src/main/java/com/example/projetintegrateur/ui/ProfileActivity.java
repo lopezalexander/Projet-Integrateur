@@ -2,8 +2,11 @@ package com.example.projetintegrateur.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.example.projetintegrateur.R;
@@ -15,11 +18,15 @@ import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
 
+
+    //***********\\
+    //  OnCREATE  \\
+    //******************************************************************************************************************************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        
+
         //HIDE DEFAULT ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
 
@@ -27,7 +34,8 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView profilePicture = findViewById(R.id.imageView_profile_picture);
         String photoURL = user.getPhotoUrl();
 
-        //Set profile picture
+        //SET/DISPLAY PROFILE INFORMATION
+        //*****************************************************************************************************************************
         Picasso.get().load(photoURL).into(profilePicture);
 
         TextView profileName = findViewById(R.id.textview_fullname);
@@ -37,6 +45,20 @@ public class ProfileActivity extends AppCompatActivity {
         TextView profileEmail = findViewById(R.id.textview_email);
         String email = user.getEmail();
         profileEmail.setText(email);
+
+
+        //BUTTON HISTORY OnClickListener
+        //*****************************************************************************************************************************
+        TextView btn_history = findViewById(R.id.btn_history);
+
+        btn_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, HistoryListActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
     }
 

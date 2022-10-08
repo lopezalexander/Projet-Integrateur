@@ -50,9 +50,10 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
             //test
 //            Toast.makeText(v.getContext(), "UNABLE TO FULFILL REQUEST, Try a shorter distance!!", Toast.LENGTH_LONG).show();
             LatLng businessCoordinate = businessData.get(position).getCoordinatesLatlng();
-            mListener.getSelectedBusinnes(businessCoordinate);
-
-
+            String businessAddressName = businessData.get(position).getAddress();
+            String businessName = businessData.get(position).getName();
+            mListener.getSelectedBusinnes(businessCoordinate, businessAddressName, businessName);
+            
         });
 
     }
@@ -83,6 +84,6 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
     }
 
     public interface DataTransferInterfaceRecycler {
-        public void getSelectedBusinnes(LatLng businessCoordinate);
+        public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName);
     }
 }
