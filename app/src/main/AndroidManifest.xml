@@ -41,7 +41,7 @@
 		-->
 		<meta-data
 			android:name="com.google.android.geo.API_KEY"
-			android:value="@string/maps_key_alex"
+			android:value="@string/maps_key"
 
 			/> <!-- FACEBOOK -->
 		<meta-data
