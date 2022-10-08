@@ -7,7 +7,7 @@ import com.example.projetintegrateur.model.placeAPI.PlusCode;
 
 import java.util.ArrayList;
 
-public class NearbyBusiness {
+public class NearbyBusinessResponse {
     @Override
     public String toString() {
         return "NearbySearch{" +

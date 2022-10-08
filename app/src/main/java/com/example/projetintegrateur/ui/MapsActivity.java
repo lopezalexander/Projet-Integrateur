@@ -1,10 +1,10 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentResultListener;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -25,11 +25,12 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
+import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
-import com.example.projetintegrateur.model.NearbyBusiness;
+import com.example.projetintegrateur.model.NearbyBusinessResponse;
 import com.example.projetintegrateur.util.UserClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
@@ -60,8 +61,11 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -84,6 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Dynamic List of LatLng from SearchBar
     private ArrayList<LatLng> locationArrayList;
+    private ArrayList<String> locationAddressName;
     private ArrayList<Marker> markerArrayList;
 
     //Place API Autocomplete
@@ -99,9 +104,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng destinationLatLng; // Address B ou 2
     LatLng start_mid_point; //Testing purpopses for now
     LatLng end_mid_point;   //Testing purpopses for now
-    LatLng selectedBusiness;
-
-    ArrayList<NearbyBusiness> allNearbyBusinessList;
+    LatLng selectedBusinessCoordinate;
+    String selectedBusinessAddressName;
+    String selectedBusinessName;
+    ItineraryModel ItineraryToAdd;
+    ArrayList<NearbyBusinessResponse> allNearbyBusinessResponseList; //Not added yet to Firebase
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -116,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final float DEFAULT_ZOOM = 13.5f;
 
     //VIEW
+    ImageView profil;
     ImageView btn_SearchBar_GPS;
     ImageView btn_MapCurrentLocation_GPS;
     ImageView btn_resetSearchBar;
@@ -138,12 +146,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Instantiate View Elements, needed for setUpPlacesAutocomplete and others steps afterward
         locationArrayList = new ArrayList<>();
+        locationAddressName = new ArrayList<>();
         markerArrayList = new ArrayList<>();
 
-        btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
-        btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
-        btn_resetSearchBar = findViewById(R.id.ic_reset);
-        btn_showBusinessList = findViewById(R.id.ic_show_listview_btn);
 
         if (isServicesOK()) {
             //GET PERMISSION
@@ -183,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             if (mLocationPermissionsGranted) {
-                Task<Location> location = fusedLocationProviderClient.getLastLocation();
+                final Task<Location> location = fusedLocationProviderClient.getLastLocation();
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -237,28 +242,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
+                        if (currentLocation != null) {
+                            //Set LatLng
+                            latLng[0] = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
-                        //Set LatLng
-                        latLng[0] = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                            //Add to locationArrayList
+                            locationArrayList.add(latLng[0]);
 
-                        //Add to locationArrayList
-                        locationArrayList.add(latLng[0]);
+                            //TODO:: ADD THE PHYSICAL ADDRESS NAME HERE , NEED TO MAKE A SEARCH TO PLACE API
+                            locationAddressName.add("");
 
-                        //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
-                        if (locationArrayList.size() == 2) {
+                            //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
+                            if (locationArrayList.size() == 2) {
 
-                            //INITIATE LOGIC FOR SEARCH RESULTS
-                            try {
-                                //FIND MIDDLE DISTANCE POINT
-                                findMiddleDistancePoint();
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                //INITIATE LOGIC FOR SEARCH RESULTS
+                                try {
+                                    //FIND MIDDLE DISTANCE POINT
+                                    findMiddleDistancePoint();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
 
-                        //MoveCamera to LatLng && Add Marker
-                        moveCamera(latLng[0], DEFAULT_ZOOM);
-                        addMarker(latLng[0], "Current Location");
+                            //MoveCamera to LatLng && Add Marker
+                            moveCamera(latLng[0], DEFAULT_ZOOM);
+                            addMarker(latLng[0], "Current Location");
+                        } else {
+                            String err = "unable to get current location";
+                            Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
+                        }
                     } else {
 //                        Log.d(TAG, "3) onComplete: current location is null");
                         String err = "unable to get current location";
@@ -312,6 +324,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         setHints();
         hideSoftKeyboard();
+    }
+
+    //
+    //  CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
+    //*****************************************************************************************************************************
+    private void centerAllMarkers() {
+        //Create Latlng Bounds Builder
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        //Add Markers Positions in Builder
+        for (Marker marker : markerArrayList) {
+            builder.include(marker.getPosition());
+        }
+        //Create Latlng Bounds
+        LatLngBounds bounds = builder.build();
+
+        int padding = 300; // offset from edges of the map in pixels
+
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.moveCamera(cu);
     }
 
     //
@@ -421,10 +453,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //DECODE POLYLINE
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
 
-                            //TESTING TO SHOW THE START AND END OF MIDPOINT
-//                            addMarker(start_mid_point, "test");
-//                            addMarker(end_mid_point, "test2");
-
                             //DRAW POLYLINE ON MAP
                             mMap.addPolyline(new PolylineOptions()
                                     .clickable(true)
@@ -461,27 +489,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }); //END  [REQUEST-RESPONSE]
     }
-
-    //
-    //  CENTER THE MAP SO THE VIEW INCLUDE ALL MARKERS WITH A PADDING OF 300 px
-    //*****************************************************************************************************************************
-    private void centerAllMarkers() {
-        //Create Latlng Bounds Builder
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-        //Add Markers Positions in Builder
-        for (Marker marker : markerArrayList) {
-            builder.include(marker.getPosition());
-        }
-        //Create Latlng Bounds
-        LatLngBounds bounds = builder.build();
-
-        int padding = 300; // offset from edges of the map in pixels
-
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.moveCamera(cu);
-    }
-
 
     //
     //
@@ -524,12 +531,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             JSONArray results = respJSON.getJSONArray("results");
 
                             //INSTANTIATE OUR ARRAYLIST OF Nearby Business
-                            allNearbyBusinessList = new ArrayList<>();
+                            allNearbyBusinessResponseList = new ArrayList<>();
 
                             //ADD ALL FOUND BUSINESS TO THE ARRAYLIST OF Nearby Business
                             for (int i = 0; i < results.length(); i++) {
-                                NearbyBusiness uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusiness.class);
-                                allNearbyBusinessList.add(uniqueBusinnes);
+                                NearbyBusinessResponse uniqueBusinnes = mapper.readValue(results.getJSONObject(i).toString(), NearbyBusinessResponse.class);
+                                allNearbyBusinessResponseList.add(uniqueBusinnes);
                             }
 
 
@@ -538,7 +545,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //CREATE ARRAYLIST OF BusinessModel TO SUPPLY TO THE RECYCLERVIEW
                             ArrayList<BusinessModel> recyclerBusinessList = new ArrayList<>();
-                            for (NearbyBusiness uniqueBusiness : allNearbyBusinessList) {
+                            for (NearbyBusinessResponse uniqueBusiness : allNearbyBusinessResponseList) {
                                 //CREATE UNIQUE BusinessModel OBJECT
                                 BusinessModel business = new BusinessModel();
 
@@ -638,14 +645,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET onClickListener on Map Markers
         //*************************************************************************************************
         mMap.setOnMarkerClickListener(marker -> {
+
             //EFFACER le LatLng de la liste
             for (int i = 0; i < locationArrayList.size(); i++) {
-                System.out.println("---------" + marker.getPosition());
-                System.out.println("---------" + locationArrayList.get(i).toString());
-                locationArrayList.remove(marker.getPosition());
-                markerArrayList.remove(marker);
-                autocompleteFragment.setText("");
-                setHints();
+                if (locationArrayList.get(i).equals(marker.getPosition())) {
+                    locationArrayList.remove(marker.getPosition());
+                    String locationAddressToRemove = locationAddressName.get(i);
+                    locationAddressName.remove(locationAddressToRemove);
+                    markerArrayList.remove(marker);
+                    autocompleteFragment.setText("");
+                    setHints();
+                }
+
             }
 
             //EFFACER MARKER
@@ -655,11 +666,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             autocompleteFragment.requireView().setVisibility(View.VISIBLE);
             findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
 
-//            if (locationArrayList.isEmpty()) {
-//                getCurrentLocation();
-//            }
             return false;
         });
+
+
     }
 
     //
@@ -693,6 +703,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void initView() {
 
+
         //INITIALIZE PLACES API
         //*************************************************************************************************
         Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
@@ -709,6 +720,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // SET OnClickListener to MAP_GPS Button to center on CurrentLocation
         //*************************************************************************************************
+
+        btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
         btn_MapCurrentLocation_GPS.setOnClickListener(view -> {
 //            Log.d(TAG, "onClicked: clicked gps icon");
             //Center to CurrentLocation
@@ -718,6 +731,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // SET OnClickListener to SearchBar_GPS Button to add a marker
         //*************************************************************************************************
+
+        btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_SearchBar_GPS.setOnClickListener(view -> {
 //            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
 
@@ -736,26 +751,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // SET OnClickListener TO DISPLAY THE BUSINESS DIALOG AFTER ITS BEEN CLOSED (BTN APPEARS WHEN SEARCH IS DONE)
         //*************************************************************************************************
+        btn_showBusinessList = findViewById(R.id.ic_show_listview_btn);
         btn_showBusinessList.setOnClickListener(view -> businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment"));
 
 
         // SET OnClickListener for the PROFILE BUTTON
         //*************************************************************************************************
-        ImageView profil = findViewById(R.id.ic_perso);
+        profil = findViewById(R.id.ic_perso);
         profil.setOnClickListener(view -> {
             Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
-            MapsActivity.this.startActivity(intent);
+            startActivity(intent);
         });
 
+        // SET OnClickListener to reset search bar and to empty addresses
+        //*************************************************************************************************
 
-        //test
-        getSupportFragmentManager().setFragmentResultListener("BusinessResult", this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                //GET DATA HERE
+        btn_resetSearchBar = findViewById(R.id.ic_reset);
+        btn_resetSearchBar.setOnClickListener(view -> resetView());
 
-            }
-        });
+
     }
 
     //
@@ -798,32 +812,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LatLng(71, 136)
         ));
 
-        // SET OnClickListener to reset search bar and to empty addresses
-        //*************************************************************************************************
-        btn_resetSearchBar.setOnClickListener(view -> {
-            locationArrayList.clear();
-            markerArrayList.clear();
-            mMap.clear();
-            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
-//            setUpPlacesAutocomplete();
-            autocompleteFragment.setText("");
-            setHints();
-        });
-
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                //Log.d(TAG, "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+                // Log.d("TEST1", "Place: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
 
                 //AJOUTER LES COORDONNEES DANS LA LISTE DES LatLng
                 locationArrayList.add(place.getLatLng());
+                locationAddressName.add(place.getName());
 
                 //CENTER CAMERA ON THE LOCATION ENTERED
                 moveCamera(Objects.requireNonNull(place.getLatLng()), DEFAULT_ZOOM);
-                addMarker(place.getLatLng(), place.getName());
+                addMarker(place.getLatLng(), Objects.requireNonNull(place.getName()));
                 centerAllMarkers();
 
                 //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
@@ -991,12 +993,102 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
-    @Override
-    public void getSelectedBusinnes(LatLng businessCoordinate) {
-        selectedBusiness = businessCoordinate;
-
-        Log.d("TEST", "============MAPSACTIVITY===============");
-        Log.d("TEST", String.valueOf(selectedBusiness.latitude) + ", " + String.valueOf(selectedBusiness.longitude));
+    //
+    //
+    //RESET THE VIEW FOR ANOTHER SEARCH
+    //*****************************************************************************************************************************
+    public void resetView() {
+        locationArrayList.clear();
+        locationAddressName.clear();
+        markerArrayList.clear();
+        mMap.clear();
+        autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+        btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+        btn_showBusinessList.setVisibility(View.GONE);
+        autocompleteFragment.setText("");
+        setHints();
     }
+
+    //
+    //
+    //DATA TRANSFER FROM BUSINESS DIALOG TO MAPSACTIVITY
+    //*****************************************************************************************************************************
+    @Override
+    public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName) {
+        //RETRIEVE BUSINESS DATA INFORMATION FROM RECYCLERVIEW --> BUSINESS DIALOG --> MAPSACTIVITY
+        this.selectedBusinessCoordinate = businessCoordinate;
+        this.selectedBusinessAddressName = businessAddressName;
+        this.selectedBusinessName = businessName;
+
+        //CREATE ITINERARY OBJECT TO SAVE INTO THE DATABASE
+        createItineraryModelObject();
+
+        showResult();
+    }
+
+
+    //
+    //
+    //CREATE THE FINAL ITINERARY OBJECT
+    //*****************************************************************************************************************************
+    public void createItineraryModelObject() {
+        //GET INSTANCE OF SINGLETON ITINERARY
+        ItineraryToAdd = ItineraryModel.getInstance();
+
+        //CREATE ITINERARY OBJECT
+        ItineraryToAdd.setOrigintLatLng(origintLatLng);
+        ItineraryToAdd.setOriginAddressName(locationAddressName.get(0));
+        ItineraryToAdd.setDestinationLatLng(destinationLatLng);
+        ItineraryToAdd.setDestinationAddressName(locationAddressName.get(1));
+        ItineraryToAdd.setStart_mid_point(start_mid_point);
+        ItineraryToAdd.setEnd_mid_point(end_mid_point);
+        ItineraryToAdd.setMidPointLatLng(midPointLatLng);
+        ItineraryToAdd.setSelectedBusiness(selectedBusinessCoordinate);
+        ItineraryToAdd.setSelectedBusinessAddressName(selectedBusinessAddressName);
+        ItineraryToAdd.setSelectedBusinessName(selectedBusinessName);
+        ItineraryToAdd.setUserID(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+
+
+        //SAVE INTO THE DATABASE
+        addItineraryToFirebase(ItineraryToAdd);
+
+    }
+
+
+    //
+    //
+    //DATA TRANSFER FROM BUSINESS DIALOG TO MAPSACTIVITY
+    //*****************************************************************************************************************************
+    public void addItineraryToFirebase(ItineraryModel itineraryToAdd) {
+
+        //ADD ITINERARY TO FIREBASE
+        DatabaseReference newItineraryPush = mFirebaseDB.getReference("Itinerary").push();
+        newItineraryPush.setValue(itineraryToAdd, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
+    //
+    //
+    //SHOW RESULTS AFTER THE SEARCH AND SELECTED BUSINESS IS DONE
+    //*****************************************************************************************************************************
+    public void showResult() {
+        //REMOVE THE BUSINESS LIST DIALOG
+        businessDialog.dismiss();
+
+        //DISABLE BUTTONS FOR RESULT
+        btn_showBusinessList.setVisibility(View.GONE);
+
+        //DISPLAY RESULTS
+
+        DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
+
+
+    }
+
+
 }//END MAPACTIVITY  //==============================================================================================================================================================
