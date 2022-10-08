@@ -1032,22 +1032,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //CREATE THE FINAL ITINERARY OBJECT
     //*****************************************************************************************************************************
     public void createItineraryModelObject() {
-        //GET INSTANCE OF SINGLETON ITINERARY
-        ItineraryToAdd = ItineraryModel.getInstance();
-
         //CREATE ITINERARY OBJECT
-        ItineraryToAdd.setOrigintLatLng(origintLatLng);
-        ItineraryToAdd.setOriginAddressName(locationAddressName.get(0));
-        ItineraryToAdd.setDestinationLatLng(destinationLatLng);
-        ItineraryToAdd.setDestinationAddressName(locationAddressName.get(1));
-        ItineraryToAdd.setStart_mid_point(start_mid_point);
-        ItineraryToAdd.setEnd_mid_point(end_mid_point);
-        ItineraryToAdd.setMidPointLatLng(midPointLatLng);
-        ItineraryToAdd.setSelectedBusiness(selectedBusinessCoordinate);
-        ItineraryToAdd.setSelectedBusinessAddressName(selectedBusinessAddressName);
-        ItineraryToAdd.setSelectedBusinessName(selectedBusinessName);
-        ItineraryToAdd.setUserID(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-
+        ItineraryToAdd = new ItineraryModel(
+                origintLatLng,
+                locationAddressName.get(0),
+                destinationLatLng,
+                locationAddressName.get(1),
+                start_mid_point,
+                end_mid_point,
+                midPointLatLng,
+                selectedBusinessCoordinate,
+                selectedBusinessAddressName,
+                selectedBusinessName,
+                mAuth.getCurrentUser().getUid()
+        );
 
         //SAVE INTO THE DATABASE
         addItineraryToFirebase(ItineraryToAdd);
