@@ -331,7 +331,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .appendQueryParameter("origin", originCoordinate)
                 .appendQueryParameter("destination", destinationCoordinate)
                 .appendQueryParameter("mode", "driving")
-                .appendQueryParameter("key", getString(R.string.maps_key_alex))
+                .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
 
@@ -493,7 +493,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .appendQueryParameter("location", midPointLatLng_String)
                 .appendQueryParameter("radius", "1000")
                 .appendQueryParameter("type", "restaurant")
-                .appendQueryParameter("key", getString(R.string.maps_key_alex))
+                .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
 
@@ -774,7 +774,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  SET THE AUTOCOMPLETE FOR THE SEARCHBAR
     //*****************************************************************************************************************************
     private void setUpPlacesAutocomplete() {
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), getString(R.string.maps_key));
 
         // Initialize the AutocompleteSupportFragment.
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
