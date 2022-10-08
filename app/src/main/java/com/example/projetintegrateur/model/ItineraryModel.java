@@ -1,10 +1,10 @@
 package com.example.projetintegrateur.model;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.model.LatLng;
 
 public class ItineraryModel {
-
-    private static final ItineraryModel singleton = new ItineraryModel();
 
     LatLng origintLatLng; //address A ou 1
     String originAddressName; //address A ou 1
@@ -27,13 +27,36 @@ public class ItineraryModel {
     //**************\\
     //  CONSTRUCTOR  \\
     //*****************************************************************************************************************************
-    private ItineraryModel() {
+    public ItineraryModel() {
     }
 
-    public static ItineraryModel getInstance() {
-        return singleton;
+    public ItineraryModel(LatLng origintLatLng,
+                          String originAddressName,
+                          LatLng destinationLatLng,
+                          String destinationAddressName,
+                          LatLng start_mid_point,
+                          LatLng end_mid_point,
+                          LatLng midPointLatLng,
+                          LatLng selectedBusiness,
+                          String selectedBusinessAddressName,
+                          String selectedBusinessName,
+                          String userID) {
+        this.origintLatLng = origintLatLng;
+        this.originAddressName = originAddressName;
+        this.destinationLatLng = destinationLatLng;
+        this.destinationAddressName = destinationAddressName;
+        this.start_mid_point = start_mid_point;
+        this.end_mid_point = end_mid_point;
+        this.midPointLatLng = midPointLatLng;
+        this.selectedBusiness = selectedBusiness;
+        this.selectedBusinessAddressName = selectedBusinessAddressName;
+        this.selectedBusinessName = selectedBusinessName;
+        this.userID = userID;
+
     }
 
+
+    @NonNull
     @Override
     public String toString() {
         return "ItineraryModel{" +
