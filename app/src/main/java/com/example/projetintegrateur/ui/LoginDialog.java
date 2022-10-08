@@ -199,7 +199,8 @@ public class LoginDialog extends DialogFragment {
 
                                                 //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                                 String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-                                                User newUserData = new User(email, "", currentUserKey);
+                                                User newUserData = new User(email, "", currentUserKey, null, null);
+
 
                                                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                                 mFirebaseDB.getReference("Users")
@@ -327,7 +328,9 @@ public class LoginDialog extends DialogFragment {
 
                                     //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-                                    User newUserData = new User(email, "", currentUserKey);
+                                    String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
+                                    String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
+                                    User newUserData = new User(email, "", currentUserKey, name, photoUrl);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")
@@ -405,8 +408,9 @@ public class LoginDialog extends DialogFragment {
 
                                     //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-
-                                    User newUserData = new User(email, "", currentUserKey);
+                                    String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
+                                    String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
+                                    User newUserData = new User(email, "", currentUserKey, name, photoUrl);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")

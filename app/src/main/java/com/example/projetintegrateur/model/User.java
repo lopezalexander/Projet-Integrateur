@@ -1,22 +1,24 @@
 package com.example.projetintegrateur.model;
-
+import android.net.Uri;
 public class User {
 
     private String email;
     private String username;
     private String user_id;
-
-
+    private String name;
+    private String photoUrl;
     //**************\\
     //  CONSTRUCTOR  \\
     //*****************************************************************************************************************************
     public User() {
     }
 
-    public User(String email, String username, String user_id) {
+    public User(String email, String username, String user_id, String name, String photoUrl) {
         this.email = email;
         this.username = username;
         this.user_id = user_id;
+        this.name = name;
+        this.photoUrl = photoUrl;
     }
 
 
@@ -35,6 +37,13 @@ public class User {
         return user_id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
 
     //**************\\
     //  SETTER       \\
@@ -50,6 +59,10 @@ public class User {
     public void setUser_id(String user_id) {
         this.user_id = user_id;
     }
+
+    public void setName(String name) { this.name = name; }
+
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
     @Override
     public String toString() {

@@ -25,10 +25,12 @@ import android.widget.Toast;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
+import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusiness;
+import com.example.projetintegrateur.util.UserClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -58,6 +60,7 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.PolyUtil;
 
@@ -941,7 +944,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //TODO:: RETRIEVE USER DATA FROM FIREBASE AND RESTORE IT INTO USER SINGLETON
             //THIS IS NEEDED FOR WHEN THE USER CLOSES THE APP AND OPENS IT.. THE SINGLETON USER IS NOT KEPT WHEN THIS FLOW OCCURS,
             // HENCE WE NEED TO QUERY IT BACK FROM THE DATABASE
+            //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+            String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
+
+            //[FETCH] THE USER IN DATABASE
+            DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
+            ref.get().addOnCompleteListener(task2 -> {
+                if (task2.isSuccessful()) {
+                    //[CREATE] SINGLETON
+                    User currentUser2 = task2.getResult().getValue(User.class);
+                    ((UserClient) getApplicationContext()).setUser(currentUser2);
+                    // Toast
+                    Toast.makeText(this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                } else {
+                    //HANDLE ERROR HERE if we cannot retrieve the user data
+                    Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
+                }
+            }); //END CREATE SINGLETON
         }
 
 
