@@ -7,7 +7,9 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -52,6 +54,7 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -108,6 +111,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng selectedBusinessCoordinate;
     String selectedBusinessAddressName;
     String selectedBusinessName;
+    Polyline mPolyline;
+    Circle mCircle;
+    Marker mMarker;
     ItineraryModel ItineraryToAdd;
     ArrayList<NearbyBusinessResponse> allNearbyBusinessResponseList; //Not added yet to Firebase
 
@@ -303,23 +309,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void addMarker(LatLng latLng, String title) {
         MarkerOptions markerOptions;
+        Marker marker;
 
         if (!title.equals("MidPoint_Fine")) {
-            markerOptions = new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
+            if (markerArrayList.size() == 1) {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
+                marker = mMap.addMarker(markerOptions);
+                //Add the new marker to the markerArrayList
+                markerArrayList.add(marker);
+            } else {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+                marker = mMap.addMarker(markerOptions);
+                //Add the new marker to the markerArrayList
+                markerArrayList.add(marker);
+            }
         } else {
             markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
+            mMarker = mMap.addMarker(markerOptions);
+            //Add the new marker to the markerArrayList
+            markerArrayList.add(mMarker);
         }
 
-
-        //Add the new marker to the markerArrayList
-        markerArrayList.add(mMap.addMarker(markerOptions));
-//        markerArrayList.get(0).setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_perso_foreground));
 
         //Clear the Search Bar text
         autocompleteFragment.setText("");
@@ -457,7 +478,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
 
                             //DRAW POLYLINE ON MAP
-                            mMap.addPolyline(new PolylineOptions()
+                            mPolyline = mMap.addPolyline(new PolylineOptions()
                                     .clickable(true)
                                     .width(10)
                                     .addAll(polylineList));
@@ -466,11 +487,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             addMarker(midPointLatLng, "MidPoint_Fine");
 
                             //ADD CIRCLE AROUND MIDPOINT
-                            Circle circle = mMap.addCircle(new CircleOptions()
+                            mCircle = mMap.addCircle(new CircleOptions()
                                     .center(midPointLatLng)
                                     .radius(1000)
                                     .strokeColor(Color.CYAN));
-                            circle.setVisible(true);
+                            mCircle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
                             moveCamera(midPointLatLng, 13);
@@ -652,30 +673,82 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //*************************************************************************************************
         mMap.setOnMarkerClickListener(marker -> {
 
-            //EFFACER le LatLng de la liste
-            for (int i = 0; i < locationArrayList.size(); i++) {
-                if (locationArrayList.get(i).equals(marker.getPosition())) {
-                    locationArrayList.remove(marker.getPosition());
-                    String locationAddressToRemove = locationAddressName.get(i);
-                    locationAddressName.remove(locationAddressToRemove);
-                    markerArrayList.remove(marker);
-                    autocompleteFragment.setText("");
-                    setHints();
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+
+                        //EFFACER le LatLng de la liste
+                        for (int i = 0; i < locationArrayList.size(); i++) {
+                            if (locationArrayList.get(i).equals(marker.getPosition())) {
+                                locationArrayList.remove(marker.getPosition());
+                                String locationAddressToRemove = locationAddressName.get(i);
+                                locationAddressName.remove(locationAddressToRemove);
+                                markerArrayList.remove(marker);
+                                autocompleteFragment.setText("");
+                                setHints();
+                            }
+
+                        }
+
+                        if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                            mCircle.remove();
+                            mPolyline.remove();
+                            mMarker = null;
+                        } else {
+                            //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
+                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+                            findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
+                        }
+
+                        //EFFACER MARKER
+                        marker.remove();
+
+
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
                 }
+            };
 
-            }
-
-            //EFFACER MARKER
-            marker.remove();
-
-            //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
-            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-            findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("êtes-vous sur de supprimer cette adresse?").setPositiveButton("Oui", dialogClickListener)
+                    .setNegativeButton("Non", dialogClickListener).show();
 
             return false;
         });
 
 
+
+        mMap.setOnPolylineClickListener(polyline1 -> {
+
+
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        //resetRoute();
+                        polyline1.remove();
+                        mCircle.remove();
+
+                        if (businessDialog.isVisible()) {
+                            businessDialog.dismiss();
+                        }
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+            builder.setMessage("êtes-vous sur de supprimer cette itinéraire?").setPositiveButton("Oui", dialogClickListener)
+                    .setNegativeButton("Non", dialogClickListener).show();
+
+
+
+        });
     }
 
     //
