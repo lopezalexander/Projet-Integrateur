@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:layout_margin="5dp"
+	android:orientation="vertical"
+	>
+
+	<!--	TOP		-->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="20dp"
+		android:background="@drawable/history_list_card_style"
+		android:orientation="horizontal"
+		android:weightSum="100"
+		>
+
+
+		<TextView
+			android:id="@+id/listNumber"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="10"
+			android:gravity="center"
+			android:text="@string/history_row_tab"
+			/>
+
+		<TextView
+			android:id="@+id/historyDate"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="40"
+			android:gravity="center"
+			android:text="@string/sampleText"
+			android:textAlignment="center"
+			/>
+
+	</LinearLayout>
+
+
+	<!--	BOTTOM		-->
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="40dp"
+		android:background="@color/blue3"
+		android:orientation="horizontal"
+		android:weightSum="100"
+		>
+
+		<LinearLayout
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="40"
+			android:orientation="vertical"
+			>
+
+			<TextView
+				android:id="@+id/address1"
+				android:layout_width="match_parent"
+				android:layout_height="20dp"
+				android:paddingStart="5dp"
+				android:paddingEnd="0dp"
+				android:text="@string/sampleText"
+				android:textAlignment="textStart"
+				/>
+
+			<TextView
+				android:id="@+id/address2"
+				android:layout_width="match_parent"
+				android:layout_height="20dp"
+				android:paddingStart="5dp"
+				android:paddingEnd="0dp"
+				android:text="@string/sampleText"
+				android:textAlignment="textStart"
+				/>
+		</LinearLayout>
+
+		<TextView
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="5"
+			android:gravity="center"
+			android:text="@string/history_row_togo"
+			android:textAlignment="center"
+			android:textSize="25sp"
+			/>
+
+		<TextView
+			android:id="@+id/selectedBusiness"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="45"
+			android:gravity="center"
+			android:text="@string/sampleText"
+			android:textAlignment="center"
+			/>
+
+
+		<ImageView
+			android:id="@+id/chooseHistoryItem"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_gravity="center"
+			android:layout_weight="10"
+			android:contentDescription="@string/empty_value"
+			android:scaleType="centerCrop"
+			android:src="@drawable/ic_go_foreground"
+			/>
+	</LinearLayout>
+
+</LinearLayout>
