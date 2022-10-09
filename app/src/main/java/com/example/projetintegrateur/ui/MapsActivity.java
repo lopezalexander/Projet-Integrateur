@@ -557,7 +557,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
-
+                                Log.d(TAG, "onResponse: "+uniqueBusiness);
+                                if (uniqueBusiness.getPhotos() != null) {
+                                    business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
+                                }
                                 //ADD BUSINESS TO THE LIST
                                 recyclerBusinessList.add(business);
                             }
