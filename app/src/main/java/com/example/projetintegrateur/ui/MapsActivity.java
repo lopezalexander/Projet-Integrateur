@@ -722,7 +722,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             };
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setMessage("êtes-vous sur de supprimer cette adresse?").setPositiveButton("Oui", dialogClickListener)
                     .setNegativeButton("Non", dialogClickListener).show();
 
@@ -752,7 +753,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             };
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setMessage("êtes-vous sur de supprimer cette itinéraire?").setPositiveButton("Oui", dialogClickListener)
                     .setNegativeButton("Non", dialogClickListener).show();
 

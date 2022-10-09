@@ -110,13 +110,12 @@ public class ProfileActivity extends AppCompatActivity {
             int[] colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
             int[] searchBar_colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which]);
                 profileLayout.setBackgroundColor(colors[which]);
-
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setBackgroundColor(colors[which]);
@@ -124,6 +123,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "onCreate: "+currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
+
         });
 
 
