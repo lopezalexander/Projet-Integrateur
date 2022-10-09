@@ -56,7 +56,10 @@
 	<string name="propos">À propos</string>
 	<string name="nom_complet">Nom Complet</string>
 
-	<!-- XXXXXX LAYOUT -->
+	<!-- HISTORY LAYOUT -->
+
+	<string name="history_title">Historique</string>
+
 
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
