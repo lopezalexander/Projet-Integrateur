@@ -1,11 +1,14 @@
 package com.example.projetintegrateur.ui;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -44,20 +47,28 @@ public class ProfileActivity extends AppCompatActivity {
 
         User user = ((UserClient) getApplicationContext()).getUser();
         ImageView profilePicture = findViewById(R.id.imageView_profile_picture);
-        String photoURL;
-        photoURL = Objects.requireNonNull(user).getPhotoUrl();
+        String photoURL = null;
+        String name = null;
+        String email = null;
+        if (user != null) {
+            photoURL = user.getPhotoUrl();
+            name = user.getName();
+            email = user.getEmail();
+        }
+
 
         //SET/DISPLAY PROFILE INFORMATION
         //*****************************************************************************************************************************
         Picasso.get().load(photoURL).into(profilePicture);
 
         TextView profileName = findViewById(R.id.textview_fullname);
-        String name = user.getName();
+
         profileName.setText(name);
 
         TextView profileEmail = findViewById(R.id.textview_email);
-        String email = user.getEmail();
+
         profileEmail.setText(email);
+
 
 
         //BUTTON HISTORY OnClickListener
@@ -95,9 +106,11 @@ public class ProfileActivity extends AppCompatActivity {
         TextView btn_parametre = findViewById(R.id.textview_parametres);
 
         btn_parametre.setOnClickListener(view -> {
-            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light","Blue Essence"};
-            int[] colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen)};
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light","Blue Essence", "Default Map"};
+            int[] colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
@@ -107,6 +120,8 @@ public class ProfileActivity extends AppCompatActivity {
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setBackgroundColor(colors[which]);
+                currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
+                Log.d(TAG, "onCreate: "+currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
         });

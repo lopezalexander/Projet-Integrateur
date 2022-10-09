@@ -1,5 +1,7 @@
 package com.example.projetintegrateur.ui;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -12,6 +14,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -24,6 +27,7 @@ import android.widget.Toast;
 
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.ItineraryModel;
@@ -157,6 +161,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerArrayList = new ArrayList<>();
 
 
+
+
         if (isServicesOK()) {
             //GET PERMISSION
             getLocationPermission();
@@ -170,6 +176,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //CHECK IF User is already Connected or Display Login Dialog
             checkUserAuth();
         }
+    }
+
+    //***********\\
+    //  OnStart  \\
+    //******************************************************************************************************************************************************************************
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Get Theme Signleton
+        AppTheme currentTheme = AppTheme.getInstance();
+        //Set search bar background color
+        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
     }
 
     //
@@ -640,7 +658,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Instantiate GoogleMap
         mMap = googleMap;
 
-        setMapStyle("Muted Blue");
+        setMapStyle("Midnight");
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
@@ -762,6 +780,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         "\"elementType\": \"geometry.stroke\",\n\"stylers\": [\n{\n    \"color\": \"#144b53\"\n},\n{\n    \"lightness\": 14\n},\n{\n    \"weight\": 1.4\n}\n" +
                         "]\n},\n{\n    \"featureType\": \"landscape\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#08304b\"\n}\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#0c4152\"\n},\n{\n    \"lightness\": 5\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b434f\"\n},\n{\n    \"lightness\": 25\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b3d51\"\n},\n{\n    \"lightness\": 16\n}\n    ]\n},\n{\n    \"featureType\": \"road.local\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#146474\"\n}\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#021019\"\n}\n    ]\n}\n" +
                         "]"));
+
                 break;
             case "Black and White":
                 mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        },\n        {\n            \"weight\": 1\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        },\n        {\n            \"weight\": 0.8\n        }\n    ]\n},\n{\n    \"featureType\": \"landscape\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.icon\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n}\n" +
@@ -774,6 +793,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case "Blue Essence":
                 mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"landscape.natural\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"color\": \"#e0efef\"\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"hue\": \"#1900ff\"\n        },\n        {\n            \"color\": \"#c0e8e8\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"lightness\": 100\n        },\n        {\n            \"visibility\": \"simplified\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit.line\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"lightness\": 700\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n        {\n            \"color\": \"#7dcdcd\"\n        }\n    ]\n}\n" +
                         "]"));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
         }
         //SET STYLE FOR THE MAP
 
@@ -901,8 +924,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setUpPlacesAutocomplete() {
         Places.initialize(getApplicationContext(), getString(R.string.maps_key));
 
+        AppTheme currentTheme = AppTheme.getInstance();
+
         // Initialize the AutocompleteSupportFragment.
         autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
 
         // Specify the types of place data to return.
         assert autocompleteFragment != null;
@@ -911,7 +937,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
 
-        autocompleteFragment.requireView().setBackgroundColor(getColor(R.color.red3));
+        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
 
 
         //SET SPECIFIC COUNTRY BASED SEARCH
