@@ -119,7 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
 
     private Boolean mLocationPermissionsGranted = false;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -640,14 +640,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Instantiate GoogleMap
         mMap = googleMap;
 
-        //SET STYLE FOR THE MAP
-        mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
-                "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
-                "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
-                "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
-                "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
-                "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
-        );
+        setMapStyle("Muted Blue");
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
@@ -748,6 +741,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         });
+    }
+
+    public static void setMapStyle(String mapStyle) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
+                        "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
+                        "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
+                        "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
+                        "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
+                        "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
+                );
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\",\n\"elementType\": \"labels.text.fill\",\n" +
+                        "\"stylers\": [\n{\n\"color\": \"#ffffff\"\n}\n]\n},\n{\n\"featureType\": \"all\",\n\"elementType\": \"labels.text.stroke\",\n" +
+                        "\"stylers\": [\n{\n\"color\": \"#000000\"\n},\n{\n\"lightness\": 13\n}\n]\n},\n{\n\"featureType\": \"administrative\",\n" +
+                        "\"elementType\": \"geometry.fill\",\n\"stylers\": [\n{\n\"color\": \"#000000\"\n}\n]\n},\n{\n\"featureType\": \"administrative\",\n" +
+                        "\"elementType\": \"geometry.stroke\",\n\"stylers\": [\n{\n    \"color\": \"#144b53\"\n},\n{\n    \"lightness\": 14\n},\n{\n    \"weight\": 1.4\n}\n" +
+                        "]\n},\n{\n    \"featureType\": \"landscape\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#08304b\"\n}\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#0c4152\"\n},\n{\n    \"lightness\": 5\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b434f\"\n},\n{\n    \"lightness\": 25\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b3d51\"\n},\n{\n    \"lightness\": 16\n}\n    ]\n},\n{\n    \"featureType\": \"road.local\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#146474\"\n}\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#021019\"\n}\n    ]\n}\n" +
+                        "]"));
+                break;
+            case "Unsaturated Browns":
+                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"hue\": \"#ff4400\"\n        },\n        {\n            \"saturation\": -68\n        },\n        {\n            \"lightness\": -4\n        },\n        {\n            \"gamma\": 0.72\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels.icon\"\n},\n{\n    \"featureType\": \"landscape.man_made\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"hue\": \"#0077ff\"\n        },\n        {\n            \"gamma\": 3.1\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"stylers\": [\n        {\n            \"hue\": \"#00ccff\"\n        },\n        {\n            \"gamma\": 0.44\n        },\n        {\n            \"saturation\": -33\n        }\n    ]\n},\n{\n    \"featureType\": \"poi.park\",\n    \"stylers\": [\n        {\n            \"hue\": \"#44ff00\"\n        },\n        {\n            \"saturation\": -23\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"labels.text.fill\",\n    \"stylers\": [\n        {\n            \"hue\": \"#007fff\"\n        },\n        {\n            \"gamma\": 0.77\n        },\n        {\n            \"saturation\": 65\n        },\n        {\n            \"lightness\": 99\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"gamma\": 0.11\n        },\n        {\n            \"weight\": 5.6\n        },\n        {\n            \"saturation\": 99\n        },\n        {\n            \"hue\": \"#0091ff\"\n        },\n        {\n            \"lightness\": -86\n        }\n    ]\n},\n{\n    \"featureType\": \"transit.line\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"lightness\": -48\n        },\n        {\n            \"hue\": \"#ff5e00\"\n        },\n        {\n            \"gamma\": 1.2\n        },\n        {\n            \"saturation\": -23\n        }\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"saturation\": -64\n        },\n        {\n            \"hue\": \"#ff9100\"\n        },\n        {\n            \"lightness\": 16\n        },\n        {\n            \"gamma\": 0.47\n        },\n        {\n            \"weight\": 2.7\n        }\n    ]\n}\n" +
+                        "]"));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#e9e9e9\"\n        },\n        {\n            \"lightness\": 17\n        }\n    ]\n},\n{\n    \"featureType\": \"landscape\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f5f5f5\"\n        },\n        {\n            \"lightness\": 20\n        }\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 17\n        }\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 29\n        },\n        {\n            \"weight\": 0.2\n        }\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 18\n        }\n    ]\n},\n{\n    \"featureType\": \"road.local\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 16\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f5f5f5\"\n        },\n        {\n            \"lightness\": 21\n        }\n    ]\n},\n{\n    \"featureType\": \"poi.park\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#dedede\"\n        },\n        {\n            \"lightness\": 21\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 16\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.fill\",\n    \"stylers\": [\n        {\n            \"saturation\": 36\n        },\n        {\n            \"color\": \"#333333\"\n        },\n        {\n            \"lightness\": 40\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.icon\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f2f2f2\"\n        },\n        {\n            \"lightness\": 19\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#fefefe\"\n        },\n        {\n            \"lightness\": 20\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#fefefe\"\n        },\n        {\n            \"lightness\": 17\n        },\n        {\n            \"weight\": 1.2\n        }\n    ]\n}\n" +
+                        "]"));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"landscape.natural\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"color\": \"#e0efef\"\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"hue\": \"#1900ff\"\n        },\n        {\n            \"color\": \"#c0e8e8\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"lightness\": 100\n        },\n        {\n            \"visibility\": \"simplified\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit.line\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"lightness\": 700\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n        {\n            \"color\": \"#7dcdcd\"\n        }\n    ]\n}\n" +
+                        "]"));
+        }
+        //SET STYLE FOR THE MAP
+
     }
 
     //

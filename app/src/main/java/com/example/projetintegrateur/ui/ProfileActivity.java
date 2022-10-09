@@ -17,6 +17,7 @@ import com.example.projetintegrateur.util.UserClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -80,6 +81,20 @@ public class ProfileActivity extends AppCompatActivity {
 
             AlertDialog alert11 = builder1.create();
             alert11.show();
+        });
+
+        TextView btn_parametre = findViewById(R.id.textview_parametres);
+
+        btn_parametre.setOnClickListener(view -> {
+            String[] colors = {"Muted Blue", "Midnight", "Unsaturated Browns", "Ultra Light","Blue Essence"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choisissez un thème");
+            builder.setItems(colors, (dialog, which) -> {
+                // the user clicked on colors[which]
+                MapsActivity.setMapStyle(colors[which]);
+            });
+            builder.show();
         });
 
 
