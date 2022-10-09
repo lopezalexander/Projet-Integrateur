@@ -59,6 +59,9 @@
 	<!-- HISTORY LAYOUT -->
 
 	<string name="history_title">Historique</string>
+	<string name="history_row_tab">1</string>
+	<string name="sampleText">lorem ipsum</string>
+	<string name="history_row_togo"><![CDATA[>]]></string>
 
 
 	<!-- XXXXXX LAYOUT -->

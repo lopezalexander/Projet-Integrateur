@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.projetintegrateur.R;
-import com.example.projetintegrateur.adapter.BusinessRecyclerViewAdapter;
 import com.example.projetintegrateur.adapter.HistoryRecyclerViewAdapter;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,7 +35,6 @@ public class HistoryListActivity extends AppCompatActivity {
     //***********\\
     //  OnCREATE  \\
     //******************************************************************************************************************************************************************************
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +49,57 @@ public class HistoryListActivity extends AppCompatActivity {
         //GET CURRENT USER HISTORY LIST OF ITINERARY
         getHistoryList();
 
-        //SET RECyCLERVIEW
-        setRecyclerView();
 
     }
 
+
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //*****************\\
+    //  FUNCTIONS       \\
+    //******************************************************************************************************************************************************************************
+
+    //
+    //
+    //  GET HISTORY LIST OF ITINERARY FROM FIREBASE
+    //*****************************************************************************************************************************
+    public void getHistoryList() {
+        //GET CURRENT USER KEY
+        String currentUserkey = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+
+        DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
+        ref.child(currentUserkey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot UniqueItinerary : snapshot.getChildren()) {
+                    historyList.add(UniqueItinerary.getValue(ItineraryModel.class));
+                    Log.d("history", "OK!!");
+                }
+
+                //SET RECyCLERVIEW
+                setRecyclerView();
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    //
+    //
+    //  SET RECYCLER VIEW
+    //*****************************************************************************************************************************
     private void setRecyclerView() {
         //CREATE RECYCLERVIEW
         RecyclerView recyclerView = findViewById(R.id.recyclerView_history);
@@ -80,6 +125,10 @@ public class HistoryListActivity extends AppCompatActivity {
     //      SETUP FUNCTIONS         \\
     //******************************************************************************************************************************************************************************
 
+    //
+    //
+    //  SETUP VIEW
+    //*****************************************************************************************************************************
     public void initView() {
         //INSTANSTIATE ARRAYLIST OF ITINERARY
         historyList = new ArrayList<>();
@@ -90,26 +139,5 @@ public class HistoryListActivity extends AppCompatActivity {
 
     }
 
-    public void getHistoryList() {
 
-
-        //GET CURRENT USER KEY
-        String currentUserkey = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-
-        DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
-        ref.child(currentUserkey).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot UniqueItinerary : snapshot.getChildren()) {
-                    historyList.add(UniqueItinerary.getValue(ItineraryModel.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-    }
 }
