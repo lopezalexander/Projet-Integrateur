@@ -2,6 +2,8 @@ package com.example.projetintegrateur.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -62,6 +64,22 @@ public class ProfileActivity extends AppCompatActivity {
         btn_logOut.setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(ProfileActivity.this, MapsActivity.class));
+        });
+
+        TextView btn_infos = findViewById(R.id.textview_info);
+
+        btn_infos.setOnClickListener(view -> {
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(ProfileActivity.this);
+            builder1.setMessage("Midway 1.0");
+            builder1.setCancelable(false);
+
+            builder1.setPositiveButton(
+                    "Ok",
+                    (dialog, id) ->
+                            dialog.cancel());
+
+            AlertDialog alert11 = builder1.create();
+            alert11.show();
         });
 
 

@@ -316,7 +316,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
-                        .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
                 marker = mMap.addMarker(markerOptions);
                 //Add the new marker to the markerArrayList
@@ -325,7 +324,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
-                        .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
                 marker = mMap.addMarker(markerOptions);
                 //Add the new marker to the markerArrayList
@@ -480,7 +478,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //DRAW POLYLINE ON MAP
                             mPolyline = mMap.addPolyline(new PolylineOptions()
                                     .clickable(true)
-                                    .width(10)
+                                    .width(15)
+                                    .color(getColor(R.color.blue6))
                                     .addAll(polylineList));
 
                             //ADD MIDDLE DISTANCE POINT MARKER
@@ -490,7 +489,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mCircle = mMap.addCircle(new CircleOptions()
                                     .center(midPointLatLng)
                                     .radius(1000)
-                                    .strokeColor(Color.CYAN));
+                                    .strokeColor(getColor(R.color.red)));
                             mCircle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
@@ -882,6 +881,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
+
+        autocompleteFragment.requireView().setBackgroundColor(getColor(R.color.red3));
+
 
         //SET SPECIFIC COUNTRY BASED SEARCH
         autocompleteFragment.setCountries("CA", "US");
