@@ -2,22 +2,23 @@ package com.example.projetintegrateur.model;
 
 import androidx.annotation.NonNull;
 
+import com.example.projetintegrateur.util.CustomLatLng;
 import com.google.android.gms.maps.model.LatLng;
 
 public class ItineraryModel {
 
-    LatLng origintLatLng; //address A ou 1
+    CustomLatLng origintLatLng; //address A ou 1
     String originAddressName; //address A ou 1
 
-    LatLng destinationLatLng; // Address B ou 2
+    CustomLatLng destinationLatLng; // Address B ou 2
     String destinationAddressName; // Address B ou 2
 
 
-    LatLng start_mid_point; //Testing purpopses for now
-    LatLng end_mid_point;   //Testing purpopses for now
-    LatLng midPointLatLng; // middle distance point
+    CustomLatLng start_mid_point; //Testing purpopses for now
+    CustomLatLng end_mid_point;   //Testing purpopses for now
+    CustomLatLng midPointLatLng; // middle distance point
 
-    LatLng selectedBusiness;
+    CustomLatLng selectedBusiness;
     String selectedBusinessAddressName;
     String selectedBusinessName;
 
@@ -30,14 +31,14 @@ public class ItineraryModel {
     public ItineraryModel() {
     }
 
-    public ItineraryModel(LatLng origintLatLng,
+    public ItineraryModel(CustomLatLng origintLatLng,
                           String originAddressName,
-                          LatLng destinationLatLng,
+                          CustomLatLng destinationLatLng,
                           String destinationAddressName,
-                          LatLng start_mid_point,
-                          LatLng end_mid_point,
-                          LatLng midPointLatLng,
-                          LatLng selectedBusiness,
+                          CustomLatLng start_mid_point,
+                          CustomLatLng end_mid_point,
+                          CustomLatLng midPointLatLng,
+                          CustomLatLng selectedBusiness,
                           String selectedBusinessAddressName,
                           String selectedBusinessName,
                           String userID) {
@@ -77,7 +78,7 @@ public class ItineraryModel {
     //**************\\
     //  GETTER       \\
     //*****************************************************************************************************************************
-    public LatLng getOrigintLatLng() {
+    public CustomLatLng getOrigintLatLng() {
         return origintLatLng;
     }
 
@@ -85,7 +86,7 @@ public class ItineraryModel {
         return originAddressName;
     }
 
-    public LatLng getDestinationLatLng() {
+    public CustomLatLng getDestinationLatLng() {
         return destinationLatLng;
     }
 
@@ -93,19 +94,19 @@ public class ItineraryModel {
         return destinationAddressName;
     }
 
-    public LatLng getStart_mid_point() {
+    public CustomLatLng getStart_mid_point() {
         return start_mid_point;
     }
 
-    public LatLng getEnd_mid_point() {
+    public CustomLatLng getEnd_mid_point() {
         return end_mid_point;
     }
 
-    public LatLng getMidPointLatLng() {
+    public CustomLatLng getMidPointLatLng() {
         return midPointLatLng;
     }
 
-    public LatLng getSelectedBusiness() {
+    public CustomLatLng getSelectedBusiness() {
         return selectedBusiness;
     }
 
@@ -124,7 +125,7 @@ public class ItineraryModel {
     //**************\\
     //  SETTER       \\
     //*****************************************************************************************************************************
-    public void setOrigintLatLng(LatLng origintLatLng) {
+    public void setOrigintLatLng(CustomLatLng origintLatLng) {
         this.origintLatLng = origintLatLng;
     }
 
@@ -132,7 +133,7 @@ public class ItineraryModel {
         this.originAddressName = originAddressName;
     }
 
-    public void setDestinationLatLng(LatLng destinationLatLng) {
+    public void setDestinationLatLng(CustomLatLng destinationLatLng) {
         this.destinationLatLng = destinationLatLng;
     }
 
@@ -140,19 +141,19 @@ public class ItineraryModel {
         this.destinationAddressName = destinationAddressName;
     }
 
-    public void setStart_mid_point(LatLng start_mid_point) {
+    public void setStart_mid_point(CustomLatLng start_mid_point) {
         this.start_mid_point = start_mid_point;
     }
 
-    public void setEnd_mid_point(LatLng end_mid_point) {
+    public void setEnd_mid_point(CustomLatLng end_mid_point) {
         this.end_mid_point = end_mid_point;
     }
 
-    public void setMidPointLatLng(LatLng midPointLatLng) {
+    public void setMidPointLatLng(CustomLatLng midPointLatLng) {
         this.midPointLatLng = midPointLatLng;
     }
 
-    public void setSelectedBusiness(LatLng selectedBusiness) {
+    public void setSelectedBusiness(CustomLatLng selectedBusiness) {
         this.selectedBusiness = selectedBusiness;
     }
 
