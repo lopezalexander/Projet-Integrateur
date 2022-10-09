@@ -1,26 +1,27 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
+
+
+    ConstraintLayout profileLayout;
 
 
     //***********\\
@@ -31,12 +32,20 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        profileLayout = findViewById(R.id.constraint_layout_profile);
+
+
         //HIDE DEFAULT ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+        AppTheme theme = AppTheme.getInstance();
+        profileLayout.setBackgroundColor(theme.getBackgroundColor());
+
+
         User user = ((UserClient) getApplicationContext()).getUser();
         ImageView profilePicture = findViewById(R.id.imageView_profile_picture);
-        String photoURL = user.getPhotoUrl();
+        String photoURL;
+        photoURL = Objects.requireNonNull(user).getPhotoUrl();
 
         //SET/DISPLAY PROFILE INFORMATION
         //*****************************************************************************************************************************
@@ -86,19 +95,23 @@ public class ProfileActivity extends AppCompatActivity {
         TextView btn_parametre = findViewById(R.id.textview_parametres);
 
         btn_parametre.setOnClickListener(view -> {
-            String[] colors = {"Muted Blue", "Midnight", "Unsaturated Browns", "Ultra Light","Blue Essence"};
-
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light","Blue Essence"};
+            int[] colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen)};
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Choisissez un thème");
-            builder.setItems(colors, (dialog, which) -> {
-                // the user clicked on colors[which]
-                MapsActivity.setMapStyle(colors[which]);
+            builder.setItems(themes, (dialog, which) -> {
+                //the user clicked on themes[which]
+                MapsActivity.setMapStyle(themes[which]);
+                profileLayout.setBackgroundColor(colors[which]);
+
+                //STORE COLOR IN SINGLETON
+                AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setBackgroundColor(colors[which]);
             });
             builder.show();
         });
 
 
     }
-
 
 }
