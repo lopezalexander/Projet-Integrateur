@@ -55,8 +55,9 @@
 	<string name="param_tres">Paramètres</string>
 	<string name="propos">À propos</string>
 	<string name="nom_complet">Nom Complet</string>
+    <string name="se_d_connecter">Se déconnecter</string>
 
-	<!-- XXXXXX LAYOUT -->
+    <!-- XXXXXX LAYOUT -->
 
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->

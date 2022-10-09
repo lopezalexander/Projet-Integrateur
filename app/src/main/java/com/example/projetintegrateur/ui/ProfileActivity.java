@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
@@ -51,12 +52,16 @@ public class ProfileActivity extends AppCompatActivity {
         //*****************************************************************************************************************************
         TextView btn_history = findViewById(R.id.btn_history);
 
-        btn_history.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, HistoryListActivity.class);
-                startActivity(intent);
-            }
+        btn_history.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, HistoryListActivity.class);
+            startActivity(intent);
+        });
+
+        TextView btn_logOut = findViewById(R.id.textview_log_out);
+
+        btn_logOut.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(ProfileActivity.this, MapsActivity.class));
         });
 
 

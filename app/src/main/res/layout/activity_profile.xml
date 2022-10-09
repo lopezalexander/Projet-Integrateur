@@ -93,7 +93,7 @@
 
 	</LinearLayout>
 
-	<!--    BOUTON CHANGER MOT DE PASSE     -->
+	<!--    BOUTON SE DECONNECTER    -->
 	<LinearLayout
 		android:id="@+id/linearLayout2"
 		android:layout_width="330dp"
@@ -113,11 +113,12 @@
 			/>
 
 		<TextView
+			android:id="@+id/textview_log_out"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:gravity="center"
 			android:paddingEnd="5dp"
-			android:text="@string/changer_le_mot_de_passe"
+			android:text="@string/se_d_connecter"
 			android:textColor="@color/blue1"
 			android:textSize="22sp"
 			android:textStyle="bold"
