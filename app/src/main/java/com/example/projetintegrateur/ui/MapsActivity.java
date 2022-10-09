@@ -30,6 +30,7 @@ import com.example.projetintegrateur.model.directionAPI.Leg;
 import com.example.projetintegrateur.model.directionAPI.Route;
 import com.example.projetintegrateur.model.directionAPI.Step;
 import com.example.projetintegrateur.model.NearbyBusinessResponse;
+import com.example.projetintegrateur.util.CustomLatLng;
 import com.example.projetintegrateur.util.UserClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.common.ConnectionResult;
@@ -60,8 +61,11 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -72,6 +76,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -179,6 +184,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
+
+
 //        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -719,7 +726,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         btn_MapCurrentLocation_GPS = findViewById(R.id.ic_gps);
         btn_MapCurrentLocation_GPS.setOnClickListener(view -> {
-//            Log.d(TAG, "onClicked: clicked gps icon");
+            //Log.d(TAG, "onClicked: clicked gps icon");
+
             //Center to CurrentLocation
             getCurrentLocation();
         });
@@ -730,7 +738,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         btn_SearchBar_GPS = findViewById(R.id.ic_gps2);
         btn_SearchBar_GPS.setOnClickListener(view -> {
-//            Log.d(TAG, "onClicked: clicked Search Bar gps icon");
+            //Log.d(TAG, "onClicked: clicked Search Bar gps icon");
 
             //Add marker on CurrentLocation
             getSearchBarCurrentLocation();
@@ -841,7 +849,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onError(@NonNull Status status) {
-//                Log.d(TAG, "An error occurred: " + status);
+                //Log.d(TAG, "An error occurred: " + status);
             }
         });
     }
@@ -889,7 +897,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        Log.d(TAG, "onRequestPermissionResults: called.");
+        //Log.d(TAG, "onRequestPermissionResults: called.");
         mLocationPermissionsGranted = false;
 
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
@@ -899,7 +907,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for (int grantResult : grantResults) {
                     if (grantResult != PackageManager.PERMISSION_GRANTED) {
                         mLocationPermissionsGranted = false;
-//                            Log.d(TAG, "onRequestPermissionResults: permission failed.");
+                        //Log.d(TAG, "onRequestPermissionResults: permission failed.");
                         return;
                     }
                 }
@@ -1030,14 +1038,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void createItineraryModelObject() {
         //CREATE ITINERARY OBJECT
         ItineraryToAdd = new ItineraryModel(
-                origintLatLng,
+                new CustomLatLng(origintLatLng.latitude, origintLatLng.longitude),
                 locationAddressName.get(0),
-                destinationLatLng,
+                new CustomLatLng(destinationLatLng.latitude, destinationLatLng.longitude),
                 locationAddressName.get(1),
-                start_mid_point,
-                end_mid_point,
-                midPointLatLng,
-                selectedBusinessCoordinate,
+                new CustomLatLng(start_mid_point.latitude, start_mid_point.longitude),
+                new CustomLatLng(end_mid_point.latitude, end_mid_point.longitude),
+                new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude),
+                new CustomLatLng(selectedBusinessCoordinate.latitude, selectedBusinessCoordinate.longitude),
                 selectedBusinessAddressName,
                 selectedBusinessName,
                 Objects.requireNonNull(mAuth.getCurrentUser()).getUid()
@@ -1055,9 +1063,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     public void addItineraryToFirebase(ItineraryModel itineraryToAdd) {
 
+        //GET CURRENT USER KEY
+        String currentUserkey = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+
         //ADD ITINERARY TO FIREBASE
-        DatabaseReference newItineraryPush = mFirebaseDB.getReference("Itinerary").push();
+        DatabaseReference newItineraryPush = mFirebaseDB.getReference("Itinerary").child(currentUserkey).push();
         newItineraryPush.setValue(itineraryToAdd, (error, ref) -> Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show());
+        
     }
 
 
@@ -1073,9 +1085,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_showBusinessList.setVisibility(View.GONE);
 
         //DISPLAY RESULTS
-
-        DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
-        
+        //TODO:: SHOW POLYLINE FROM A TO MID , B TO MID
+        //TODO:: DISPLAY PERTINENT DATA
 
     }
 
