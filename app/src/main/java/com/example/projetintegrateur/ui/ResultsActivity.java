@@ -9,8 +9,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.DirectionResponse;
@@ -430,7 +432,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         public View getInfoWindow(@NonNull Marker marker) {
             render(marker, mWindow);
             return mWindow;
-            //  return null;
+//              return null;
         }
 
         @Override
@@ -445,11 +447,19 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
             TextView markerName = view.findViewById(R.id.markerName);
             TextView markerName1 = view.findViewById(R.id.markerName1);
             TextView markerName2 = view.findViewById(R.id.markerName2);
+            Button btn_suprrimerMarker = view.findViewById(R.id.btn_supprimerMarker);
 
             if (Objects.equals(marker.getTitle(), "AddressA")) {
                 markerName.setText(marker.getTitle());
                 markerName1.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
                 markerName2.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
+                btn_suprrimerMarker.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Toast.makeText(ResultsActivity.this, "asdsad", Toast.LENGTH_LONG).show();
+                    }
+                });
             } else if (Objects.equals(marker.getTitle(), "AddressB")) {
                 markerName.setText(marker.getTitle());
                 markerName1.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
