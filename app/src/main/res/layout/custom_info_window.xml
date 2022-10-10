@@ -51,11 +51,6 @@
 			app:layout_constraintTop_toTopOf="parent"
 			/>
 
-		<Button
-			android:id="@+id/btn_supprimerMarker"
-			android:layout_width="50dp"
-			android:layout_height="50dp"
-			/>
 
 	</LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

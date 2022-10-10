@@ -447,19 +447,11 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
             TextView markerName = view.findViewById(R.id.markerName);
             TextView markerName1 = view.findViewById(R.id.markerName1);
             TextView markerName2 = view.findViewById(R.id.markerName2);
-            Button btn_suprrimerMarker = view.findViewById(R.id.btn_supprimerMarker);
 
             if (Objects.equals(marker.getTitle(), "AddressA")) {
                 markerName.setText(marker.getTitle());
                 markerName1.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
                 markerName2.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
-                btn_suprrimerMarker.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        Toast.makeText(ResultsActivity.this, "asdsad", Toast.LENGTH_LONG).show();
-                    }
-                });
             } else if (Objects.equals(marker.getTitle(), "AddressB")) {
                 markerName.setText(marker.getTitle());
                 markerName1.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
