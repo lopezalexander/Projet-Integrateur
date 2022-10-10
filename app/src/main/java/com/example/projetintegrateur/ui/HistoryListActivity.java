@@ -74,6 +74,7 @@ public class HistoryListActivity extends AppCompatActivity {
         //GET CURRENT USER KEY
         String currentUserkey = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
 
+        //QUERY THE HISTORY LIST OF THE CURRENT USER FROM FIREBASE
         DatabaseReference ref = mFirebaseDB.getReference("Itinerary");
         ref.child(currentUserkey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -90,7 +91,6 @@ public class HistoryListActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
@@ -133,6 +133,7 @@ public class HistoryListActivity extends AppCompatActivity {
         //INSTANSTIATE ARRAYLIST OF ITINERARY
         historyList = new ArrayList<>();
 
+        //INSTANSTIATE FIREBASE AUTH & DB
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
 

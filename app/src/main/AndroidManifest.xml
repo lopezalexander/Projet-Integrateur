@@ -3,14 +3,11 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	package="com.example.projetintegrateur"
 	>
-
-	<!--		PERMISSION		-->
+	<!-- PERMISSION -->
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-	<!-- FACEBOOK -->
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- FACEBOOK -->
 	<uses-permission
 		android:name="com.google.android.gms.permission.AD_ID"
 		tools:node="remove"
@@ -43,9 +40,7 @@
 		<meta-data
 			android:name="com.google.android.geo.API_KEY"
 			android:value="@string/maps_key"
-			/>
-
-		<!-- FACEBOOK -->
+			/> <!-- FACEBOOK -->
 		<meta-data
 			android:name="com.facebook.sdk.ApplicationId"
 			android:value="@string/facebook_app_id"
@@ -53,9 +48,7 @@
 		<meta-data
 			android:name="com.facebook.sdk.ClientToken"
 			android:value="@string/facebook_client_token"
-			/>
-
-		<!-- APP ACTIVITIES -->
+			/> <!-- APP ACTIVITIES -->
 		<!-- SPLASH -->
 		<activity
 			android:name=".ui.SplashActivity"
@@ -67,27 +60,23 @@
 
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-		</activity>
-
-
-		<!-- MAPS -->
+		</activity> <!-- MAPS -->
 		<activity
 			android:name=".ui.MapsActivity"
 			android:exported="true"
 			android:label="@string/title_activity_maps"
-			/>
-
-
-		<!-- PROFILE -->
+			/> <!-- PROFILE -->
 		<activity
 			android:name=".ui.ProfileActivity"
 			android:exported="false"
-			/>
-
-
-		<!-- HISTORY -->
+			/> <!-- HISTORY -->
 		<activity
 			android:name=".ui.HistoryListActivity"
+			android:exported="false"
+			/>
+		<!-- RESULTS -->
+		<activity
+			android:name=".ui.ResultsActivity"
 			android:exported="false"
 			/>
 	</application>
