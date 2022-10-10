@@ -47,23 +47,22 @@ public class ProfileActivity extends AppCompatActivity {
 
         User user = ((UserClient) getApplicationContext()).getUser();
         ImageView profilePicture = findViewById(R.id.imageView_profile_picture);
-        String photoURL = null;
-        String name = null;
-        String email = null;
+ 
         if (user != null) {
             photoURL = user.getPhotoUrl();
             name = user.getName();
             email = user.getEmail();
         }
-
+ 
 
         //SET/DISPLAY PROFILE INFORMATION
         //*****************************************************************************************************************************
-        Picasso.get().load(photoURL).into(profilePicture);
-
+        //Picasso.get().load(photoURL).into(profilePicture);
+ 
         TextView profileName = findViewById(R.id.textview_fullname);
 
         profileName.setText(name);
+ 
 
         TextView profileEmail = findViewById(R.id.textview_email);
 

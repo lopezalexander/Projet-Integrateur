@@ -1,11 +1,13 @@
 package com.example.projetintegrateur.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import com.example.projetintegrateur.util.CustomLatLng;
-import com.google.android.gms.maps.model.LatLng;
 
-public class ItineraryModel {
+public class ItineraryModel implements Parcelable {
 
     CustomLatLng origintLatLng; //address A ou 1
     String originAddressName; //address A ou 1
@@ -25,6 +27,9 @@ public class ItineraryModel {
     String userID;
 
 
+    String currentDate;
+
+
     //**************\\
     //  CONSTRUCTOR  \\
     //*****************************************************************************************************************************
@@ -41,7 +46,8 @@ public class ItineraryModel {
                           CustomLatLng selectedBusiness,
                           String selectedBusinessAddressName,
                           String selectedBusinessName,
-                          String userID) {
+                          String userID,
+                          String currentDate) {
         this.origintLatLng = origintLatLng;
         this.originAddressName = originAddressName;
         this.destinationLatLng = destinationLatLng;
@@ -53,6 +59,7 @@ public class ItineraryModel {
         this.selectedBusinessAddressName = selectedBusinessAddressName;
         this.selectedBusinessName = selectedBusinessName;
         this.userID = userID;
+        this.currentDate = currentDate;
 
     }
 
@@ -72,6 +79,7 @@ public class ItineraryModel {
                 ", selectedBusinessAddressName='" + selectedBusinessAddressName + '\'' +
                 ", selectedBusinessName='" + selectedBusinessName + '\'' +
                 ", userID='" + userID + '\'' +
+                ", currentDate='" + currentDate + '\'' +
                 '}';
     }
 
@@ -122,6 +130,10 @@ public class ItineraryModel {
         return userID;
     }
 
+    public String getCurrentDate() {
+        return currentDate;
+    }
+
     //**************\\
     //  SETTER       \\
     //*****************************************************************************************************************************
@@ -168,4 +180,60 @@ public class ItineraryModel {
     public void setUserID(String userID) {
         this.userID = userID;
     }
+
+    public void setCurrentDate(String currentDate) {
+        this.currentDate = currentDate;
+    }
+
+
+    //******************\\
+    //  PARCELABLE       \\
+    //*****************************************************************************************************************************
+    protected ItineraryModel(Parcel in) {
+        origintLatLng = in.readParcelable(CustomLatLng.class.getClassLoader());
+        originAddressName = in.readString();
+        destinationLatLng = in.readParcelable(CustomLatLng.class.getClassLoader());
+        destinationAddressName = in.readString();
+        start_mid_point = in.readParcelable(CustomLatLng.class.getClassLoader());
+        end_mid_point = in.readParcelable(CustomLatLng.class.getClassLoader());
+        midPointLatLng = in.readParcelable(CustomLatLng.class.getClassLoader());
+        selectedBusiness = in.readParcelable(CustomLatLng.class.getClassLoader());
+        selectedBusinessAddressName = in.readString();
+        selectedBusinessName = in.readString();
+        userID = in.readString();
+        currentDate = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(origintLatLng, flags);
+        dest.writeString(originAddressName);
+        dest.writeParcelable(destinationLatLng, flags);
+        dest.writeString(destinationAddressName);
+        dest.writeParcelable(start_mid_point, flags);
+        dest.writeParcelable(end_mid_point, flags);
+        dest.writeParcelable(midPointLatLng, flags);
+        dest.writeParcelable(selectedBusiness, flags);
+        dest.writeString(selectedBusinessAddressName);
+        dest.writeString(selectedBusinessName);
+        dest.writeString(userID);
+        dest.writeString(currentDate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ItineraryModel> CREATOR = new Creator<ItineraryModel>() {
+        @Override
+        public ItineraryModel createFromParcel(Parcel in) {
+            return new ItineraryModel(in);
+        }
+
+        @Override
+        public ItineraryModel[] newArray(int size) {
+            return new ItineraryModel[size];
+        }
+    };
 }

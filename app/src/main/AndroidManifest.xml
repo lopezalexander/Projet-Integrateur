@@ -3,7 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	package="com.example.projetintegrateur"
 	>
-
+	<!-- PERMISSION -->
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -25,10 +25,6 @@
 		android:theme="@style/Theme.ProjetIntegrateur"
 		tools:targetApi="31"
 		>
-		<activity
-			android:name=".ui.HistoryListActivity"
-			android:exported="false"
-			/>
 		<!--
 			 TODO: Before you run your application, you need a Google Maps API key.
 
@@ -71,6 +67,15 @@
 			/> <!-- PROFILE -->
 		<activity
 			android:name=".ui.ProfileActivity"
+			android:exported="false"
+			/> <!-- HISTORY -->
+		<activity
+			android:name=".ui.HistoryListActivity"
+			android:exported="false"
+			/>
+		<!-- RESULTS -->
+		<activity
+			android:name=".ui.ResultsActivity"
 			android:exported="false"
 			/>
 	</application>

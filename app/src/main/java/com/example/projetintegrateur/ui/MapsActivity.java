@@ -68,11 +68,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -80,10 +77,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -208,8 +207,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-
-
 //        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -1164,12 +1161,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showResult();
     }
 
-
     //
     //
     //CREATE THE FINAL ITINERARY OBJECT
     //*****************************************************************************************************************************
     public void createItineraryModelObject() {
+
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
         //CREATE ITINERARY OBJECT
         ItineraryToAdd = new ItineraryModel(
                 new CustomLatLng(origintLatLng.latitude, origintLatLng.longitude),
@@ -1182,14 +1181,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new CustomLatLng(selectedBusinessCoordinate.latitude, selectedBusinessCoordinate.longitude),
                 selectedBusinessAddressName,
                 selectedBusinessName,
-                Objects.requireNonNull(mAuth.getCurrentUser()).getUid()
+                Objects.requireNonNull(mAuth.getCurrentUser()).getUid(),
+                currentDate
         );
 
         //SAVE INTO THE DATABASE
         addItineraryToFirebase(ItineraryToAdd);
 
     }
-
 
     //
     //
@@ -1203,10 +1202,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //ADD ITINERARY TO FIREBASE
         DatabaseReference newItineraryPush = mFirebaseDB.getReference("Itinerary").child(currentUserkey).push();
         newItineraryPush.setValue(itineraryToAdd, (error, ref) -> Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show());
-        
+
     }
-
-
+    
     //
     //
     //SHOW RESULTS AFTER THE SEARCH AND SELECTED BUSINESS IS DONE

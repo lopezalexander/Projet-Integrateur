@@ -62,7 +62,7 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
             String businessAddressName = businessData.get(position).getAddress();
             String businessName = businessData.get(position).getName();
             mListener.getSelectedBusinnes(businessCoordinate, businessAddressName, businessName);
-            
+
         });
 
     }
