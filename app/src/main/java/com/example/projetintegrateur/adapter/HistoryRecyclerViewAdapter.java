@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.ui.ProfileActivity;
+import com.example.projetintegrateur.ui.ResultsActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
             ItineraryModel ItineraryItemToSend = historyList.get(position);
 
             //START THE ACTIVITY
-            Intent intent = new Intent(v.getContext(), ProfileActivity.class);
+            Intent intent = new Intent(v.getContext(), ResultsActivity.class);
             intent.putExtra("selectedHistory", ItineraryItemToSend);
             v.getContext().startActivity(intent);
         });

@@ -73,7 +73,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -184,8 +183,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-
-
 //        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -1030,7 +1027,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         showResult();
     }
 
-
     //
     //
     //CREATE THE FINAL ITINERARY OBJECT
@@ -1060,7 +1056,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
     //
     //
     //DATA TRANSFER FROM BUSINESS DIALOG TO MAPSACTIVITY
@@ -1075,8 +1070,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         newItineraryPush.setValue(itineraryToAdd, (error, ref) -> Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show());
 
     }
-
-
+    
     //
     //
     //SHOW RESULTS AFTER THE SEARCH AND SELECTED BUSINESS IS DONE

@@ -13,6 +13,21 @@ public class Leg {
     public ArrayList<Object> traffic_speed_entry;
     public ArrayList<Object> via_waypoint;
 
+    @Override
+    public String toString() {
+        return "Leg{" +
+                "distance=" + distance +
+                ", duration=" + duration +
+                ", end_address='" + end_address + '\'' +
+                ", end_location=" + end_location +
+                ", start_address='" + start_address + '\'' +
+                ", start_location=" + start_location +
+                ", steps=" + steps +
+                ", traffic_speed_entry=" + traffic_speed_entry +
+                ", via_waypoint=" + via_waypoint +
+                '}';
+    }
+
     public Distance getDistance() {
         return distance;
     }
