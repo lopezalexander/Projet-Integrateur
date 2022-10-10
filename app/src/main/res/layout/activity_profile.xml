@@ -6,6 +6,7 @@
 	android:layout_height="match_parent"
 	android:background="@color/blue1"
 	tools:context=".ui.ProfileActivity"
+	android:id="@+id/constraint_layout_profile"
 	>
 
 
@@ -22,14 +23,12 @@
 		app:layout_constraintHorizontal_bias="0.497"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.105"
-		/>
+		app:layout_constraintVertical_bias="0.06999999" />
 
 	<TextView
 		android:id="@+id/textview_fullname"
 		android:layout_width="200dp"
 		android:layout_height="40dp"
-		android:background="@color/blue1"
 		android:gravity="center"
 		android:text="@string/nom_complet"
 		android:textColor="@color/red"
@@ -39,25 +38,22 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
-		app:layout_constraintVertical_bias="0.0"
-		/>
+		app:layout_constraintVertical_bias="0.100000024" />
 
 	<TextView
 		android:id="@+id/textview_email"
 		android:layout_width="300dp"
 		android:layout_height="40dp"
-		android:background="@color/blue1"
 		android:gravity="center"
 		android:text="@string/email"
-		android:textColor="@color/blue3"
+		android:textColor="@color/red2"
 		android:textSize="16sp"
 		android:textStyle="bold"
 		app:layout_constraintBottom_toTopOf="@+id/linearLayout"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
-		app:layout_constraintVertical_bias="0.65"
-		/>
+		app:layout_constraintVertical_bias="0.66999996" />
 
 	<!--    BOUTON HISTORIQUE DE RENCONTRES     -->
 	<LinearLayout
@@ -93,7 +89,7 @@
 
 	</LinearLayout>
 
-	<!--    BOUTON CHANGER MOT DE PASSE     -->
+	<!--    BOUTON SE DECONNECTER    -->
 	<LinearLayout
 		android:id="@+id/linearLayout2"
 		android:layout_width="330dp"
@@ -113,11 +109,12 @@
 			/>
 
 		<TextView
+			android:id="@+id/textview_log_out"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:gravity="center"
 			android:paddingEnd="5dp"
-			android:text="@string/changer_le_mot_de_passe"
+			android:text="@string/se_d_connecter"
 			android:textColor="@color/blue1"
 			android:textSize="22sp"
 			android:textStyle="bold"
@@ -146,6 +143,7 @@
 			/>
 
 		<TextView
+			android:id="@+id/textview_parametres"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:gravity="center"
@@ -177,6 +175,7 @@
 			/>
 
 		<TextView
+			android:id="@+id/textview_info"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:gravity="center"

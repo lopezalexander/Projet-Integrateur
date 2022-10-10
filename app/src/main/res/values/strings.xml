@@ -6,8 +6,8 @@
 
 
 	<!--	//ALEX = AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4  -->
-	<!--	//ADNAN = AIzaSyCt0NIr9jL92fUTQEco4ZykynMCgR0JLMY  -->
-	<string name="maps_key">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
+	<!--	//ADNAN = AIzaSyDjO6PUHubAOFISZ8CF2t2OykYQ04DbM3M  -->
+	<string name="maps_key">AIzaSyDjO6PUHubAOFISZ8CF2t2OykYQ04DbM3M</string>
 
 	<string name="empty_value">" "</string>
 
@@ -38,14 +38,14 @@
 
 	<!-- FACEBOOK LOGIN -->
 	<!--================= ADNAN ================== -->
-	<!--	<string name="facebook_app_id">1533089473800999</string>-->
-	<!--	<string name="fb_login_protocol_scheme">fb1234</string>-->
-	<!--	<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>-->
+		<string name="facebook_app_id">1533089473800999</string>
+		<string name="fb_login_protocol_scheme">fb1234</string>
+		<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>
 
 	<!--================= ALEX ================== -->
-	<string name="facebook_app_id">1369837933544502</string>
-	<string name="fb_login_protocol_scheme">fb1234</string>
-	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
+<!--	<string name="facebook_app_id">1369837933544502</string>-->
+<!--	<string name="fb_login_protocol_scheme">fb1234</string>-->
+<!--	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>-->
 
 
 	<!-- PROFILE LAYOUT -->
@@ -55,14 +55,16 @@
 	<string name="param_tres">Paramètres</string>
 	<string name="propos">À propos</string>
 	<string name="nom_complet">Nom Complet</string>
+    <string name="se_d_connecter">Se déconnecter</string>
 
+ 
 	<!-- HISTORY LAYOUT -->
 
 	<string name="history_title">Historique</string>
 	<string name="history_row_tab">1</string>
 	<string name="sampleText">lorem ipsum</string>
 	<string name="history_row_togo"><![CDATA[>]]></string>
-
+ 
 
 	<!-- XXXXXX LAYOUT -->
 	<!-- XXXXXX LAYOUT -->
