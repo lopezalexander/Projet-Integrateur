@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.HistoryRecyclerViewAdapter;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +33,9 @@ public class HistoryListActivity extends AppCompatActivity {
     //LIST VARIABLES
     ArrayList<ItineraryModel> historyList;
 
+    LinearLayout linearLayout_HistoryList;
+
+
 
     //***********\\
     //  OnCREATE  \\
@@ -39,6 +44,8 @@ public class HistoryListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_list);
+
+        linearLayout_HistoryList = findViewById(R.id.linearLayout_HistoryList);
 
         //HIDE DEFAULT ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
@@ -50,6 +57,21 @@ public class HistoryListActivity extends AppCompatActivity {
         getHistoryList();
 
 
+    }
+
+
+    //***********\\
+    //  OnStart  \\
+    //******************************************************************************************************************************************************************************
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //Get Theme Signleton
+        AppTheme currentTheme = AppTheme.getInstance();
+        //Set search bar background color
+//        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        linearLayout_HistoryList.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+//        setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
     }
 
 

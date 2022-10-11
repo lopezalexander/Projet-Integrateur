@@ -760,7 +760,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(@NonNull Marker marker) {
-
+                markerArrayList.get(i).setPosition(marker.getPosition());
+                locationArrayList.set(i, marker.getPosition());
             }
 
             @Override
