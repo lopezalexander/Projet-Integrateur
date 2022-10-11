@@ -1,7 +1,5 @@
 package com.example.projetintegrateur.ui;
 
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -15,8 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -120,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Marker mMarker;
     ItineraryModel ItineraryToAdd;
     ArrayList<NearbyBusinessResponse> allNearbyBusinessResponseList; //Not added yet to Firebase
+    int i;
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -333,19 +330,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
+                        .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
-                marker = mMap.addMarker(markerOptions);
-                //Add the new marker to the markerArrayList
-                markerArrayList.add(marker);
             } else {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
+                        .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
-                marker = mMap.addMarker(markerOptions);
-                //Add the new marker to the markerArrayList
-                markerArrayList.add(marker);
             }
+            //Add the new marker to the markerArrayList
+            marker = mMap.addMarker(markerOptions);
+            markerArrayList.add(marker);
         } else {
             markerOptions = new MarkerOptions()
                     .position(latLng)
@@ -759,32 +755,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         });
+
+
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDrag(@NonNull Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(@NonNull Marker marker) {
+                //REPLACE LIST VALUE AT POSITION OF THE MARKER
+                markerArrayList.get(i).setPosition(marker.getPosition());
+                locationArrayList.set(i, marker.getPosition());
+                //AJOUTER LA FONCTION de PLACE API pour avoir l'address ie. 4200 Plamondon
+
+                //Remplacer l'address dans la list d'addresse
+                locationAddressName.set(i, "");
+
+
+                try {
+                    if (locationArrayList.size() == 2) {
+                        findMiddleDistancePoint();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onMarkerDragStart(@NonNull Marker marker) {
+                i = markerArrayList.indexOf(marker);
+                resetRoute();
+            }
+        });
     }
 
-    public static void setMapStyle(String mapStyle, Context context) {
-        switch (mapStyle) {
-            case "Muted Blue":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
-                break;
-            case "Midnight":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
-                break;
-            case "Black and White":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
-                break;
-            case "Ultra Light":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
-                break;
-            case "Blue Essence":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
-                break;
-            case "Default Map":
-                mMap.setMapStyle(new MapStyleOptions("[]"));
-                break;
-        }
-        //SET STYLE FOR THE MAP
-
-    }
 
     //
     //
@@ -909,7 +915,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //*************************************************************************************************
 
         btn_resetSearchBar = findViewById(R.id.ic_reset);
-        btn_resetSearchBar.setOnClickListener(view -> resetView());
+        btn_resetSearchBar.setOnClickListener(view -> resetMap());
 
 
     }
@@ -1142,11 +1148,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
     //
     //
-    //RESET THE VIEW FOR ANOTHER SEARCH
+    //SET MAP STYLE
     //*****************************************************************************************************************************
-    public void resetView() {
+    public static void setMapStyle(String mapStyle, Context context) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
+    }
+
+    //
+    //
+    //RESET THE MAP FOR ANOTHER SEARCH
+    //*****************************************************************************************************************************
+    public void resetMap() {
         locationArrayList.clear();
         locationAddressName.clear();
         markerArrayList.clear();
@@ -1155,7 +1191,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_SearchBar_GPS.setVisibility(View.VISIBLE);
         btn_showBusinessList.setVisibility(View.GONE);
         autocompleteFragment.setText("");
+        if (businessDialog.isAdded()) {
+            businessDialog.dismiss();
+        }
         setHints();
+    }
+
+
+    //
+    //
+    //RESET ROUTE AFTER THE MARKER DRAG
+    //*****************************************************************************************************************************
+    private void resetRoute() {
+        if (mPolyline != null) {
+            mPolyline.remove();
+        }
+        if (mCircle != null) {
+            mCircle.remove();
+        }
+        if (mMarker != null) {
+            mMarker.remove();
+        }
     }
 
     //

@@ -43,6 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
         //HIDE DEFAULT ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
 
+
         AppTheme theme = AppTheme.getInstance();
         profileLayout.setBackgroundColor(theme.getBackgroundColor());
 
