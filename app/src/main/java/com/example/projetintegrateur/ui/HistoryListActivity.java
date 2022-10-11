@@ -81,7 +81,6 @@ public class HistoryListActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot UniqueItinerary : snapshot.getChildren()) {
                     historyList.add(UniqueItinerary.getValue(ItineraryModel.class));
-                    Log.d("history", "OK!!");
                 }
 
                 //SET RECyCLERVIEW
