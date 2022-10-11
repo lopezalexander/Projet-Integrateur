@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.model.directionAPI.Leg;
@@ -221,15 +222,22 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         MarkerOptions markerOptions;
 
         if (!title.equals("selectedBusiness")) {
-            markerOptions = new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
+            if (markerArrayList.size() == 1) {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
+            } else {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+            }
         } else {
             markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
         }
         //Add the new marker to the map
         //Add the new marker to the markerArrayList
@@ -371,14 +379,14 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                             if (addressType.equals("AddressA")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
-                                        .width(10)
-                                        .color(Color.GREEN)
+                                        .width(15)
+                                        .color(getColor(R.color.green))
                                         .addAll(polylineList));
                             } else if (addressType.equals("AddressB")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
-                                        .width(10)
-                                        .color(Color.BLUE)
+                                        .width(15)
+                                        .color(getColor(R.color.green))
                                         .addAll(polylineList));
                             }
                         });

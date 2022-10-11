@@ -22,7 +22,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="50dp"
 		android:layout_marginLeft="25dp"
-		android:layout_marginTop="20dp"
+		android:layout_marginTop="40dp"
 		android:layout_marginRight="25dp"
 		android:background="@color/blue3"
 		android:elevation="10dp"
@@ -57,15 +57,31 @@
 		android:layout_alignParentTop="true"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
-		android:layout_marginStart="-40dp"
-		android:layout_marginTop="81dp"
+		android:layout_marginStart="-54dp"
+		android:layout_marginTop="130dp"
 		android:layout_marginEnd="15dp"
-		android:layout_marginBottom="590dp"
+		android:layout_marginBottom="580dp"
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_reset_foreground"
 		/>
 
+
+	<ImageView
+		android:id="@+id/ic_gps"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginStart="-54dp"
+		android:layout_marginTop="171dp"
+		android:layout_marginEnd="15dp"
+		android:layout_marginBottom="540dp"
+		android:contentDescription="@string/empty_value"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_gps_foreground"
+		/>
 
 	<!--	<ImageView-->
 	<!--		android:id="@+id/ic_expand"-->
@@ -96,23 +112,6 @@
 	<!--		android:scaleType="centerCrop"-->
 	<!--		android:src="@drawable/ic_share_foreground"-->
 	<!--		/>-->
-
-	<ImageView
-		android:id="@+id/ic_gps"
-		android:layout_width="60dp"
-		android:layout_height="60dp"
-		android:layout_alignParentTop="true"
-		android:layout_alignParentEnd="true"
-		android:layout_alignParentBottom="true"
-		android:layout_marginStart="-54dp"
-		android:layout_marginTop="171dp"
-		android:layout_marginEnd="15dp"
-		android:layout_marginBottom="500dp"
-		android:contentDescription="@string/empty_value"
-		android:scaleType="centerCrop"
-		android:src="@drawable/ic_gps_foreground"
-		/>
-
 
 	<ImageView
 		android:id="@+id/ic_show_listview_btn"
