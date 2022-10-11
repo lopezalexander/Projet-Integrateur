@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -55,7 +57,7 @@ import java.util.Objects;
 public class LoginDialog extends DialogFragment {
 
     //CAROUSEL
-    int[] carousel_Images = {R.drawable.page_one, R.drawable.page_two, R.drawable.page_three};
+//    int[] carousel_Images = {R.drawable.page_one, R.drawable.page_two, R.drawable.page_three};
 
     //FIREBASE
     private FirebaseAuth mAuth;
@@ -64,6 +66,12 @@ public class LoginDialog extends DialogFragment {
     //LOGIN PAGE VIEW ITEMS
     EditText email_input;
     EditText password_input;
+    EditText name_input;
+
+    LinearLayout name_layout;
+    LinearLayout password2_layout;
+    LinearLayout link_register;
+    View view_line;
 
     //GOOGLE LOGIN
     private GoogleSignInClient mGoogleSignInClient;
@@ -98,21 +106,30 @@ public class LoginDialog extends DialogFragment {
 
         //Setup Login Carousel
         //*******************************************************************************************
-        ViewPager login_Carousel = myFormView.findViewById(R.id.pager);
-        CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(myFormView.getContext(), carousel_Images);
-        login_Carousel.setAdapter(mCustomPagerAdapter);
+//        ViewPager login_Carousel = myFormView.findViewById(R.id.pager);
+//        CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(myFormView.getContext(), carousel_Images);
+//        login_Carousel.setAdapter(mCustomPagerAdapter);
 
 
         //GET VIEW ELEMENTS AND SETUP CLICKLISTENER AND HIDEKEYBOARD ON EDITTEXT
         //*******************************************************************************************
         email_input = myFormView.findViewById(R.id.input_email);
         password_input = myFormView.findViewById(R.id.input_password);
+        name_input = myFormView.findViewById(R.id.input_name);
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
         Button firebase_signIn_btn = myFormView.findViewById(R.id.btn_signIn);
 
         ImageView facebook_btn = myFormView.findViewById(R.id.btn_facebook);
         Button firebase_register_btn = myFormView.findViewById(R.id.btn_register);
+
+        name_layout = myFormView.findViewById(R.id.linearLayout_name);
+        password2_layout = myFormView.findViewById(R.id.linearLayout_password2);
+        link_register = myFormView.findViewById(R.id.linearLayout_link_register);
+        view_line = myFormView.findViewById(R.id.view_line);
+
+        TextView link_register = myFormView.findViewById(R.id.weblink_register);
+
 
 
         //SET HideKeyBoard() to EditText
@@ -156,6 +173,20 @@ public class LoginDialog extends DialogFragment {
         //FIREBASE REGISTER FUNCTION
         firebase_register_btn.setOnClickListener(view -> registerUserFirebase());
 
+        //LIEN POUR PAGE CREER COMPTE
+        link_register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                name_layout.setVisibility(View.VISIBLE);
+                password2_layout.setVisibility(View.VISIBLE);
+                firebase_register_btn.setVisibility(View.VISIBLE);
+                firebase_signIn_btn.setVisibility(View.GONE);
+                link_register.setVisibility(View.GONE);
+                view_line.setVisibility(View.GONE);
+                email_input.setText("");
+                password_input.setText("");
+            }
+        });
 
         // END CREATE VIEW, RETURN IT TO THE CALLER --> MapsActivity
         //*******************************************************************************************
@@ -172,9 +203,10 @@ public class LoginDialog extends DialogFragment {
     //*******************************************************************************************************
     private void registerUserFirebase() {
         //GET LOGIN INPUT DATA
+        String name = name_input.getText().toString().trim();
         String email = email_input.getText().toString().trim();
         String password = password_input.getText().toString().trim();
-        boolean valid = loginValidation(email, password);
+        boolean valid = loginValidation(name, email, password);
 
         if (valid) {
 
@@ -199,7 +231,7 @@ public class LoginDialog extends DialogFragment {
 
                                                 //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                                 String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-                                                User newUserData = new User(email, "", currentUserKey, null, null);
+                                                User newUserData = new User(email, "", currentUserKey, name, null);
 
 
                                                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
@@ -228,7 +260,7 @@ public class LoginDialog extends DialogFragment {
                                                     dismiss();
 
                                                     // Toast
-                                                    Toast.makeText(getActivity(), "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(getActivity(), "Bienvenue " + Objects.requireNonNull(name) + "!", Toast.LENGTH_LONG).show();
 
                                                 } else {
                                                     //HANDLE ERROR HERE if we cannot retrieve the user data
@@ -256,9 +288,10 @@ public class LoginDialog extends DialogFragment {
     //*******************************************************************************************************
     private void loginUserFirebase() {
         //GET LOGIN INPUT DATA
+        String name = name_input.getText().toString().trim();
         String email = email_input.getText().toString().trim();
         String password = password_input.getText().toString().trim();
-        boolean valid = loginValidation(email, password);
+        boolean valid = loginValidation(name, email, password);
 
         if (valid) {
 
@@ -478,8 +511,14 @@ public class LoginDialog extends DialogFragment {
     //
     //  LOGIN/REGISTRATION VALIDATION
     //*******************************************************************************************************
-    private boolean loginValidation(String email, String password) {
+    private boolean loginValidation(String name, String email, String password) {
         //VALIDATIONS
+        if (name.isEmpty()) {
+            email_input.setError("Email Required!");
+            email_input.requestFocus();
+            return false;
+        }
+
         if (email.isEmpty()) {
             email_input.setError("Email Required!");
             email_input.requestFocus();
