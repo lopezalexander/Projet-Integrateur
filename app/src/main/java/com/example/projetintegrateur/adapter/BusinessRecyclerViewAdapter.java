@@ -15,6 +15,7 @@ import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
 import com.example.projetintegrateur.ui.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -41,10 +42,18 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
     @Override
     public void onBindViewHolder(@NonNull BusinessRecyclerViewAdapter.MyViewHolder holder, int position) {
-        holder.businesImage.setImageResource(R.drawable.ic_restaurant_foreground);
+        if (!businessData.get(position).getPhotoURL().equals("")) {
+            String photoURL = businessData.get(position).getPhotoURL();
+            String photoURL2 = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="+photoURL+"&key="+ context.getString(R.string.maps_key);
+             Picasso.get().load(photoURL2).into(holder.businesImage);
+        }
+        else {
+            holder.businesImage.setImageResource(R.drawable.ic_restaurant_foreground);
+        }
         holder.businessName.setText(businessData.get(position).getName());
         holder.businessAddress.setText(businessData.get(position).getAddress());
         holder.businessRating.setText(businessData.get(position).getRating());
+
 
         holder.btn_chooseBusiness.setOnClickListener(v -> {
             //test

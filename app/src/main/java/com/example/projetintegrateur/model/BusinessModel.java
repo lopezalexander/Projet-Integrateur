@@ -9,6 +9,16 @@ public class BusinessModel {
     private String rating;
     private LatLng coordinatesLatlng;
 
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
+    private  String photoURL;
+
     public LatLng getCoordinatesLatlng() {
         return coordinatesLatlng;
     }
