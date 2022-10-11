@@ -11,6 +11,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -138,6 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_MapCurrentLocation_GPS;
     ImageView btn_resetSearchBar;
     ImageView btn_showBusinessList;
+    ImageView setting;
     BusinessDialog businessDialog;
 
 
@@ -158,8 +160,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationArrayList = new ArrayList<>();
         locationAddressName = new ArrayList<>();
         markerArrayList = new ArrayList<>();
-
-
 
 
         if (isServicesOK()) {
@@ -187,6 +187,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppTheme currentTheme = AppTheme.getInstance();
         //Set search bar background color
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        //profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        //setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
     }
 
     //
@@ -592,7 +594,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
-                                Log.d(TAG, "onResponse: "+uniqueBusiness);
+                                Log.d(TAG, "onResponse: " + uniqueBusiness);
                                 if (uniqueBusiness.getPhotos() != null) {
                                     business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
                                 }
@@ -655,7 +657,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Instantiate GoogleMap
         mMap = googleMap;
 
-        setMapStyle("Midnight");
+
+        setMapStyle("Midnight", MapsActivity.this);
+
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
@@ -681,7 +685,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(marker -> {
 
             DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
 
                         //EFFACER le LatLng de la liste
@@ -728,12 +732,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-
         mMap.setOnPolylineClickListener(polyline1 -> {
 
 
             DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         //resetRoute();
                         polyline1.remove();
@@ -755,42 +758,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .setNegativeButton("Non", dialogClickListener).show();
 
 
-
         });
     }
 
-    public static void setMapStyle(String mapStyle) {
+    public static void setMapStyle(String mapStyle, Context context) {
         switch (mapStyle) {
             case "Muted Blue":
-                mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
-                        "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
-                        "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
-                        "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
-                        "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
-                        "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
-                );
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
                 break;
             case "Midnight":
-                mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\",\n\"elementType\": \"labels.text.fill\",\n" +
-                        "\"stylers\": [\n{\n\"color\": \"#ffffff\"\n}\n]\n},\n{\n\"featureType\": \"all\",\n\"elementType\": \"labels.text.stroke\",\n" +
-                        "\"stylers\": [\n{\n\"color\": \"#000000\"\n},\n{\n\"lightness\": 13\n}\n]\n},\n{\n\"featureType\": \"administrative\",\n" +
-                        "\"elementType\": \"geometry.fill\",\n\"stylers\": [\n{\n\"color\": \"#000000\"\n}\n]\n},\n{\n\"featureType\": \"administrative\",\n" +
-                        "\"elementType\": \"geometry.stroke\",\n\"stylers\": [\n{\n    \"color\": \"#144b53\"\n},\n{\n    \"lightness\": 14\n},\n{\n    \"weight\": 1.4\n}\n" +
-                        "]\n},\n{\n    \"featureType\": \"landscape\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#08304b\"\n}\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#0c4152\"\n},\n{\n    \"lightness\": 5\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b434f\"\n},\n{\n    \"lightness\": 25\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n{\n    \"color\": \"#0b3d51\"\n},\n{\n    \"lightness\": 16\n}\n    ]\n},\n{\n    \"featureType\": \"road.local\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n{\n    \"color\": \"#000000\"\n}\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#146474\"\n}\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n{\n    \"color\": \"#021019\"\n}\n    ]\n}\n" +
-                        "]"));
-
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
                 break;
             case "Black and White":
-                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        },\n        {\n            \"weight\": 1\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        },\n        {\n            \"weight\": 0.8\n        }\n    ]\n},\n{\n    \"featureType\": \"landscape\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#000000\"\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.icon\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        }\n    ]\n}\n" +
-                        "]"));
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
                 break;
             case "Ultra Light":
-                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#e9e9e9\"\n        },\n        {\n            \"lightness\": 17\n        }\n    ]\n},\n{\n    \"featureType\": \"landscape\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f5f5f5\"\n        },\n        {\n            \"lightness\": 20\n        }\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 17\n        }\n    ]\n},\n{\n    \"featureType\": \"road.highway\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 29\n        },\n        {\n            \"weight\": 0.2\n        }\n    ]\n},\n{\n    \"featureType\": \"road.arterial\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 18\n        }\n    ]\n},\n{\n    \"featureType\": \"road.local\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 16\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f5f5f5\"\n        },\n        {\n            \"lightness\": 21\n        }\n    ]\n},\n{\n    \"featureType\": \"poi.park\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#dedede\"\n        },\n        {\n            \"lightness\": 21\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.stroke\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"color\": \"#ffffff\"\n        },\n        {\n            \"lightness\": 16\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.text.fill\",\n    \"stylers\": [\n        {\n            \"saturation\": 36\n        },\n        {\n            \"color\": \"#333333\"\n        },\n        {\n            \"lightness\": 40\n        }\n    ]\n},\n{\n    \"elementType\": \"labels.icon\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"color\": \"#f2f2f2\"\n        },\n        {\n            \"lightness\": 19\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"color\": \"#fefefe\"\n        },\n        {\n            \"lightness\": 20\n        }\n    ]\n},\n{\n    \"featureType\": \"administrative\",\n    \"elementType\": \"geometry.stroke\",\n    \"stylers\": [\n        {\n            \"color\": \"#fefefe\"\n        },\n        {\n            \"lightness\": 17\n        },\n        {\n            \"weight\": 1.2\n        }\n    ]\n}\n" +
-                        "]"));
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
                 break;
             case "Blue Essence":
-                mMap.setMapStyle(new MapStyleOptions("[\n{\n    \"featureType\": \"landscape.natural\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"color\": \"#e0efef\"\n        }\n    ]\n},\n{\n    \"featureType\": \"poi\",\n    \"elementType\": \"geometry.fill\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"hue\": \"#1900ff\"\n        },\n        {\n            \"color\": \"#c0e8e8\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"lightness\": 100\n        },\n        {\n            \"visibility\": \"simplified\"\n        }\n    ]\n},\n{\n    \"featureType\": \"road\",\n    \"elementType\": \"labels\",\n    \"stylers\": [\n        {\n            \"visibility\": \"off\"\n        }\n    ]\n},\n{\n    \"featureType\": \"transit.line\",\n    \"elementType\": \"geometry\",\n    \"stylers\": [\n        {\n            \"visibility\": \"on\"\n        },\n        {\n            \"lightness\": 700\n        }\n    ]\n},\n{\n    \"featureType\": \"water\",\n    \"elementType\": \"all\",\n    \"stylers\": [\n        {\n            \"color\": \"#7dcdcd\"\n        }\n    ]\n}\n" +
-                        "]"));
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
                 break;
             case "Default Map":
                 mMap.setMapStyle(new MapStyleOptions("[]"));
@@ -891,6 +877,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
+
+        // SET OnClickListener for the SETTING BUTTON
+        //*************************************************************************************************
+        setting = findViewById(R.id.ic_settings);
+        setting.setOnClickListener(view -> {
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+            builder.setTitle("Choisissez un thème");
+            builder.setItems(themes, (dialog, which) -> {
+                //the user clicked on themes[which]
+                MapsActivity.setMapStyle(themes[which], MapsActivity.this);
+
+                //STORE COLOR IN SINGLETON
+                AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setBackgroundColor(colors[which]);
+                currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
+                profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+            });
+            builder.show();
+        });
+
 
         // SET OnClickListener to reset search bar and to empty addresses
         //*************************************************************************************************
@@ -1204,7 +1217,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         newItineraryPush.setValue(itineraryToAdd, (error, ref) -> Toast.makeText(MapsActivity.this, "Itinerary Saved!", Toast.LENGTH_LONG).show());
 
     }
-    
+
     //
     //
     //SHOW RESULTS AFTER THE SEARCH AND SELECTED BUSINESS IS DONE

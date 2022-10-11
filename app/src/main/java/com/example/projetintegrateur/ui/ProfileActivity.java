@@ -19,6 +19,8 @@ import com.example.projetintegrateur.util.UserClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
 import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -47,27 +49,31 @@ public class ProfileActivity extends AppCompatActivity {
 
         User user = ((UserClient) getApplicationContext()).getUser();
         ImageView profilePicture = findViewById(R.id.imageView_profile_picture);
- 
+
+        String photoURL = null;
+        String name = null;
+        String email = null;
+
+
         if (user != null) {
             photoURL = user.getPhotoUrl();
             name = user.getName();
             email = user.getEmail();
         }
- 
+
 
         //SET/DISPLAY PROFILE INFORMATION
         //*****************************************************************************************************************************
         //Picasso.get().load(photoURL).into(profilePicture);
- 
+
         TextView profileName = findViewById(R.id.textview_fullname);
 
         profileName.setText(name);
- 
+
 
         TextView profileEmail = findViewById(R.id.textview_email);
 
         profileEmail.setText(email);
-
 
 
         //BUTTON HISTORY OnClickListener
@@ -105,21 +111,22 @@ public class ProfileActivity extends AppCompatActivity {
         TextView btn_parametre = findViewById(R.id.textview_parametres);
 
         btn_parametre.setOnClickListener(view -> {
-            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light","Blue Essence", "Default Map"};
-            int[] colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1),getColor(R.color.black),getColor(R.color.white),getColor(R.color.grey),getColor(R.color.blueGreen),getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
-                MapsActivity.setMapStyle(themes[which]);
+                MapsActivity.setMapStyle(themes[which], ProfileActivity.this);
+
                 profileLayout.setBackgroundColor(colors[which]);
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
-                Log.d(TAG, "onCreate: "+currentTheme.getSearchBar_backgroundColor());
+                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
 
