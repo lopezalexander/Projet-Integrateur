@@ -89,7 +89,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         btn_logOut.setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(ProfileActivity.this, MapsActivity.class));
+            Intent intent = new Intent(ProfileActivity.this, MapsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         });
 
         TextView btn_infos = findViewById(R.id.textview_info);

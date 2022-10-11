@@ -228,7 +228,7 @@ public class LoginDialog extends DialogFragment {
                                                     dismiss();
 
                                                     // Toast
-                                                    Toast.makeText(getActivity(), "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(getActivity(), "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
                                                 } else {
                                                     //HANDLE ERROR HERE if we cannot retrieve the user data
@@ -284,7 +284,7 @@ public class LoginDialog extends DialogFragment {
                                             dismiss();
 
                                             // Toast
-                                            Toast.makeText(getActivity(), "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getActivity(), "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
                                         } else {
                                             //HANDLE ERROR HERE if we cannot retrieve the user data
@@ -359,7 +359,7 @@ public class LoginDialog extends DialogFragment {
                                         dismiss();
 
                                         // Toast
-                                        Toast.makeText(getActivity(), "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getActivity(), "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
                                     } else {
                                         //HANDLE ERROR HERE if we cannot retrieve the user data
@@ -438,7 +438,7 @@ public class LoginDialog extends DialogFragment {
                                         dismiss();
 
                                         // Toast
-                                        Toast.makeText(getContext(), "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(getContext(), "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
 
                                     } else {
                                         //HANDLE ERROR HERE if we cannot retrieve the user data

@@ -187,8 +187,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppTheme currentTheme = AppTheme.getInstance();
         //Set search bar background color
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        //profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        //setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
     }
 
     //
@@ -1089,6 +1089,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (currentUser == null) {
             loginDialog = new LoginDialog();
+            loginDialog.setCancelable(false);
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
         } else {
             //TODO:: RETRIEVE USER DATA FROM FIREBASE AND RESTORE IT INTO USER SINGLETON
@@ -1106,7 +1107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     User currentUser2 = task2.getResult().getValue(User.class);
                     ((UserClient) getApplicationContext()).setUser(currentUser2);
                     // Toast
-                    Toast.makeText(this, "Welcome to MidWay!!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
                 } else {
                     //HANDLE ERROR HERE if we cannot retrieve the user data
                     Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
