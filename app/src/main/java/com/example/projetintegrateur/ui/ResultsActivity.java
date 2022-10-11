@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
-import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.model.directionAPI.Leg;
@@ -380,7 +379,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
-                                        .color(getColor(R.color.green))
+                                        .color(getColor(R.color.blue6))
                                         .addAll(polylineList));
                             } else if (addressType.equals("AddressB")) {
                                 mMap.addPolyline(new PolylineOptions()
