@@ -1,13 +1,17 @@
 package com.example.projetintegrateur.ui;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.model.directionAPI.Leg;
@@ -55,7 +60,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     ItineraryModel itineraryData;
 
     //GOOGLE MAPS SETUP
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
 
     //LISTS//VARIABLES
     private ArrayList<Marker> markerArrayList;
@@ -84,6 +89,18 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
 
     }
+
+    //***********\\
+    //  OnStart  \\
+    //******************************************************************************************************************************************************************************
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+
+    }
+
 
 
     //
@@ -173,13 +190,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         mMap = googleMap;
 
         //SET STYLE FOR THE MAP
-        mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
-                "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
-                "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
-                "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
-                "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
-                "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
-        );
+//        setMapStyle("Midnight", ResultsActivity.this);
 
         //Disables the native button for getting current location, we will need to create
         //our own, because we need to add the seach bar
@@ -197,6 +208,43 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         //NEED THE MAP TO BE LOADED TO ADD MARKERS AND USE MAP FUNCTIONS
         mMap.setOnMapLoadedCallback(this::mapIsReady);
+
+        //Get Theme Signleton
+        AppTheme currentTheme = AppTheme.getInstance();
+        //Set search bar background color
+        setMapStyle(currentTheme.getTheme());
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.508888,-73.561668),13.5f));
+    }
+
+
+    //
+    //
+    //SET MAP STYLE
+    //*****************************************************************************************************************************
+    public void setMapStyle(String mapStyle) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
     }
 
 
@@ -408,6 +456,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
 
+
     //
     //
     //
@@ -473,6 +522,10 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
+
+
+
+
 
 }//END RESULTS ACTIVITY  //=========================================================================================================================================================
 

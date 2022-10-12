@@ -790,6 +790,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 resetRoute();
             }
         });
+
     }
 
 
@@ -890,8 +891,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setting = findViewById(R.id.ic_settings);
         setting.setOnClickListener(view -> {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
-            int[] colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue3), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
@@ -901,6 +902,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setTheme(themes[which]);
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
                 profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
@@ -1192,7 +1194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_SearchBar_GPS.setVisibility(View.VISIBLE);
         btn_showBusinessList.setVisibility(View.GONE);
         autocompleteFragment.setText("");
-        if (businessDialog.isAdded()) {
+        if (businessDialog != null) {
             businessDialog.dismiss();
         }
         setHints();

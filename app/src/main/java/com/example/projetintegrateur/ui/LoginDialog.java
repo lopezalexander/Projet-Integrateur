@@ -66,11 +66,15 @@ public class LoginDialog extends DialogFragment {
     //LOGIN PAGE VIEW ITEMS
     EditText email_input;
     EditText password_input;
+    EditText password2_input;
     EditText name_input;
 
     LinearLayout name_layout;
     LinearLayout password2_layout;
-    LinearLayout link_register;
+    LinearLayout linearLayout_register;
+    TextView link_register;
+    LinearLayout linearLayout_login;
+    TextView link_login;
     View view_line;
 
     //GOOGLE LOGIN
@@ -115,6 +119,7 @@ public class LoginDialog extends DialogFragment {
         //*******************************************************************************************
         email_input = myFormView.findViewById(R.id.input_email);
         password_input = myFormView.findViewById(R.id.input_password);
+        password2_input = myFormView.findViewById(R.id.input_password2);
         name_input = myFormView.findViewById(R.id.input_name);
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
@@ -125,10 +130,11 @@ public class LoginDialog extends DialogFragment {
 
         name_layout = myFormView.findViewById(R.id.linearLayout_name);
         password2_layout = myFormView.findViewById(R.id.linearLayout_password2);
-        link_register = myFormView.findViewById(R.id.linearLayout_link_register);
+        linearLayout_register = myFormView.findViewById(R.id.linearLayout_link_register);
+        link_register = myFormView.findViewById(R.id.weblink_register);
+        linearLayout_login = myFormView.findViewById(R.id.linearLayout_link_login);
+        link_login = myFormView.findViewById(R.id.weblink_login);
         view_line = myFormView.findViewById(R.id.view_line);
-
-        TextView link_register = myFormView.findViewById(R.id.weblink_register);
 
 
 
@@ -137,6 +143,7 @@ public class LoginDialog extends DialogFragment {
         ArrayList<EditText> editTextList = new ArrayList<>();
         editTextList.add(email_input);
         editTextList.add(password_input);
+        editTextList.add(password2_input);
 
         for (int i = 0; i < editTextList.size(); i++) {
             editTextList.get(i).setOnFocusChangeListener((v, hasFocus) -> {
@@ -181,12 +188,32 @@ public class LoginDialog extends DialogFragment {
                 password2_layout.setVisibility(View.VISIBLE);
                 firebase_register_btn.setVisibility(View.VISIBLE);
                 firebase_signIn_btn.setVisibility(View.GONE);
-                link_register.setVisibility(View.GONE);
+                linearLayout_register.setVisibility(View.GONE);
+                linearLayout_login.setVisibility(View.VISIBLE);
                 view_line.setVisibility(View.GONE);
                 email_input.setText("");
                 password_input.setText("");
             }
         });
+
+        link_login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                name_layout.setVisibility(View.GONE);
+                password2_layout.setVisibility(View.GONE);
+                firebase_register_btn.setVisibility(View.GONE);
+                firebase_signIn_btn.setVisibility(View.VISIBLE);
+                linearLayout_register.setVisibility(View.VISIBLE);
+                linearLayout_login.setVisibility(View.GONE);
+                view_line.setVisibility(View.VISIBLE);
+                name_input.setText("");
+                email_input.setText("");
+                password_input.setText("");
+                password2_input.setText("");
+            }
+        });
+
+
 
         // END CREATE VIEW, RETURN IT TO THE CALLER --> MapsActivity
         //*******************************************************************************************
@@ -206,7 +233,8 @@ public class LoginDialog extends DialogFragment {
         String name = name_input.getText().toString().trim();
         String email = email_input.getText().toString().trim();
         String password = password_input.getText().toString().trim();
-        boolean valid = loginValidation(name, email, password);
+        String password2 = password2_input.getText().toString().trim();
+        boolean valid = loginValidation(name, email, password, password2);
 
         if (valid) {
 
@@ -291,7 +319,8 @@ public class LoginDialog extends DialogFragment {
         String name = name_input.getText().toString().trim();
         String email = email_input.getText().toString().trim();
         String password = password_input.getText().toString().trim();
-        boolean valid = loginValidation(name, email, password);
+        String password2 = password2_input.getText().toString().trim();
+        boolean valid = loginValidation(name, email, password, password2);
 
         if (valid) {
 
@@ -511,22 +540,22 @@ public class LoginDialog extends DialogFragment {
     //
     //  LOGIN/REGISTRATION VALIDATION
     //*******************************************************************************************************
-    private boolean loginValidation(String name, String email, String password) {
+    private boolean loginValidation(String name, String email, String password, String password2) {
         //VALIDATIONS
         if (name.isEmpty()) {
-            email_input.setError("Email Required!");
+            name_input.setError("Entrez votre nom!");
             email_input.requestFocus();
             return false;
         }
 
         if (email.isEmpty()) {
-            email_input.setError("Email Required!");
+            email_input.setError("Entrez votre courriel!");
             email_input.requestFocus();
             return false;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            email_input.setError("Please provide valid email!");
+            email_input.setError("Votre courriel est incorrect");
             email_input.requestFocus();
             return false;
         }
@@ -540,6 +569,12 @@ public class LoginDialog extends DialogFragment {
         if (password.length() < 6) {
             password_input.setError("Password requires at least 6 characters!");
             password_input.requestFocus();
+            return false;
+        }
+
+        if (!password.equals(password2)) {
+            password2_input.setError("Confirmation du mot de passe ne correspond pas. Resaisissez votre mot de passe.");
+            password2_input.requestFocus();
             return false;
         }
 

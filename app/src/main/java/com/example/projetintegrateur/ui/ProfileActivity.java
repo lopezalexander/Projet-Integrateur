@@ -65,7 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         //SET/DISPLAY PROFILE INFORMATION
         //*****************************************************************************************************************************
-        //Picasso.get().load(photoURL).into(profilePicture);
+        Picasso.get().load(photoURL).into(profilePicture);
 
         TextView profileName = findViewById(R.id.textview_fullname);
 
@@ -115,18 +115,18 @@ public class ProfileActivity extends AppCompatActivity {
 
         btn_parametre.setOnClickListener(view -> {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
-            int[] colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
-                MapsActivity.setMapStyle(themes[which], ProfileActivity.this);
-
+                MapsActivity.setMapStyle(themes[which],getApplicationContext());
                 profileLayout.setBackgroundColor(colors[which]);
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setTheme(themes[which]);
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());

@@ -1,14 +1,15 @@
 package com.example.projetintegrateur.model;
 
 public class AppTheme {
-    int backgroundColor = -16361597;
-    int searchBar_backgroundColor = -16361597;
+    private int backgroundColor = -16361597;
+    private int searchBar_backgroundColor = -16361597;
+    private String theme = "Midnight";
 
     //**************\\
     //  CONSTRUCTOR  \\
     //*****************************************************************************************************************************
 
-    public AppTheme() { }
+    private AppTheme() { }
 
     private static AppTheme appTheme = new AppTheme();
 
@@ -30,5 +31,13 @@ public class AppTheme {
 
     public void setSearchBar_backgroundColor(int searchBar_backgroundColor) {
         this.searchBar_backgroundColor = searchBar_backgroundColor;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
     }
 }
