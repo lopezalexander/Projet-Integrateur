@@ -1,6 +1,7 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -175,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //***********\\
-    //  OnStart  \\
+    //  OnPause  \\
     //******************************************************************************************************************************************************************************
     @Override
     protected void onStart() {
@@ -184,8 +186,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppTheme currentTheme = AppTheme.getInstance();
         //Set search bar background color
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
     }
 
     //
@@ -791,6 +793,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        getCurrentLocation();
+
     }
 
 
@@ -891,8 +895,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setting = findViewById(R.id.ic_settings);
         setting.setOnClickListener(view -> {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
-            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue3), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] buttons_Drawables = {R.drawable.icon_container_settings, R.drawable.icon_container_settings2, R.drawable.icon_container_settings3, R.drawable.icon_container_settings4, R.drawable.icon_container_settings5, R.drawable.icon_container_settings6};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
@@ -905,8 +910,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currentTheme.setTheme(themes[which]);
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
-                profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-                setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                currentTheme.setButtonBg(buttons_Drawables[which]);
+                profil.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
+                setting.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
@@ -958,7 +964,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         autocompleteFragment.setHint(getString(R.string.search_address_1));
 
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-
 
         //SET SPECIFIC COUNTRY BASED SEARCH
         autocompleteFragment.setCountries("CA", "US");

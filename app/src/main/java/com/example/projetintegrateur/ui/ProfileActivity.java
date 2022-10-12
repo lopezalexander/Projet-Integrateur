@@ -116,7 +116,7 @@ public class ProfileActivity extends AppCompatActivity {
         btn_parametre.setOnClickListener(view -> {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
             int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
