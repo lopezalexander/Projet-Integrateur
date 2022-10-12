@@ -400,7 +400,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
                 .appendQueryParameter("destination", destinationCoordinate)
-                .appendQueryParameter("mode", "driving")
+                .appendQueryParameter("mode", "walking")
                 .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
@@ -492,7 +492,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mPolyline = mMap.addPolyline(new PolylineOptions()
                                     .clickable(true)
                                     .width(15)
-                                    .color(getColor(R.color.blue6))
+                                    .color(getColor(R.color.blue))
                                     .addAll(polylineList));
 
                             //ADD MIDDLE DISTANCE POINT MARKER

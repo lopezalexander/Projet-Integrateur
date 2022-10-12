@@ -129,7 +129,9 @@ public class HistoryListActivity extends AppCompatActivity {
 
         //SET ADAPTER AND SET THE LAYOUTMANAGER
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(layoutManager);
     }
 
     //

@@ -328,7 +328,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
                 .appendQueryParameter("destination", destinationCoordinate)
-                .appendQueryParameter("mode", "driving")
+                .appendQueryParameter("mode", "walking")
                 .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
@@ -427,7 +427,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
-                                        .color(getColor(R.color.blue6))
+                                        .color(getColor(R.color.blue))
                                         .addAll(polylineList));
                             } else if (addressType.equals("AddressB")) {
                                 mMap.addPolyline(new PolylineOptions()
