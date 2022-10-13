@@ -1,6 +1,7 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -15,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -63,8 +65,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -177,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     //***********\\
-    //  OnStart  \\
+    //  OnPause  \\
     //******************************************************************************************************************************************************************************
     @Override
     protected void onStart() {
@@ -186,8 +190,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AppTheme currentTheme = AppTheme.getInstance();
         //Set search bar background color
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
     }
 
     //
@@ -208,7 +212,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-//        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -217,8 +220,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
-
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
 
@@ -229,8 +230,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //MoveCamera to LatLng
                             moveCamera(latLng, DEFAULT_ZOOM);
                         } else {
-                            String err = "unable to get current location";
-                            Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
+                            LatLng latLngMontreal_Default = new LatLng(45.5019, -73.5674);
+                            moveCamera(latLngMontreal_Default, DEFAULT_ZOOM);
                         }
 
                     } else {
@@ -261,8 +262,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
-
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
                         if (currentLocation != null) {
@@ -324,7 +323,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  MOVE CAMERO TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void moveCamera(LatLng latLng, float zoom) {
-//        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
@@ -411,7 +409,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
                 .appendQueryParameter("destination", destinationCoordinate)
-                .appendQueryParameter("mode", "driving")
+                .appendQueryParameter("mode", "walking")
                 .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
@@ -503,7 +501,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mPolyline = mMap.addPolyline(new PolylineOptions()
                                     .clickable(true)
                                     .width(15)
-                                    .color(getColor(R.color.blue6))
+                                    .color(getColor(R.color.blue))
                                     .addAll(polylineList));
 
                             //ADD MIDDLE DISTANCE POINT MARKER
@@ -771,7 +769,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDrag(@NonNull Marker marker) {
-
+                markerArrayList.get(i).setPosition(marker.getPosition());
+                locationArrayList.set(i, marker.getPosition());
             }
 
             @Override
@@ -809,6 +808,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 resetRoute();
             }
         });
+
+        getCurrentLocation();
+
     }
 
 
@@ -846,7 +848,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //INITIALIZE PLACES API
         //*************************************************************************************************
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), getString(R.string.maps_key));
 
         //FIREBASE
         //*************************************************************************************************
@@ -909,21 +911,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setting = findViewById(R.id.ic_settings);
         setting.setOnClickListener(view -> {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
-            int[] colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
-            int[] searchBar_colors = {getColor(R.color.blue1), getColor(R.color.black), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] buttons_Drawables = {R.drawable.icon_container_settings, R.drawable.icon_container_settings2, R.drawable.icon_container_settings3, R.drawable.icon_container_settings4, R.drawable.icon_container_settings5, R.drawable.icon_container_settings6};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
-                MapsActivity.setMapStyle(themes[which], MapsActivity.this);
-
+                MapsActivity.setMapStyle(themes[which], getApplicationContext());
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setTheme(themes[which]);
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
-                profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-                setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                currentTheme.setButtonBg(buttons_Drawables[which]);
+                profil.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
+                setting.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 //Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
@@ -973,9 +977,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
-
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-
 
         //SET SPECIFIC COUNTRY BASED SEARCH
         autocompleteFragment.setCountries("CA", "US");
@@ -1211,7 +1213,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_SearchBar_GPS.setVisibility(View.VISIBLE);
         btn_showBusinessList.setVisibility(View.GONE);
         autocompleteFragment.setText("");
-        if (businessDialog.isAdded()) {
+        if (businessDialog != null) {
             businessDialog.dismiss();
         }
         setHints();

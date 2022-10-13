@@ -17,65 +17,68 @@
 	app:layout_constraintTop_toTopOf="parent"
 	>
 
-	<!--	START TOP CONTAINER-->
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="50"
-		android:gravity="center"
-		>
+<!--	&lt;!&ndash;	START TOP CONTAINER&ndash;&gt;-->
+<!--	<LinearLayout-->
+<!--		android:layout_width="match_parent"-->
+<!--		android:layout_height="0dp"-->
+<!--		android:layout_weight="50"-->
+<!--		android:gravity="center"-->
+<!--		>-->
 
-		<androidx.viewpager.widget.ViewPager
-			android:id="@+id/pager"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_margin="25dp"
-			android:background="@color/white"
-			/>
+<!--		<androidx.viewpager.widget.ViewPager-->
+<!--			android:id="@+id/pager"-->
+<!--			android:layout_width="wrap_content"-->
+<!--			android:layout_height="wrap_content"-->
+<!--			android:layout_margin="25dp"-->
+<!--			android:background="@color/white"-->
+<!--			/>-->
 
-	</LinearLayout><!--	END TOP CONTAINER-->
+<!--	</LinearLayout>&lt;!&ndash;	END TOP CONTAINER&ndash;&gt;-->
 
-	webLink_google_register
+<!--	webLink_google_register-->
 
 	<!--	START BOTTOM CONTAINER-->
 	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:layout_weight="50"
+		android:padding="20dp"
 		android:gravity="center_horizontal"
 		android:orientation="vertical"
 		>
 
 		<LinearLayout
+			android:id="@+id/linearLayout_name"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:gravity="center"
+			android:layout_marginTop="10dp"
 			android:orientation="vertical"
-			>
+			android:visibility="gone">
 
 			<TextView
+				android:id="@+id/textview_name"
 				android:layout_width="match_parent"
 				android:layout_height="25dp"
-				android:layout_marginStart="50dp"
+				android:layout_marginStart="20dp"
 				android:layout_marginEnd="50dp"
 				android:labelFor="@+id/input_email"
-				android:text="@string/email"
+				android:text="Nom"
 				android:textColor="@color/white"
-				android:textSize="18sp"
-				/>
+				android:textSize="18sp"/>
 
 			<EditText
-				android:id="@+id/input_email"
-				android:layout_width="match_parent"
+				android:id="@+id/input_name"
+				android:layout_width="290dp"
 				android:layout_height="40dp"
 				android:layout_marginStart="50dp"
 				android:layout_marginEnd="50dp"
-				android:autofillHints="emailAddress"
-				android:background="@color/white"
-				android:inputType="textEmailAddress"
-				/>
+				android:padding="5dp"
+				android:textColor="@color/blue5"
+				android:background="@color/blue3"
+				android:inputType="textCapWords"/>
 
-		</LinearLayout> <!-- EMAIL INPUT -->
+		</LinearLayout>
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -88,7 +91,42 @@
 			<TextView
 				android:layout_width="match_parent"
 				android:layout_height="25dp"
+				android:layout_marginStart="20dp"
+				android:layout_marginEnd="50dp"
+				android:labelFor="@+id/input_email"
+				android:text="@string/email"
+				android:textColor="@color/white"
+				android:textSize="18sp"
+				/>
+
+			<EditText
+				android:id="@+id/input_email"
+				android:layout_width="290dp"
+				android:layout_height="40dp"
 				android:layout_marginStart="50dp"
+				android:layout_marginEnd="50dp"
+				android:padding="5dp"
+				android:autofillHints="emailAddress"
+				android:textColor="@color/blue5"
+				android:background="@color/blue3"
+				android:inputType="textEmailAddress"
+				/>
+
+		</LinearLayout> <!-- EMAIL INPUT -->
+
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:gravity="center"
+			android:orientation="vertical"
+			>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="25dp"
+				android:layout_marginStart="20dp"
 				android:layout_marginEnd="50dp"
 				android:labelFor="@+id/input_password"
 				android:text="@string/password"
@@ -98,17 +136,58 @@
 
 			<EditText
 				android:id="@+id/input_password"
-				android:layout_width="match_parent"
+				android:layout_width="290dp"
 				android:layout_height="40dp"
 				android:layout_marginStart="50dp"
 				android:layout_marginEnd="50dp"
+				android:padding="5dp"
 				android:autofillHints="password"
-				android:background="@color/white"
+				android:textColor="@color/blue5"
+				android:background="@color/blue3"
 				android:inputType="textPassword"
 				/>
 
 
 		</LinearLayout> <!-- PASSWORD INPUT -->
+
+
+		<LinearLayout
+			android:id="@+id/linearLayout_password2"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:visibility="gone"
+			>
+
+			<TextView
+				android:layout_width="match_parent"
+				android:layout_height="25dp"
+				android:layout_marginStart="20dp"
+				android:layout_marginEnd="50dp"
+				android:labelFor="@+id/input_password"
+				android:text="Confirmer le mot de passe"
+				android:textColor="@color/white"
+				android:textSize="18sp"
+				/>
+
+			<EditText
+				android:id="@+id/input_password2"
+				android:layout_width="290dp"
+				android:layout_height="40dp"
+				android:layout_marginStart="50dp"
+				android:layout_marginEnd="50dp"
+				android:padding="5dp"
+				android:autofillHints="password"
+				android:background="@color/blue3"
+				android:textColor="@color/blue5"
+				android:inputType="textPassword"
+				/>
+
+
+		</LinearLayout> <!-- PASSWORD INPUT -->
+
 
 
 		<LinearLayout
@@ -122,39 +201,31 @@
 
 			<Button
 				android:id="@+id/btn_register"
-				android:layout_width="110dp"
+				android:layout_width="200dp"
 				android:layout_height="wrap_content"
-				android:backgroundTint="@color/white"
-				android:text="@string/login_register"
-				android:textColor="@color/red"
+				android:backgroundTint="@color/red3"
+				android:text="@string/enregistrer"
+				android:textColor="@color/blue1"
 				android:textStyle="bold"
+				android:visibility="gone"
 				/>
 
-			<Space
-				android:layout_width="5dp"
-				android:layout_height="0dp"
-				/>
+
 
 
 			<Button
 				android:id="@+id/btn_signIn"
 				android:layout_width="200dp"
 				android:layout_height="wrap_content"
-				android:backgroundTint="@color/white"
+				android:backgroundTint="@color/red3"
 				android:text="@string/signIn_button"
 				android:textColor="@color/blue1"
 				android:textStyle="bold"
+				android:visibility="visible"
 				/>
 
 		</LinearLayout>  <!-- SIGN IN BUTTON -->
 
-
-		<View
-			android:layout_width="300dp"
-			android:layout_height="3dp"
-			android:layout_marginTop="15dp"
-			android:background="#c0c0c0"
-			/>
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -166,8 +237,8 @@
 
 			<ImageView
 				android:id="@+id/btn_google"
-				android:layout_width="55dp"
-				android:layout_height="55dp"
+				android:layout_width="65dp"
+				android:layout_height="65dp"
 				android:contentDescription="@string/googlesigninlogo"
 				android:scaleType="fitXY"
 				android:src="@drawable/ic_google_icon"
@@ -191,26 +262,77 @@
 
 		</LinearLayout>
 
+		<View
+			android:layout_width="300dp"
+			android:layout_height="3dp"
+			android:layout_marginTop="15dp"
+			android:background="@color/red"
+			android:id="@+id/view_line"
+			/>
+
 		<LinearLayout
+			android:id="@+id/linearLayout_link_register"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_marginTop="10dp"
 			android:gravity="center"
+			android:orientation="vertical" 
 			>
 
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/login_google_signup1"
+				android:text="@string/nonMembre"
 				android:textColor="@color/white"
 				android:textSize="18sp"
 				/>
 
 			<TextView
-				android:id="@+id/webLink_google_register"
+				android:id="@+id/weblink_register"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="@string/login_google_signup2"
+				android:linksClickable="true"
+				android:autoLink="all"
+				android:selectAllOnFocus="true"
+				android:padding="5dp"
+				android:background="@color/red3"
+				android:text="@string/login_register"
+				android:textColor="@color/red"
+				android:textSize="18sp"
+				android:textStyle="bold"
+				/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/linearLayout_link_login"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="10dp"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:visibility="gone"
+ 
+			>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" 
+				android:text="@string/membre"
+				android:textColor="@color/white"
+				android:textSize="18sp"
+				/>
+
+			<TextView
+        android:id="@+id/weblink_login" 
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:linksClickable="true"
+				android:autoLink="all"
+				android:selectAllOnFocus="true"
+				android:padding="5dp"
+				android:background="@color/red3" 
+				android:text="@string/connectez_vous_maintenant" 
 				android:textColor="@color/red"
 				android:textSize="18sp"
 				android:textStyle="bold"

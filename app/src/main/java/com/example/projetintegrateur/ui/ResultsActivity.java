@@ -1,13 +1,18 @@
 package com.example.projetintegrateur.ui;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.DirectionResponse;
 import com.example.projetintegrateur.model.ItineraryModel;
 import com.example.projetintegrateur.model.directionAPI.Leg;
@@ -55,7 +61,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     ItineraryModel itineraryData;
 
     //GOOGLE MAPS SETUP
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
 
     //LISTS//VARIABLES
     private ArrayList<Marker> markerArrayList;
@@ -63,6 +69,8 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     ImageView btn_MapCurrentLocation_GPS;
     DirectionResponse directionResponseAddressA;
     DirectionResponse directionResponseAddressB;
+
+    ImageView setting;
 
     //UTILS
     ObjectMapper mapper;
@@ -84,6 +92,18 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
 
     }
+
+    //***********\\
+    //  OnStart  \\
+    //******************************************************************************************************************************************************************************
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+
+    }
+
 
 
     //
@@ -151,6 +171,35 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
             //CENTER ON MARKERS
             centerAllMarkers();
         });
+
+        // SET OnClickListener for the SETTING BUTTON
+        //*************************************************************************************************
+        setting = findViewById(R.id.ic_settings2);
+        setting.setOnClickListener(view -> {
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] buttons_Drawables = {R.drawable.icon_container_settings, R.drawable.icon_container_settings2, R.drawable.icon_container_settings3, R.drawable.icon_container_settings4, R.drawable.icon_container_settings5, R.drawable.icon_container_settings6};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+            builder.setTitle("Choisissez un thème");
+            builder.setItems(themes, (dialog, which) -> {
+                //the user clicked on themes[which]
+                MapsActivity.setMapStyle(themes[which], ResultsActivity.this);
+                ResultsActivity.setMapStyle(themes[which], ResultsActivity.this);
+
+
+                //STORE COLOR IN SINGLETON
+                AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setTheme(themes[which]);
+                currentTheme.setBackgroundColor(colors[which]);
+                currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
+                currentTheme.setButtonBg(buttons_Drawables[which]);
+
+                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+            });
+            builder.show();
+        });
     }
 
     private void initMap() {
@@ -173,13 +222,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         mMap = googleMap;
 
         //SET STYLE FOR THE MAP
-        mMap.setMapStyle(new MapStyleOptions("[{\"featureType\":\"all\"," +
-                "\"stylers\":[{\"saturation\":0},{\"hue\":\"#e7ecf0\"}]},{\"featureType" +
-                "\":\"road\",\"stylers\":[{\"saturation\":-70}]},{\"featureType\":" +
-                "\"transit\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType" +
-                "\":\"poi\",\"stylers\":[{\"visibility\":\"off\"}]},{\"featureType\":" +
-                "\"water\",\"stylers\":[{\"visibility\":\"simplified\"},{\"saturation\":-60}]}]")
-        );
+//        setMapStyle("Midnight", ResultsActivity.this);
 
         //Disables the native button for getting current location, we will need to create
         //our own, because we need to add the seach bar
@@ -197,6 +240,43 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         //NEED THE MAP TO BE LOADED TO ADD MARKERS AND USE MAP FUNCTIONS
         mMap.setOnMapLoadedCallback(this::mapIsReady);
+
+        //Get Theme Signleton
+        AppTheme currentTheme = AppTheme.getInstance();
+        //Set search bar background color
+        setMapStyle(currentTheme.getTheme());
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.508888,-73.561668),13.5f));
+    }
+
+
+    //
+    //
+    //SET MAP STYLE
+    //*****************************************************************************************************************************
+    public void setMapStyle(String mapStyle) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
     }
 
 
@@ -221,15 +301,22 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         MarkerOptions markerOptions;
 
         if (!title.equals("selectedBusiness")) {
-            markerOptions = new MarkerOptions()
-                    .position(latLng)
-                    .title(title)
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person4));
+            if (markerArrayList.size() == 1) {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
+            } else {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+            }
         } else {
             markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
         }
         //Add the new marker to the map
         //Add the new marker to the markerArrayList
@@ -273,7 +360,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 .buildUpon()
                 .appendQueryParameter("origin", originCoordinate)
                 .appendQueryParameter("destination", destinationCoordinate)
-                .appendQueryParameter("mode", "driving")
+                .appendQueryParameter("mode", "walking")
                 .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
@@ -371,14 +458,14 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                             if (addressType.equals("AddressA")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
-                                        .width(10)
-                                        .color(Color.GREEN)
+                                        .width(15)
+                                        .color(getColor(R.color.blue))
                                         .addAll(polylineList));
                             } else if (addressType.equals("AddressB")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
-                                        .width(10)
-                                        .color(Color.BLUE)
+                                        .width(15)
+                                        .color(getColor(R.color.green))
                                         .addAll(polylineList));
                             }
                         });
@@ -399,6 +486,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     public void onInfoWindowClick(@NonNull Marker marker) {
 
     }
+
 
 
     //
@@ -466,6 +554,38 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         }
     }
+
+
+    //
+    //
+    //SET MAP STYLE
+    //*****************************************************************************************************************************
+    public static void setMapStyle(String mapStyle, Context context) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
+    }
+
+
 
 }//END RESULTS ACTIVITY  //=========================================================================================================================================================
 

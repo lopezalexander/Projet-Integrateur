@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/constraint_layout_profile"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="@color/blue1"
 	tools:context=".ui.ProfileActivity"
-	android:id="@+id/constraint_layout_profile"
 	>
 
 
@@ -23,7 +23,8 @@
 		app:layout_constraintHorizontal_bias="0.497"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.06999999" />
+		app:layout_constraintVertical_bias="0.06999999"
+		/>
 
 	<TextView
 		android:id="@+id/textview_fullname"
@@ -32,13 +33,14 @@
 		android:gravity="center"
 		android:text="@string/nom_complet"
 		android:textColor="@color/red"
-		android:textSize="24sp"
+		android:textSize="20sp"
 		android:textStyle="bold"
 		app:layout_constraintBottom_toTopOf="@+id/linearLayout"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
-		app:layout_constraintVertical_bias="0.100000024" />
+		app:layout_constraintVertical_bias="0.100000024"
+		/>
 
 	<TextView
 		android:id="@+id/textview_email"
@@ -53,7 +55,8 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toBottomOf="@+id/imageView_profile_picture"
-		app:layout_constraintVertical_bias="0.66999996" />
+		app:layout_constraintVertical_bias="0.66999996"
+		/>
 
 	<!--    BOUTON HISTORIQUE DE RENCONTRES     -->
 	<LinearLayout
@@ -81,8 +84,8 @@
 			android:gravity="center"
 			android:paddingEnd="5dp"
 			android:text="@string/historique_de_rencontres"
-			android:textColor="@color/blue1"
-			android:textSize="22sp"
+			android:textColor="@color/blue3"
+			android:textSize="18sp"
 			android:textStyle="bold"
 			/>
 
@@ -115,8 +118,8 @@
 			android:gravity="center"
 			android:paddingEnd="5dp"
 			android:text="@string/se_d_connecter"
-			android:textColor="@color/blue1"
-			android:textSize="22sp"
+			android:textColor="@color/blue3"
+			android:textSize="18sp"
 			android:textStyle="bold"
 			/>
 
@@ -149,8 +152,8 @@
 			android:gravity="center"
 			android:paddingEnd="20dp"
 			android:text="@string/param_tres"
-			android:textColor="@color/blue1"
-			android:textSize="22sp"
+			android:textColor="@color/blue3"
+			android:textSize="18sp"
 			android:textStyle="bold"
 			/>
 
@@ -181,8 +184,8 @@
 			android:gravity="center"
 			android:paddingEnd="20dp"
 			android:text="@string/propos"
-			android:textColor="@color/blue1"
-			android:textSize="22sp"
+			android:textColor="@color/blue3"
+			android:textSize="18sp"
 			android:textStyle="bold"
 			/>
 
