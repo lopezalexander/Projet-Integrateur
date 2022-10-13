@@ -7,7 +7,7 @@
 
 	<!--	//ALEX = AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4  -->
 	<!--	//ADNAN = AIzaSyDjO6PUHubAOFISZ8CF2t2OykYQ04DbM3M  -->
-	<string name="maps_key">AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4</string>
+	<string name="maps_key">AIzaSyDjO6PUHubAOFISZ8CF2t2OykYQ04DbM3M</string>
 
 	<string name="empty_value">" "</string>
 
@@ -38,14 +38,14 @@
 
 	<!-- FACEBOOK LOGIN -->
 	<!--	================= ADNAN ================== -->
-	<!--			<string name="facebook_app_id">1533089473800999</string>-->
-	<!--			<string name="fb_login_protocol_scheme">fb1234</string>-->
-	<!--			<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>-->
+				<string name="facebook_app_id">1533089473800999</string>
+				<string name="fb_login_protocol_scheme">fb1234</string>
+				<string name="facebook_client_token">05ca6dbe06bc31eb2f1a7977a848c3fc</string>
 
 	<!--================= ALEX ================== -->
-	<string name="facebook_app_id">1369837933544502</string>
-	<string name="fb_login_protocol_scheme">fb1234</string>
-	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>
+<!--	<string name="facebook_app_id">1369837933544502</string>-->
+<!--	<string name="fb_login_protocol_scheme">fb1234</string>-->
+<!--	<string name="facebook_client_token">41805522f50b1bf1c0ea433671549089</string>-->
 
 
 	<!-- PROFILE LAYOUT -->

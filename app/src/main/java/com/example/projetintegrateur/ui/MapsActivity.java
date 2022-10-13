@@ -1000,6 +1000,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mPolyline2.remove();
                     }
 
+
+
+
+
                     //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
                     drawResultPolyline(new CustomLatLng(locationArrayList.get(0).latitude, locationArrayList.get(0).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressA");
                     drawResultPolyline(new CustomLatLng(locationArrayList.get(1).latitude, locationArrayList.get(1).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressB");
@@ -1016,11 +1020,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 i = markerArrayList.indexOf(marker);
 
                 //EFFACER POLYLINE ET CIRCLE DU MARKEUR QUI SE FAIT BOUGER
+                if (mPolyline2 != null) {
+                    mPolyline2.remove();
+                }
                 if (mPolyline != null) {
                     mPolyline.remove();
                 }
                 if (mCircle != null) {
                     mCircle.remove();
+                }
+                if (mMarker != null && !marker.equals(mMarker)) {
+                    mMarker.remove();
                 }
             }
         });
@@ -1533,11 +1543,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //SHOW RESULTS AFTER THE SEARCH AND SELECTED BUSINESS IS DONE
     //*****************************************************************************************************************************
     public void showResult() {
-        //REMOVE THE BUSINESS LIST DIALOG
-        businessDialog.dismiss();
-
-        //DISABLE BUTTONS FOR RESULT
-        btn_showBusinessList.setVisibility(View.GONE);
+//        //REMOVE THE BUSINESS LIST DIALOG
+//        businessDialog.dismiss();
+//
+//        //DISABLE BUTTONS FOR RESULT
+//        btn_showBusinessList.setVisibility(View.GONE);
 
         //TODO:: DISPLAY PERTINENT DATA
         resultActive = true;
