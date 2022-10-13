@@ -1,5 +1,7 @@
 package com.example.projetintegrateur.model;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -16,7 +18,6 @@ public class BusinessModel {
 
     public BusinessModel() {
     }
-
 
     public BusinessModel(String name,
                          String address,
@@ -88,4 +89,17 @@ public class BusinessModel {
         this.coordinatesLatlng = coordinatesLatlng;
     }
 
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "BusinessModel{" +
+                "name='" + name + '\'' +
+                ", address='" + address + '\'' +
+                ", rating='" + rating + '\'' +
+                ", coordinatesLatlng=" + coordinatesLatlng +
+                ", photoURL='" + photoURL + '\'' +
+                ", types=" + types +
+                '}';
+    }
 }

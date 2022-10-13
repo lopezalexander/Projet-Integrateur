@@ -7,15 +7,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.example.projetintegrateur.R;
 
-public class CustomPagerAdapter  extends PagerAdapter {
+public class CustomPagerAdapter extends PagerAdapter {
 
-    private Context mContext;
-    private LayoutInflater mLayoutInflater;
-    private int[] mResources;
+    private final Context mContext;
+    private final LayoutInflater mLayoutInflater;
+    private final int[] mResources;
 
     public CustomPagerAdapter(Context context, int[] resources) {
         mContext = context;
@@ -29,15 +30,16 @@ public class CustomPagerAdapter  extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == ((LinearLayout) object);
+    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+        return view == object;
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
 
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
+        ImageView imageView = itemView.findViewById(R.id.imageView);
         imageView.setImageResource(mResources[position]);
 
         container.addView(itemView);
@@ -46,7 +48,7 @@ public class CustomPagerAdapter  extends PagerAdapter {
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(ViewGroup container, int position, @NonNull Object object) {
         container.removeView((LinearLayout) object);
     }
 

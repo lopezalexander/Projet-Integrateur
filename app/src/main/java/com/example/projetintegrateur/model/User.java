@@ -1,15 +1,14 @@
 package com.example.projetintegrateur.model;
 
-import android.net.Uri;
+import androidx.annotation.NonNull;
 
 public class User {
 
     private String email;
-    private String username;
     private String user_id;
     private String name;
     private String photoUrl;
-    
+
 
     //**************\\
     //  CONSTRUCTOR  \\
@@ -17,9 +16,8 @@ public class User {
     public User() {
     }
 
-    public User(String email, String username, String user_id, String name, String photoUrl) {
+    public User(String email, String user_id, String name, String photoUrl) {
         this.email = email;
-        this.username = username;
         this.user_id = user_id;
         this.name = name;
         this.photoUrl = photoUrl;
@@ -33,9 +31,6 @@ public class User {
         return email;
     }
 
-    public String getUsername() {
-        return username;
-    }
 
     public String getUser_id() {
         return user_id;
@@ -56,9 +51,6 @@ public class User {
         this.email = email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public void setUser_id(String user_id) {
         this.user_id = user_id;
@@ -72,12 +64,14 @@ public class User {
         this.photoUrl = photoUrl;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
-                ", username='" + username + '\'' +
                 ", user_id='" + user_id + '\'' +
+                ", name='" + name + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
                 '}';
     }
 }

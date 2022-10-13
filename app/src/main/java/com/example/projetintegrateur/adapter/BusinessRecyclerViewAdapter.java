@@ -6,14 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.BusinessModel;
-import com.example.projetintegrateur.ui.MapsActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
@@ -92,6 +90,6 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
     }
 
     public interface DataTransferInterfaceRecycler {
-        public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName);
+        void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName);
     }
 }

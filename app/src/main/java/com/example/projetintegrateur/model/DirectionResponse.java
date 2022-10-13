@@ -11,29 +11,33 @@ public class DirectionResponse {
     public String status;
 
 
-
-
-
-
+    //**************\\
+    //  GETTER       \\
+    //*****************************************************************************************************************************
     public ArrayList<GeocodedWaypoint> getGeocoded_waypoints() {
         return geocoded_waypoints;
-    }
-
-    public void setGeocoded_waypoints(ArrayList<GeocodedWaypoint> geocoded_waypoints) {
-        this.geocoded_waypoints = geocoded_waypoints;
     }
 
     public ArrayList<Route> getRoutes() {
         return routes;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+
+    //**************\\
+    //  SETTER       \\
+    //*****************************************************************************************************************************
+    public void setGeocoded_waypoints(ArrayList<GeocodedWaypoint> geocoded_waypoints) {
+        this.geocoded_waypoints = geocoded_waypoints;
+    }
+
     public void setRoutes(ArrayList<Route> routes) {
         this.routes = routes;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
     public void setStatus(String status) {
         this.status = status;

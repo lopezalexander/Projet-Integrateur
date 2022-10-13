@@ -21,10 +21,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.viewpager.widget.ViewPager;
 
 import com.example.projetintegrateur.R;
-import com.example.projetintegrateur.adapter.CustomPagerAdapter;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.facebook.AccessToken;
@@ -177,7 +175,7 @@ public class LoginDialog extends DialogFragment {
         //FACEBOOK
         facebook_btn.setOnClickListener(view -> {
             //LAUNCH THE REQUEST/INTENT TO CONNECT TO FACEBOOK
-            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Arrays.asList("email"));
+            LoginManager.getInstance().logInWithReadPermissions(this, mCallbackManager, Arrays.asList("email", "public_profile"));
         });
 
         //
@@ -185,38 +183,32 @@ public class LoginDialog extends DialogFragment {
         firebase_register_btn.setOnClickListener(view -> registerUserFirebase());
 
         //LIEN POUR PAGE CREER COMPTE
-        link_register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                name_layout.setVisibility(View.VISIBLE);
-                password2_layout.setVisibility(View.VISIBLE);
-                firebase_register_btn.setVisibility(View.VISIBLE);
-                firebase_signIn_btn.setVisibility(View.GONE);
+        link_register.setOnClickListener(view -> {
+            name_layout.setVisibility(View.VISIBLE);
+            password2_layout.setVisibility(View.VISIBLE);
+            firebase_register_btn.setVisibility(View.VISIBLE);
+            firebase_signIn_btn.setVisibility(View.GONE);
 
-                linearLayout_register.setVisibility(View.GONE);
-                linearLayout_login.setVisibility(View.VISIBLE);
+            linearLayout_register.setVisibility(View.GONE);
+            linearLayout_login.setVisibility(View.VISIBLE);
 
-                view_line.setVisibility(View.GONE);
-                email_input.setText("");
-                password_input.setText("");
-            }
+            view_line.setVisibility(View.GONE);
+            email_input.setText("");
+            password_input.setText("");
         });
 
-        link_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                name_layout.setVisibility(View.GONE);
-                password2_layout.setVisibility(View.GONE);
-                firebase_register_btn.setVisibility(View.GONE);
-                firebase_signIn_btn.setVisibility(View.VISIBLE);
-                linearLayout_register.setVisibility(View.VISIBLE);
-                linearLayout_login.setVisibility(View.GONE);
-                view_line.setVisibility(View.VISIBLE);
-                name_input.setText("");
-                email_input.setText("");
-                password_input.setText("");
-                password2_input.setText("");
-            }
+        link_login.setOnClickListener(view -> {
+            name_layout.setVisibility(View.GONE);
+            password2_layout.setVisibility(View.GONE);
+            firebase_register_btn.setVisibility(View.GONE);
+            firebase_signIn_btn.setVisibility(View.VISIBLE);
+            linearLayout_register.setVisibility(View.VISIBLE);
+            linearLayout_login.setVisibility(View.GONE);
+            view_line.setVisibility(View.VISIBLE);
+            name_input.setText("");
+            email_input.setText("");
+            password_input.setText("");
+            password2_input.setText("");
         });
 
 
@@ -265,7 +257,7 @@ public class LoginDialog extends DialogFragment {
 
                                                 //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                                 String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-                                                User newUserData = new User(email, "", currentUserKey, name, null);
+                                                User newUserData = new User(email, currentUserKey, name, null);
 
 
                                                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
@@ -399,7 +391,7 @@ public class LoginDialog extends DialogFragment {
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
                                     String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
                                     String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
-                                    User newUserData = new User(email, "", currentUserKey, name, photoUrl);
+                                    User newUserData = new User(email, currentUserKey, name, photoUrl);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")
@@ -479,7 +471,7 @@ public class LoginDialog extends DialogFragment {
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
                                     String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
                                     String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
-                                    User newUserData = new User(email, "", currentUserKey, name, photoUrl);
+                                    User newUserData = new User(email, currentUserKey, name, photoUrl);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")
