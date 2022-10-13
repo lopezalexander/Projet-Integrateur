@@ -29,11 +29,27 @@
 			>
 
 			<TextView
+				android:id="@+id/textview_all"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_margin="5dp"
+				android:layout_weight="25"
+				android:background="@drawable/business_layout_tab_filters_border"
+				android:gravity="center"
+				android:padding="10dp"
+				android:text="@string/all"
+				android:textAlignment="center"
+				android:textColor="@color/blue5"
+				android:textSize="15sp"
+				android:textStyle="bold"
+				/>
+
+			<TextView
 				android:id="@+id/textview_restaurants"
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_margin="5dp"
-				android:layout_weight="40"
+				android:layout_weight="25"
 				android:background="@drawable/business_layout_tab_filters_border"
 				android:gravity="center"
 				android:padding="10dp"
@@ -49,7 +65,7 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_margin="5dp"
-				android:layout_weight="20"
+				android:layout_weight="25"
 				android:background="@drawable/business_layout_tab_filters_border"
 				android:gravity="center"
 				android:padding="10dp"
@@ -65,7 +81,7 @@
 				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:layout_margin="5dp"
-				android:layout_weight="20"
+				android:layout_weight="25"
 				android:background="@drawable/business_layout_tab_filters_border"
 				android:gravity="center"
 				android:padding="10dp"
@@ -76,21 +92,6 @@
 				android:textStyle="bold"
 				/>
 
-			<TextView
-				android:id="@+id/discos"
-				android:layout_width="0dp"
-				android:layout_height="wrap_content"
-				android:layout_margin="5dp"
-				android:layout_weight="20"
-				android:background="@drawable/business_layout_tab_filters_border"
-				android:gravity="center"
-				android:padding="10dp"
-				android:text="@string/disco"
-				android:textAlignment="center"
-				android:textColor="@color/blue5"
-				android:textSize="15sp"
-				android:textStyle="bold"
-				/>
 
 		</LinearLayout>
 

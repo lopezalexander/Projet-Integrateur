@@ -1,5 +1,7 @@
 package com.example.projetintegrateur.model;
 
+import androidx.annotation.NonNull;
+
 import com.example.projetintegrateur.model.placeAPI.Geometry;
 import com.example.projetintegrateur.model.placeAPI.OpeningHours;
 import com.example.projetintegrateur.model.placeAPI.Photo;
@@ -8,6 +10,7 @@ import com.example.projetintegrateur.model.placeAPI.PlusCode;
 import java.util.ArrayList;
 
 public class NearbyBusinessResponse {
+    @NonNull
     @Override
     public String toString() {
         return "NearbySearch{" +

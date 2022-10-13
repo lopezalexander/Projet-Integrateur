@@ -580,7 +580,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .buildUpon()
                 .appendQueryParameter("location", midPointLatLng_String)
                 .appendQueryParameter("radius", "1000")
-                .appendQueryParameter("type", "restaurant")
                 .appendQueryParameter("key", getString(R.string.maps_key))
                 .toString();
 
@@ -632,7 +631,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getRating())+"★");
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
-
+                                business.setTypes(uniqueBusiness.getTypes());
+                                
                                 if (uniqueBusiness.getPhotos() != null) {
                                     business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
                                 }
@@ -993,7 +993,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 } else if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
                     midPointLatLng = marker.getPosition();
-                    
+
                     if (mPolyline != null) {
                         mPolyline.remove();
                     }
@@ -1001,9 +1001,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (mPolyline2 != null) {
                         mPolyline2.remove();
                     }
-
-
-
 
 
                     //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
