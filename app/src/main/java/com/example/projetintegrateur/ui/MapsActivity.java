@@ -210,7 +210,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-//        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -219,8 +218,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
-
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
 
@@ -231,8 +228,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //MoveCamera to LatLng
                             moveCamera(latLng, DEFAULT_ZOOM);
                         } else {
-                            String err = "unable to get current location";
-                            Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
+                            LatLng latLngMontreal_Default = new LatLng(45.5019, -73.5674);
+                            moveCamera(latLngMontreal_Default, DEFAULT_ZOOM);
                         }
 
                     } else {
@@ -255,7 +252,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void getSearchBarCurrentLocation() {
         final LatLng[] latLng = new LatLng[1];
-//        Log.d(TAG, "2.B) getDeviceCoordinates: getting the devices current location FROM SEARCH BAR GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -265,7 +261,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-//                        Log.d(TAG, "3) onComplete: found location!");
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
@@ -317,7 +312,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  MOVE CAMERO TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void moveCamera(LatLng latLng, float zoom) {
-//        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
@@ -834,7 +828,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //INITIALIZE PLACES API
         //*************************************************************************************************
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), getString(R.string.maps_key));
 
         //FIREBASE
         //*************************************************************************************************
@@ -906,7 +900,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which], getApplicationContext());
-                ResultsActivity.setMapStyle(themes[which], getApplicationContext());
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setTheme(themes[which]);
@@ -964,7 +957,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
-
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
 
         //SET SPECIFIC COUNTRY BASED SEARCH

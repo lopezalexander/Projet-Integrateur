@@ -60,11 +60,12 @@
 				android:id="@+id/address1"
 				android:layout_width="match_parent"
 				android:layout_height="35dp"
+				android:layout_gravity="center"
+				android:gravity="center"
+				android:maxLines="2"
 				android:paddingStart="5dp"
 				android:paddingEnd="0dp"
 				android:text="@string/sampleText"
-				android:gravity="center"
-				android:layout_gravity="center"
 				android:textAlignment="center"
 				android:textColor="@color/blue5"
 				/>
@@ -73,10 +74,12 @@
 				android:id="@+id/address2"
 				android:layout_width="match_parent"
 				android:layout_height="35dp"
+				android:gravity="center"
+				android:maxLines="2"
 				android:paddingStart="5dp"
+
 				android:paddingEnd="0dp"
 				android:text="@string/sampleText"
-				android:gravity="center"
 				android:textAlignment="center"
 				android:textColor="@color/blue5"
 				/>
@@ -88,7 +91,8 @@
 			android:layout_weight="3"
 			android:gravity="center"
 			android:scaleType="center"
-			android:src="@drawable/ic_arrow_foreground" />
+			android:src="@drawable/ic_arrow_foreground"
+			/>
 
 		<TextView
 			android:id="@+id/selectedBusiness"
@@ -96,6 +100,7 @@
 			android:layout_height="match_parent"
 			android:layout_weight="40"
 			android:gravity="center"
+			android:maxLines="3"
 			android:text="@string/sampleText"
 			android:textAlignment="center"
 			android:textColor="@color/blue5"

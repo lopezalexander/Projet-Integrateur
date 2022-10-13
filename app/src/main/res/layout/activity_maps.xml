@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:map="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
@@ -8,7 +7,7 @@
 	>
 
 
-	<androidx.fragment.app.FragmentContainerView
+	<fragment
 		android:id="@+id/map"
 		android:name="com.google.android.gms.maps.SupportMapFragment"
 		android:layout_width="match_parent"
@@ -33,7 +32,8 @@
 			android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			tools:layout="@layout/activity_maps" />
+			tools:layout="@layout/activity_maps"
+			/>
 
 		<ImageView
 			android:id="@+id/ic_gps2"
@@ -56,11 +56,10 @@
 		android:layout_height="75dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
-		android:layout_marginStart="-54dp" 
+		android:layout_marginStart="-54dp"
 		android:layout_marginTop="10dp"
-		android:layout_marginEnd="11dp"
-		android:layout_marginBottom="480dp"
- 
+		android:layout_marginEnd="10dp"
+		android:layout_marginBottom="440dp"
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_reset_foreground"
@@ -68,49 +67,19 @@
 
 
 	<ImageView
-		android:id="@+id/ic_gps" 
-		android:layout_width="70dp"
-		android:layout_height="70dp"
+		android:id="@+id/ic_gps"
+		android:layout_width="75dp"
+		android:layout_height="75dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginStart="-54dp"
 		android:layout_marginTop="10dp"
 		android:layout_marginEnd="10dp"
-		android:layout_marginBottom="400dp"
+		android:layout_marginBottom="360dp"
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_gps_foreground"
 		/>
-
-	<!--	<ImageView-->
-	<!--		android:id="@+id/ic_expand"-->
-	<!--		android:layout_width="80dp"-->
-	<!--		android:layout_height="80dp"-->
-	<!--		android:layout_alignParentEnd="true"-->
-	<!--		android:layout_alignParentBottom="true"-->
-	<!--		android:layout_marginStart="-54dp"-->
-	<!--		android:layout_marginTop="10dp"-->
-	<!--		android:layout_marginEnd="3dp"-->
-	<!--		android:layout_marginBottom="530dp"-->
-	<!--		android:contentDescription="@string/empty_value"-->
-	<!--		android:scaleType="centerCrop"-->
-	<!--		android:src="@drawable/ic_expand_foreground"-->
-	<!--		/>-->
-
-
-	<!--	<ImageView-->
-	<!--		android:id="@+id/ic_share"-->
-	<!--		android:layout_width="60dp"-->
-	<!--		android:layout_height="60dp"-->
-	<!--		android:layout_alignParentRight="true"-->
-	<!--		android:layout_alignParentBottom="true"-->
-	<!--		android:layout_marginStart="-54dp"-->
-	<!--		android:layout_marginTop="10dp"-->
-	<!--		android:layout_marginRight="3dp"-->
-	<!--		android:layout_marginBottom="210dp"-->
-	<!--		android:scaleType="centerCrop"-->
-	<!--		android:src="@drawable/ic_share_foreground"-->
-	<!--		/>-->
 
 	<ImageView
 		android:id="@+id/ic_show_listview_btn"
@@ -129,27 +98,17 @@
 		android:visibility="invisible"
 		/>
 
-<!--<androidx.cardview.widget.CardView-->
-<!--	android:layout_width="200dp"-->
-<!--	android:layout_height="wrap_content"-->
-<!--	android:layout_marginStart="80dp"-->
-<!--	android:layout_marginEnd="80dp"-->
-
-<!--	android:background="@drawable/profile_activity_border">-->
-
-
 	<LinearLayout
 		android:layout_width="150dp"
 		android:layout_height="70dp"
-		android:weightSum="100"
-		android:layout_gravity="center"
-		android:gravity="center"
-		android:layout_marginStart="105dp"
-		android:layout_marginEnd="20dp"
 		android:layout_alignParentBottom="true"
-
-		android:background="@drawable/profile_activity_border">
-
+		android:layout_centerHorizontal="true"
+		android:layout_gravity="center"
+		android:layout_marginBottom="15dp"
+		android:background="@drawable/profile_activity_border"
+		android:gravity="center"
+		android:weightSum="100"
+		>
 
 		<ImageView
 			android:id="@+id/ic_settings"
@@ -158,11 +117,11 @@
 			android:layout_marginTop="15dp"
 			android:layout_marginEnd="20dp"
 			android:layout_marginBottom="15dp"
+			android:layout_weight="10"
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"
 			android:scaleType="centerCrop"
 			android:src="@drawable/ic_settings_foreground"
-			android:layout_weight="10"
 			/>
 
 
@@ -173,18 +132,15 @@
 			android:layout_marginStart="0dp"
 			android:layout_marginTop="15dp"
 			android:layout_marginBottom="15dp"
+			android:layout_weight="10"
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"
 			android:scaleType="centerCrop"
-			android:layout_weight="10"
 			android:src="@drawable/ic_perso_foreground"
 			/>
 
 
 	</LinearLayout>
-
-<!--</androidx.cardview.widget.CardView>-->
-
 
 
 </RelativeLayout>
