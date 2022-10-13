@@ -42,7 +42,7 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
 
     @Override
     public void onBindViewHolder(@NonNull BusinessRecyclerViewAdapter.MyViewHolder holder, int position) {
-        if (!businessData.get(position).getPhotoURL().equals("")) {
+        if (businessData.get(position).getPhotoURL() != null) {
             String photoURL = businessData.get(position).getPhotoURL();
             String photoURL2 = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference="+photoURL+"&key="+ context.getString(R.string.maps_key);
              Picasso.get().load(photoURL2).into(holder.businesImage);
