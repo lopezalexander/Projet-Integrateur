@@ -9,7 +9,7 @@
 	<!--	TOP		-->
 	<LinearLayout
 		android:layout_width="match_parent"
-		android:layout_height="20dp"
+		android:layout_height="40dp"
 		android:background="@drawable/history_list_card_style"
 		android:orientation="horizontal"
 		android:weightSum="100"
@@ -43,7 +43,7 @@
 	<!--	BOTTOM		-->
 	<LinearLayout
 		android:layout_width="match_parent"
-		android:layout_height="40dp"
+		android:layout_height="80dp"
 		android:background="@color/blue3"
 		android:orientation="horizontal"
 		android:weightSum="100"
@@ -54,27 +54,31 @@
 			android:layout_height="match_parent"
 			android:layout_weight="40"
 			android:orientation="vertical"
+
 			>
 
 			<TextView
 				android:id="@+id/address1"
 				android:layout_width="match_parent"
-				android:layout_height="20dp"
+				android:layout_height="40dp"
+				android:gravity="center_vertical"
+				android:maxLines="2"
 				android:paddingStart="5dp"
 				android:paddingEnd="0dp"
 				android:text="@string/sampleText"
-				android:textAlignment="textStart"
 				android:textColor="@color/black"
 				/>
 
 			<TextView
 				android:id="@+id/address2"
 				android:layout_width="match_parent"
-				android:layout_height="20dp"
+				android:layout_height="40dp"
+				android:ellipsize="end"
+				android:gravity="center_vertical"
+				android:maxLines="2"
 				android:paddingStart="5dp"
 				android:paddingEnd="0dp"
 				android:text="@string/sampleText"
-				android:textAlignment="textStart"
 				android:textColor="@color/black"
 				/>
 		</LinearLayout>
@@ -94,8 +98,9 @@
 			android:id="@+id/selectedBusiness"
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
-			android:layout_weight="45"
+			android:layout_weight="40"
 			android:gravity="center"
+			android:maxLines="3"
 			android:text="@string/sampleText"
 			android:textAlignment="center"
 			android:textColor="@color/black"
@@ -107,7 +112,7 @@
 			android:layout_width="0dp"
 			android:layout_height="match_parent"
 			android:layout_gravity="center"
-			android:layout_weight="10"
+			android:layout_weight="15"
 			android:contentDescription="@string/empty_value"
 			android:scaleType="centerCrop"
 			android:src="@drawable/ic_go_foreground"

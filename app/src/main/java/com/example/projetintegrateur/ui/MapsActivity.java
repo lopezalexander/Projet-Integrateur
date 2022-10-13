@@ -13,6 +13,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -251,17 +253,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void getSearchBarCurrentLocation() {
         final LatLng[] latLng = new LatLng[1];
-//        Log.d(TAG, "2.B) getDeviceCoordinates: getting the devices current location FROM SEARCH BAR GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
             if (mLocationPermissionsGranted) {
                 final Task<Location> location = fusedLocationProviderClient.getLastLocation();
 
-
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-//                        Log.d(TAG, "3) onComplete: found location!");
+
 
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
@@ -272,8 +272,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Add to locationArrayList
                             locationArrayList.add(latLng[0]);
 
-                            //TODO:: ADD THE PHYSICAL ADDRESS NAME HERE , NEED TO MAKE A SEARCH TO PLACE API
-                            locationAddressName.add("");
+                            //Add to locationAddressName
+                            Geocoder geocoder;
+                            List<Address> addresses;
+                            geocoder = new Geocoder(this, Locale.getDefault());
+                            try {
+                                addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+                                String address = addresses.get(0).getAddressLine(0);
+                                locationAddressName.add(address);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
 
                             //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                             if (locationArrayList.size() == 2) {
@@ -590,7 +601,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
-                                Log.d(TAG, "onResponse: " + uniqueBusiness);
+
                                 if (uniqueBusiness.getPhotos() != null) {
                                     business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
                                 }
@@ -768,10 +779,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //REPLACE LIST VALUE AT POSITION OF THE MARKER
                 markerArrayList.get(i).setPosition(marker.getPosition());
                 locationArrayList.set(i, marker.getPosition());
-                //AJOUTER LA FONCTION de PLACE API pour avoir l'address ie. 4200 Plamondon
 
-                //Remplacer l'address dans la list d'addresse
-                locationAddressName.set(i, "");
+                //Add to locationAddressName
+                Geocoder geocoder;
+                List<Address> addresses;
+                geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                try {
+                    addresses = geocoder.getFromLocation(marker.getPosition().latitude, marker.getPosition().longitude, 1);
+                    String address = addresses.get(0).getAddressLine(0);
+                    locationAddressName.set(i, address);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
 
                 try {
@@ -905,7 +925,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 profil.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 setting.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+                //Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
         });
