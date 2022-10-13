@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -137,8 +136,10 @@ public class HistoryListActivity extends AppCompatActivity {
 
         //SET ADAPTER AND SET THE LAYOUTMANAGER
         recyclerView.setAdapter(adapter);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
         //DISMISS PROGRESS BAR
