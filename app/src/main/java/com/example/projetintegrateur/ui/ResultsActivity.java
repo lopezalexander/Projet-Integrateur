@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -68,6 +69,8 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     ImageView btn_MapCurrentLocation_GPS;
     DirectionResponse directionResponseAddressA;
     DirectionResponse directionResponseAddressB;
+
+    ImageView setting;
 
     //UTILS
     ObjectMapper mapper;
@@ -167,6 +170,35 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         btn_MapCurrentLocation_GPS.setOnClickListener(view -> {
             //CENTER ON MARKERS
             centerAllMarkers();
+        });
+
+        // SET OnClickListener for the SETTING BUTTON
+        //*************************************************************************************************
+        setting = findViewById(R.id.ic_settings2);
+        setting.setOnClickListener(view -> {
+            String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
+            int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] buttons_Drawables = {R.drawable.icon_container_settings, R.drawable.icon_container_settings2, R.drawable.icon_container_settings3, R.drawable.icon_container_settings4, R.drawable.icon_container_settings5, R.drawable.icon_container_settings6};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+            builder.setTitle("Choisissez un thème");
+            builder.setItems(themes, (dialog, which) -> {
+                //the user clicked on themes[which]
+                MapsActivity.setMapStyle(themes[which], ResultsActivity.this);
+                ResultsActivity.setMapStyle(themes[which], ResultsActivity.this);
+
+
+                //STORE COLOR IN SINGLETON
+                AppTheme currentTheme = AppTheme.getInstance();
+                currentTheme.setTheme(themes[which]);
+                currentTheme.setBackgroundColor(colors[which]);
+                currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
+                currentTheme.setButtonBg(buttons_Drawables[which]);
+
+                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+            });
+            builder.show();
         });
     }
 
@@ -524,6 +556,34 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     }
 
 
+    //
+    //
+    //SET MAP STYLE
+    //*****************************************************************************************************************************
+    public static void setMapStyle(String mapStyle, Context context) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
+    }
 
 
 

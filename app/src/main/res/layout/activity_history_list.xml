@@ -39,14 +39,15 @@
 		android:layout_height="0dp"
 		android:layout_weight="80"
 		android:gravity="center"
+		android:background="@drawable/historry_list_border"
 		>
 
 		<androidx.cardview.widget.CardView
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:layout_margin="15dp"
-			android:padding="10dp"
-			app:cardBackgroundColor="@color/blue4"
+			android:padding="4dp"
+			app:cardBackgroundColor="@color/blue1"
 			app:cardCornerRadius="20dp"
 			app:cardElevation="50dp"
 			app:cardPreventCornerOverlap="true"
