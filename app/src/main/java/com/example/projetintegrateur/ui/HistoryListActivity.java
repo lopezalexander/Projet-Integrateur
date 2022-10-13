@@ -145,7 +145,6 @@ public class HistoryListActivity extends AppCompatActivity {
         //DISMISS PROGRESS BAR
         bottomLinearLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
- 
     }
 
     //
