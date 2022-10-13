@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.ItineraryModel;
-import com.example.projetintegrateur.ui.ProfileActivity;
 import com.example.projetintegrateur.ui.ResultsActivity;
 
 import java.util.ArrayList;
@@ -41,15 +40,18 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
 
     @Override
     public void onBindViewHolder(@NonNull HistoryRecyclerViewAdapter.MyViewHolder holder, int position) {
-        //BIND DATA HERE TO VIEW ELEMENTS
-        holder.listNumber.setText(String.valueOf(position + 1));
-        holder.address1.setText(historyList.get(position).getOriginAddressName());
-        holder.address2.setText(historyList.get(position).getDestinationAddressName());
-
-
-        List<String> selectedBusinessAddressNameSplit = Arrays.asList(historyList.get(position).getSelectedBusinessAddressName().split(","));
-        holder.selectedBusiness.setText(selectedBusinessAddressNameSplit.get(0));
+        //BIND DATA HERE TO VIEW ELEMENTS  
+        holder.listNumber.setText(String.valueOf(getItemCount() - position));
         holder.historyDate.setText(historyList.get(position).getCurrentDate());
+
+        List<String> address1Split = Arrays.asList(historyList.get(position).getOriginAddressName().split(","));
+        holder.address1.setText(address1Split.get(0));
+
+        List<String> address2Split = Arrays.asList(historyList.get(position).getDestinationAddressName().split(","));
+        holder.address2.setText(address2Split.get(0));
+        
+        holder.selectedBusiness.setText(historyList.get(position).getSelectedBusinessName());
+
         holder.btn_chooseHistoryItem.setOnClickListener(v -> {
             //GET THE CHOSEN ITINERARY
             ItineraryModel ItineraryItemToSend = historyList.get(position);

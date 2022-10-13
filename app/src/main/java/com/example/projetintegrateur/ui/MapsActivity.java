@@ -13,7 +13,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.pm.PackageManager; 
+import android.location.Address;
+import android.location.Geocoder; 
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -210,7 +212,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  GET CURRENT LOCATION AND MOVE CAMERA TO LOCATION
     //*****************************************************************************************************************************
     private void getCurrentLocation() {
-//        Log.d(TAG, "2.A) getDeviceLocation: getting the devices current location FROM MAP GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
@@ -219,8 +220,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-
-
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
 
@@ -231,8 +230,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //MoveCamera to LatLng
                             moveCamera(latLng, DEFAULT_ZOOM);
                         } else {
-                            String err = "unable to get current location";
-                            Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
+                            LatLng latLngMontreal_Default = new LatLng(45.5019, -73.5674);
+                            moveCamera(latLngMontreal_Default, DEFAULT_ZOOM);
                         }
 
                     } else {
@@ -255,18 +254,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void getSearchBarCurrentLocation() {
         final LatLng[] latLng = new LatLng[1];
-//        Log.d(TAG, "2.B) getDeviceCoordinates: getting the devices current location FROM SEARCH BAR GPS BUTTON");
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         try {
             if (mLocationPermissionsGranted) {
                 final Task<Location> location = fusedLocationProviderClient.getLastLocation();
 
-
                 location.addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-//                        Log.d(TAG, "3) onComplete: found location!");
-
                         //Get result to find currentLocation
                         Location currentLocation = task.getResult();
                         if (currentLocation != null) {
@@ -276,8 +271,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Add to locationArrayList
                             locationArrayList.add(latLng[0]);
 
-                            //TODO:: ADD THE PHYSICAL ADDRESS NAME HERE , NEED TO MAKE A SEARCH TO PLACE API
-                            locationAddressName.add("");
+                            //Add to locationAddressName
+                            Geocoder geocoder;
+                            List<Address> addresses;
+                            geocoder = new Geocoder(this, Locale.getDefault());
+                            try {
+                                addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+                                String address = addresses.get(0).getAddressLine(0);
+                                locationAddressName.add(address);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
 
                             //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                             if (locationArrayList.size() == 2) {
@@ -317,7 +323,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //  MOVE CAMERO TO A LOCATION/COORDINATE
     //*****************************************************************************************************************************
     private void moveCamera(LatLng latLng, float zoom) {
-//        Log.d(TAG, "4) moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
@@ -597,7 +602,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setAddress(uniqueBusiness.getVicinity());
                                 business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
-                                Log.d(TAG, "onResponse: " + uniqueBusiness);
+
                                 if (uniqueBusiness.getPhotos() != null) {
                                     business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
                                 }
@@ -787,10 +792,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //REPLACE LIST VALUE AT POSITION OF THE MARKER
                 markerArrayList.get(i).setPosition(marker.getPosition());
                 locationArrayList.set(i, marker.getPosition());
-                //AJOUTER LA FONCTION de PLACE API pour avoir l'address ie. 4200 Plamondon
 
-                //Remplacer l'address dans la list d'addresse
-                locationAddressName.set(i, "");
+                //Add to locationAddressName
+                Geocoder geocoder;
+                List<Address> addresses;
+                geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                try {
+                    addresses = geocoder.getFromLocation(marker.getPosition().latitude, marker.getPosition().longitude, 1);
+                    String address = addresses.get(0).getAddressLine(0);
+                    locationAddressName.set(i, address);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
 
                 try {
@@ -848,7 +862,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //INITIALIZE PLACES API
         //*************************************************************************************************
-        Places.initialize(getApplicationContext(), "AIzaSyDR3NrmbrjstWl59Wwy23yjBS3nrp67kT4");
+        Places.initialize(getApplicationContext(), getString(R.string.maps_key));
 
         //FIREBASE
         //*************************************************************************************************
@@ -920,7 +934,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which], getApplicationContext());
-                ResultsActivity.setMapStyle(themes[which], getApplicationContext());
+ 
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setTheme(themes[which]);
@@ -930,7 +944,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 profil.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
                 setting.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-                Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+                //Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
         });
@@ -978,7 +992,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //SET SEARCH BAR HINT
         autocompleteFragment.setHint(getString(R.string.search_address_1));
-
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
 
         //SET SPECIFIC COUNTRY BASED SEARCH
