@@ -68,8 +68,9 @@ public class HistoryListActivity extends AppCompatActivity {
         super.onStart();
         //Get Theme Signleton
         AppTheme currentTheme = AppTheme.getInstance();
-        //Set search bar background color
+        //Set search bar background color 
         linearLayout_HistoryList.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+ 
     }
 
 

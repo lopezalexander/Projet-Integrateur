@@ -65,16 +65,18 @@ public class LoginDialog extends DialogFragment {
 
     //LOGIN PAGE VIEW ITEMS
     EditText email_input;
-    EditText password_input;
+    EditText password_input; 
     EditText password2_input;
+ 
     EditText name_input;
 
     LinearLayout name_layout;
-    LinearLayout password2_layout;
+    LinearLayout password2_layout; 
     LinearLayout linearLayout_register;
     TextView link_register;
     LinearLayout linearLayout_login;
     TextView link_login;
+ 
     View view_line;
 
     //GOOGLE LOGIN
@@ -119,7 +121,9 @@ public class LoginDialog extends DialogFragment {
         //*******************************************************************************************
         email_input = myFormView.findViewById(R.id.input_email);
         password_input = myFormView.findViewById(R.id.input_password);
+ 
         password2_input = myFormView.findViewById(R.id.input_password2);
+ 
         name_input = myFormView.findViewById(R.id.input_name);
 
         ImageView google_signIn_btn = myFormView.findViewById(R.id.btn_google);
@@ -130,12 +134,14 @@ public class LoginDialog extends DialogFragment {
 
         name_layout = myFormView.findViewById(R.id.linearLayout_name);
         password2_layout = myFormView.findViewById(R.id.linearLayout_password2);
+ 
         linearLayout_register = myFormView.findViewById(R.id.linearLayout_link_register);
         link_register = myFormView.findViewById(R.id.weblink_register);
         linearLayout_login = myFormView.findViewById(R.id.linearLayout_link_login);
         link_login = myFormView.findViewById(R.id.weblink_login);
         view_line = myFormView.findViewById(R.id.view_line);
 
+ 
 
 
         //SET HideKeyBoard() to EditText
@@ -188,14 +194,16 @@ public class LoginDialog extends DialogFragment {
                 password2_layout.setVisibility(View.VISIBLE);
                 firebase_register_btn.setVisibility(View.VISIBLE);
                 firebase_signIn_btn.setVisibility(View.GONE);
+ 
                 linearLayout_register.setVisibility(View.GONE);
                 linearLayout_login.setVisibility(View.VISIBLE);
+ 
                 view_line.setVisibility(View.GONE);
                 email_input.setText("");
                 password_input.setText("");
             }
         });
-
+ 
         link_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -213,7 +221,7 @@ public class LoginDialog extends DialogFragment {
             }
         });
 
-
+ 
 
         // END CREATE VIEW, RETURN IT TO THE CALLER --> MapsActivity
         //*******************************************************************************************
@@ -235,6 +243,7 @@ public class LoginDialog extends DialogFragment {
         String password = password_input.getText().toString().trim();
         String password2 = password2_input.getText().toString().trim();
         boolean valid = loginValidation(name, email, password, password2);
+ 
 
         if (valid) {
 
@@ -321,6 +330,7 @@ public class LoginDialog extends DialogFragment {
         String password = password_input.getText().toString().trim();
         String password2 = password2_input.getText().toString().trim();
         boolean valid = loginValidation(name, email, password, password2);
+ 
 
         if (valid) {
 
@@ -540,6 +550,7 @@ public class LoginDialog extends DialogFragment {
     //
     //  LOGIN/REGISTRATION VALIDATION
     //*******************************************************************************************************
+ 
     private boolean loginValidation(String name, String email, String password, String password2) {
         //VALIDATIONS
         if (name.isEmpty()) {

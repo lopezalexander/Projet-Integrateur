@@ -273,7 +273,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="10dp"
 			android:gravity="center"
-			android:orientation="vertical"
+			android:orientation="vertical" 
 			>
 
 			<TextView
@@ -309,26 +309,27 @@
 			android:gravity="center"
 			android:orientation="vertical"
 			android:visibility="gone"
+ 
 			>
 
 			<TextView
 				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				android:layout_height="wrap_content" 
 				android:text="@string/membre"
 				android:textColor="@color/white"
 				android:textSize="18sp"
 				/>
 
 			<TextView
-				android:id="@+id/weblink_login"
+        android:id="@+id/weblink_login" 
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:linksClickable="true"
 				android:autoLink="all"
 				android:selectAllOnFocus="true"
 				android:padding="5dp"
-				android:background="@color/red3"
-				android:text="@string/connectez_vous_maintenant"
+				android:background="@color/red3" 
+				android:text="@string/connectez_vous_maintenant" 
 				android:textColor="@color/red"
 				android:textSize="18sp"
 				android:textStyle="bold"
