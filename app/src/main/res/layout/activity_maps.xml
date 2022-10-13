@@ -7,7 +7,7 @@
 	>
 
 
-	<fragment
+	<androidx.fragment.app.FragmentContainerView
 		android:id="@+id/map"
 		android:name="com.google.android.gms.maps.SupportMapFragment"
 		android:layout_width="match_parent"
@@ -31,9 +31,8 @@
 			android:id="@+id/autocomplete_fragment"
 			android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			tools:layout="@layout/activity_maps"
-			/>
+			android:layout_height="wrap_content" 
+			tools:layout="@layout/activity_maps" /> 
 
 		<ImageView
 			android:id="@+id/ic_gps2"
@@ -57,9 +56,9 @@
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginStart="-54dp"
-		android:layout_marginTop="10dp"
+		android:layout_marginTop="10dp" 
 		android:layout_marginEnd="10dp"
-		android:layout_marginBottom="440dp"
+		android:layout_marginBottom="440dp" 
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_reset_foreground"
@@ -97,31 +96,42 @@
 		android:src="@drawable/ic_restaurant2_foreground"
 		android:visibility="invisible"
 		/>
+ 
+<!--<androidx.cardview.widget.CardView-->
+<!--	android:layout_width="200dp"-->
+<!--	android:layout_height="wrap_content"-->
+<!--	android:layout_marginStart="80dp"-->
+<!--	android:layout_marginEnd="80dp"-->
+
+<!--	android:background="@drawable/profile_activity_border">-->
+
 
 	<LinearLayout
 		android:layout_width="150dp"
 		android:layout_height="70dp"
-		android:layout_alignParentBottom="true"
-		android:layout_centerHorizontal="true"
-		android:layout_gravity="center"
-		android:layout_marginBottom="15dp"
-		android:background="@drawable/profile_activity_border"
-		android:gravity="center"
 		android:weightSum="100"
-		>
+		android:layout_gravity="center"
+		android:gravity="center"
+		android:layout_marginStart="105dp"
+		android:layout_marginEnd="20dp"
+		android:layout_alignParentBottom="true"
 
+		android:background="@drawable/profile_activity_border">
+
+
+ 
 		<ImageView
 			android:id="@+id/ic_settings"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:layout_marginTop="15dp"
 			android:layout_marginEnd="20dp"
-			android:layout_marginBottom="15dp"
-			android:layout_weight="10"
+			android:layout_marginBottom="15dp" 
+			android:layout_weight="10" 
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"
 			android:scaleType="centerCrop"
-			android:src="@drawable/ic_settings_foreground"
+			android:src="@drawable/ic_settings_foreground" 
 			/>
 
 
@@ -131,16 +141,18 @@
 			android:layout_height="50dp"
 			android:layout_marginStart="0dp"
 			android:layout_marginTop="15dp"
-			android:layout_marginBottom="15dp"
-			android:layout_weight="10"
+			android:layout_marginBottom="15dp" 
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"
 			android:scaleType="centerCrop"
+			android:layout_weight="10" 
 			android:src="@drawable/ic_perso_foreground"
 			/>
 
 
-	</LinearLayout>
+	</LinearLayout> 
+<!--</androidx.cardview.widget.CardView>-->
+ 
 
 
 </RelativeLayout>

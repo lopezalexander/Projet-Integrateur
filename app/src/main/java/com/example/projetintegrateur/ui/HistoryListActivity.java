@@ -136,7 +136,7 @@ public class HistoryListActivity extends AppCompatActivity {
 
         //SET ADAPTER AND SET THE LAYOUTMANAGER
         recyclerView.setAdapter(adapter);
-
+ 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
@@ -145,7 +145,7 @@ public class HistoryListActivity extends AppCompatActivity {
         //DISMISS PROGRESS BAR
         bottomLinearLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
-
+ 
     }
 
     //

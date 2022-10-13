@@ -13,9 +13,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.pm.PackageManager; 
 import android.location.Address;
-import android.location.Geocoder;
+import android.location.Geocoder; 
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -396,6 +396,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void findMiddleDistancePoint() throws IOException {
 
+        //RESET ROUTE
+        resetRoute();
+
         //SET ORIGIN STRING
         origintLatLng = locationArrayList.get(0);
         String originCoordinate = origintLatLng.latitude + "," + origintLatLng.longitude;
@@ -707,13 +710,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
-                            mCircle.remove();
-                            mPolyline.remove();
-                            mMarker = null;
+                            resetRoute();
+                            markerArrayList.get(1).remove();
+                            markerArrayList.remove(1);
+                            locationArrayList.remove(1);
+                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+                            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+                            if (businessDialog.isVisible()) {
+                                businessDialog.dismiss();
+                            }
                         } else {
                             //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
                             autocompleteFragment.requireView().setVisibility(View.VISIBLE);
                             findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
+                            resetRoute();
+
                         }
 
                         //EFFACER MARKER
@@ -744,9 +755,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         //resetRoute();
-                        polyline1.remove();
-                        mCircle.remove();
-
+                        resetRoute();
+                        markerArrayList.get(1).remove();
+                        markerArrayList.remove(1);
+                        locationArrayList.remove(1);
+                        autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+                        btn_SearchBar_GPS.setVisibility(View.VISIBLE);
                         if (businessDialog.isVisible()) {
                             businessDialog.dismiss();
                         }
@@ -920,6 +934,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which], getApplicationContext());
+ 
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setTheme(themes[which]);
@@ -1232,6 +1247,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mCircle.remove();
         }
         if (mMarker != null) {
+            markerArrayList.remove(mMarker);
             mMarker.remove();
         }
     }

@@ -84,8 +84,8 @@
 			android:gravity="center"
 			android:paddingEnd="5dp"
 			android:text="@string/historique_de_rencontres"
-			android:textColor="@color/blue3"
-			android:textSize="18sp"
+			android:textColor="@color/blue3" 
+			android:textSize="18sp" 
 			android:textStyle="bold"
 			/>
 
@@ -118,8 +118,8 @@
 			android:gravity="center"
 			android:paddingEnd="5dp"
 			android:text="@string/se_d_connecter"
-			android:textColor="@color/blue3"
-			android:textSize="18sp"
+			android:textColor="@color/blue3" 
+			android:textSize="18sp" 
 			android:textStyle="bold"
 			/>
 
@@ -152,8 +152,8 @@
 			android:gravity="center"
 			android:paddingEnd="20dp"
 			android:text="@string/param_tres"
-			android:textColor="@color/blue3"
-			android:textSize="18sp"
+			android:textColor="@color/blue3" 
+			android:textSize="18sp" 
 			android:textStyle="bold"
 			/>
 
@@ -184,8 +184,8 @@
 			android:gravity="center"
 			android:paddingEnd="20dp"
 			android:text="@string/propos"
-			android:textColor="@color/blue3"
-			android:textSize="18sp"
+			android:textColor="@color/blue3" 
+			android:textSize="18sp" 
 			android:textStyle="bold"
 			/>
 
