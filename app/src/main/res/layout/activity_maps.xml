@@ -52,13 +52,13 @@
 
 	<ImageView
 		android:id="@+id/ic_reset"
-		android:layout_width="70dp"
-		android:layout_height="70dp"
+		android:layout_width="75dp"
+		android:layout_height="75dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginStart="-54dp"
 		android:layout_marginTop="10dp"
-		android:layout_marginEnd="10dp"
+		android:layout_marginEnd="11dp"
 		android:layout_marginBottom="480dp"
 		android:contentDescription="@string/empty_value"
 		android:scaleType="centerCrop"
@@ -138,12 +138,12 @@
 
 
 	<LinearLayout
-		android:layout_width="190dp"
-		android:layout_height="80dp"
+		android:layout_width="150dp"
+		android:layout_height="70dp"
 		android:weightSum="100"
 		android:layout_gravity="center"
 		android:gravity="center"
-		android:layout_marginStart="85dp"
+		android:layout_marginStart="105dp"
 		android:layout_marginEnd="20dp"
 		android:layout_alignParentBottom="true"
 
@@ -152,11 +152,10 @@
 
 		<ImageView
 			android:id="@+id/ic_settings"
-			android:layout_width="60dp"
-			android:layout_height="60dp"
-			android:layout_marginStart="7dp"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
 			android:layout_marginTop="15dp"
-			android:layout_marginEnd="30dp"
+			android:layout_marginEnd="20dp"
 			android:layout_marginBottom="15dp"
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"
@@ -168,11 +167,10 @@
 
 		<ImageView
 			android:id="@+id/ic_perso"
-			android:layout_width="60dp"
-			android:layout_height="60dp"
+			android:layout_width="50dp"
+			android:layout_height="50dp"
 			android:layout_marginStart="0dp"
 			android:layout_marginTop="15dp"
-			android:layout_marginEnd="7dp"
 			android:layout_marginBottom="15dp"
 			android:background="@drawable/icon_container_settings"
 			android:contentDescription="@string/empty_value"

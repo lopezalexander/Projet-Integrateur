@@ -29,6 +29,13 @@ public class ProfileActivity extends AppCompatActivity {
     ConstraintLayout profileLayout;
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AppTheme theme = AppTheme.getInstance();
+        profileLayout.setBackgroundColor(theme.getBackgroundColor());
+    }
+
     //***********\\
     //  OnCREATE  \\
     //******************************************************************************************************************************************************************************
@@ -124,6 +131,7 @@ public class ProfileActivity extends AppCompatActivity {
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which],getApplicationContext());
+                ResultsActivity.setMapStyle(themes[which], getApplicationContext());
                 profileLayout.setBackgroundColor(colors[which]);
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
@@ -136,6 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
             builder.show();
 
         });
+
 
 
     }

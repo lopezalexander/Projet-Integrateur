@@ -63,8 +63,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -903,8 +905,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
-                MapsActivity.setMapStyle(themes[which], MapsActivity.this);
-
+                MapsActivity.setMapStyle(themes[which], getApplicationContext());
+                ResultsActivity.setMapStyle(themes[which], getApplicationContext());
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setTheme(themes[which]);

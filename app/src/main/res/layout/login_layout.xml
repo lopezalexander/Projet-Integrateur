@@ -107,6 +107,7 @@
 				android:layout_marginEnd="50dp"
 				android:padding="5dp"
 				android:autofillHints="emailAddress"
+				android:textColor="@color/blue5"
 				android:background="@color/blue3"
 				android:inputType="textEmailAddress"
 				/>
@@ -141,6 +142,7 @@
 				android:layout_marginEnd="50dp"
 				android:padding="5dp"
 				android:autofillHints="password"
+				android:textColor="@color/blue5"
 				android:background="@color/blue3"
 				android:inputType="textPassword"
 				/>
@@ -179,6 +181,7 @@
 				android:padding="5dp"
 				android:autofillHints="password"
 				android:background="@color/blue3"
+				android:textColor="@color/blue5"
 				android:inputType="textPassword"
 				/>
 
