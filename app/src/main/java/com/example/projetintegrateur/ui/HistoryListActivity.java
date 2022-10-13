@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.adapter.HistoryRecyclerViewAdapter;
@@ -32,9 +34,8 @@ public class HistoryListActivity extends AppCompatActivity {
 
     //LIST VARIABLES
     ArrayList<ItineraryModel> historyList;
-
-    LinearLayout linearLayout_HistoryList;
-
+    ProgressBar progressBar;
+    LinearLayout linearLayout_HistoryList, bottomLinearLayout;
 
 
     //***********\\
@@ -66,11 +67,13 @@ public class HistoryListActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
         //Get Theme Signleton
         AppTheme currentTheme = AppTheme.getInstance();
+
         //Set search bar background color 
         linearLayout_HistoryList.setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
- 
+
     }
 
 
@@ -92,6 +95,11 @@ public class HistoryListActivity extends AppCompatActivity {
     //  GET HISTORY LIST OF ITINERARY FROM FIREBASE
     //*****************************************************************************************************************************
     public void getHistoryList() {
+
+        //START PROGRESS BAR
+        progressBar.setVisibility(View.VISIBLE);
+
+
         //GET CURRENT USER KEY
         String currentUserkey = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
 
@@ -132,6 +140,11 @@ public class HistoryListActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
+
+        //DISMISS PROGRESS BAR
+        bottomLinearLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+
     }
 
     //
@@ -158,6 +171,10 @@ public class HistoryListActivity extends AppCompatActivity {
         //INSTANSTIATE FIREBASE AUTH & DB
         mAuth = FirebaseAuth.getInstance();
         mFirebaseDB = FirebaseDatabase.getInstance();
+
+        //ProgressBar
+        progressBar = findViewById(R.id.progress_bar);
+        bottomLinearLayout = findViewById(R.id.bottomLinearLayout);
 
 
     }
