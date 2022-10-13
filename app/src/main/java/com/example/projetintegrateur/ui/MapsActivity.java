@@ -140,6 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_MapCurrentLocation_GPS;
     ImageView btn_resetSearchBar;
     ImageView btn_showBusinessList;
+    ImageView btn_share;
     ImageView setting;
     BusinessDialog businessDialog;
 
@@ -343,7 +344,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .position(latLng)
                         .title(title)
                         .draggable(false)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_point));
             } else if (markerArrayList.size() == 1) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
@@ -629,7 +630,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //SET NAME AND ADDRESS
                                 business.setName(uniqueBusiness.getName());
                                 business.setAddress(uniqueBusiness.getVicinity());
-                                business.setRating(String.valueOf(uniqueBusiness.getUser_ratings_total()));
+                                business.setRating(String.valueOf(uniqueBusiness.getRating())+"★");
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
 
                                 if (uniqueBusiness.getPhotos() != null) {
@@ -646,6 +647,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 businessDialog = new BusinessDialog(recyclerBusinessList, MapsActivity.this);
                                 businessDialog.show(getSupportFragmentManager(), "BusinessDialogFragment");
                                 btn_showBusinessList.setVisibility(View.VISIBLE);
+                                btn_share.setVisibility(View.VISIBLE);
                             });
 
 
@@ -1085,6 +1087,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //UTILS --> ObjectMapper to Map JSON response to Model Class
         //*************************************************************************************************
         mapper = new ObjectMapper();
+        //SHARE LOCATION WITH IMPLICIT INTENT WITH FACEBOOK MESSENGER
+        btn_share = findViewById(R.id.ic_share);
+        btn_share.setOnClickListener(view -> {
+            String location;
+            if (selectedBusinessCoordinate == null) {
+                location = "https://www.google.com/maps?daddr="+mMarker.getPosition().latitude+","+mMarker.getPosition().longitude+"&amp;ll=";
+            } else {
+                location = "https://www.google.com/maps?daddr="+selectedBusinessCoordinate.latitude+","+selectedBusinessCoordinate.longitude+"&amp;ll=";
+            }
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, location);
+            sendIntent.setType("text/plain");
+            sendIntent.setPackage("com.facebook.orca");
+
+            try {
+                startActivity(sendIntent);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MapsActivity.this, "Please Install Facebook Messenger", Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         // SET OnClickListener to MAP_GPS Button to center on CurrentLocation
@@ -1230,7 +1253,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //CENTER CAMERA ON THE LOCATION ENTERED
                 moveCamera(Objects.requireNonNull(place.getLatLng()), DEFAULT_ZOOM);
                 addMarker(place.getLatLng(), Objects.requireNonNull(place.getName()));
-                centerAllMarkers();
+                if (locationArrayList.size() > 1) {
+                    centerAllMarkers();
+                }
 
                 //CACHER LA BARRE DE RECHERCHE QUAND IL Y A 2 ADRESSES
                 if (locationArrayList.size() == 2) {
@@ -1440,6 +1465,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         autocompleteFragment.requireView().setVisibility(View.VISIBLE);
         btn_SearchBar_GPS.setVisibility(View.VISIBLE);
         btn_showBusinessList.setVisibility(View.GONE);
+        btn_share.setVisibility(View.GONE);
         autocompleteFragment.setText("");
         if (businessDialog != null) {
             businessDialog.dismiss();
@@ -1453,6 +1479,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //RESET ROUTE AFTER THE MARKER DRAG
     //*****************************************************************************************************************************
     private void resetRoute() {
+        btn_share.setVisibility(View.GONE);
         if (mPolyline != null) {
             mPolyline.remove();
         }
@@ -1471,9 +1498,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //RESET MAP FOR RESULT
     //*****************************************************************************************************************************
     private void resetResult() {
-        locationArrayList.clear();
-        locationAddressName.clear();
-        markerArrayList.clear();
+//        locationArrayList.clear();
+//        locationAddressName.clear();
+//        markerArrayList.clear();
         mMap.clear();
     }
 

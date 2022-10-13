@@ -82,6 +82,22 @@
 		/>
 
 	<ImageView
+	android:id="@+id/ic_share"
+	android:layout_width="75dp"
+	android:layout_height="75dp"
+	android:layout_alignParentEnd="true"
+	android:layout_alignParentBottom="true"
+	android:layout_marginStart="-54dp"
+	android:layout_marginTop="10dp"
+	android:layout_marginEnd="10dp"
+	android:layout_marginBottom="280dp"
+	android:contentDescription="@string/empty_value"
+	android:visibility="invisible"
+	android:scaleType="centerCrop"
+	android:src="@drawable/ic_share_foreground"
+	/>
+
+	<ImageView
 		android:id="@+id/ic_show_listview_btn"
 		android:layout_width="60dp"
 		android:layout_height="60dp"

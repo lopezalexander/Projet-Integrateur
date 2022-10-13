@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
-	android:layout_height="60dp"
+	android:layout_height="80dp"
 	android:layout_margin="2dp"
 	android:orientation="horizontal"
 	>
@@ -9,7 +9,7 @@
 	<ImageView
 		android:id="@+id/businessImage"
 		android:layout_width="60dp"
-		android:layout_height="60dp"
+		android:layout_height="80dp"
 		android:background="@drawable/list_item_component_border"
 		android:contentDescription="@string/empty_value"
 		android:gravity="center"
@@ -20,31 +20,33 @@
 
 	<LinearLayout
 		android:layout_width="wrap_content"
-		android:layout_height="60dp"
+		android:layout_height="80dp"
 		android:background="@drawable/list_item_component_border"
 		android:orientation="vertical"
 		>
 
 		<TextView
 			android:id="@+id/businessName"
-			android:layout_width="250dp"
-			android:layout_height="30dp"
+			android:layout_width="230dp"
+			android:layout_height="40dp"
 			android:background="@drawable/list_item_component_border"
 			android:gravity="center"
 			android:text="@string/businessRow_name"
 			android:textColor="@color/blue5"
 			android:textSize="15sp"
 			android:textStyle="bold"
+			android:scrollbars="vertical"
 			/>
 
 
 		<TextView
 			android:id="@+id/businessAddress"
-			android:layout_width="250dp"
-			android:layout_height="30dp"
+			android:layout_width="230dp"
+			android:layout_height="40dp"
 			android:background="@drawable/list_item_component_border"
 			android:gravity="center"
 			android:text="@string/businessRow_address"
+			android:maxLines="2"
 			android:textColor="@color/blue5"
 			android:textSize="12sp"
 			android:textStyle="bold"
@@ -62,20 +64,23 @@
 		<TextView
 			android:id="@+id/businessRating"
 			android:layout_width="0dp"
-			android:layout_height="60dp"
+			android:layout_height="80dp"
 			android:layout_weight="50"
 			android:gravity="center"
-			android:text="@string/businessRow_rating"
+			android:text="@string/empty_value"
 			android:textAlignment="center"
+			android:maxLines="2"
 			android:textColor="@color/blue5"
-			android:textSize="17sp"
+			android:textSize="16sp"
 			android:textStyle="bold"
 			/>
 
 		<ImageView
 			android:id="@+id/chooseBusiness"
 			android:layout_width="0dp"
-			android:layout_height="35dp"
+			android:layout_height="63dp"
+			android:paddingEnd="2dp"
+			android:paddingStart="0dp"
 			android:layout_gravity="center"
 			android:layout_weight="50"
 			android:contentDescription="@string/empty_value"
@@ -83,7 +88,6 @@
 			android:src="@drawable/ic_go_foreground"
 			/>
 
-		<!--		</LinearLayout>-->
 
 	</LinearLayout>
 
