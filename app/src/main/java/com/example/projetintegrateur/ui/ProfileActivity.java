@@ -98,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
         TextView btn_infos = findViewById(R.id.textview_info);
 
         btn_infos.setOnClickListener(view -> {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(ProfileActivity.this);
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(ProfileActivity.this, R.style.AlertDialogCustom);
             builder1.setMessage("Midway 1.0");
             builder1.setCancelable(false);
 
@@ -117,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity {
             String[] themes = {"Muted Blue", "Midnight", "Black and White", "Ultra Light", "Blue Essence", "Default Map"};
             int[] colors = {getColor(R.color.blue1), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
             int[] searchBar_colors = {getColor(R.color.blue4), getColor(R.color.blue6), getColor(R.color.white), getColor(R.color.grey), getColor(R.color.blueGreen), getColor(com.google.android.libraries.places.R.color.quantum_orange100)};
+            int[] buttons_Drawables = {R.drawable.icon_container_settings, R.drawable.icon_container_settings2, R.drawable.icon_container_settings3, R.drawable.icon_container_settings4, R.drawable.icon_container_settings5, R.drawable.icon_container_settings6};
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Choisissez un thème");
@@ -129,6 +130,7 @@ public class ProfileActivity extends AppCompatActivity {
                 currentTheme.setTheme(themes[which]);
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
+                currentTheme.setButtonBg(buttons_Drawables[which]);
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
