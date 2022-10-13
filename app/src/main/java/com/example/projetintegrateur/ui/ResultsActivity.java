@@ -101,9 +101,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         super.onStart();
 
 
-
     }
-
 
 
     //
@@ -112,7 +110,6 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     //*****************************************************************************************************************************
     @SuppressLint("PotentialBehaviorOverride")
     private void mapIsReady() {
-
         //ADD ORIGIN MARKER
         addMarker(new LatLng(itineraryData.getOrigintLatLng().getLatitude(), itineraryData.getOrigintLatLng().getLongitude()), "AddressA");
 
@@ -246,7 +243,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         //Set search bar background color
         setMapStyle(currentTheme.getTheme());
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.508888,-73.561668),13.5f));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.508888, -73.561668), 13.5f));
     }
 
 
@@ -470,9 +467,11 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                             }
                         });
 
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                 }
             }
 
@@ -486,7 +485,6 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     public void onInfoWindowClick(@NonNull Marker marker) {
 
     }
-
 
 
     //
@@ -584,7 +582,6 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         //SET STYLE FOR THE MAP
 
     }
-
 
 
 }//END RESULTS ACTIVITY  //=========================================================================================================================================================

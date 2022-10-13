@@ -1,7 +1,6 @@
 package com.example.projetintegrateur.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -13,10 +12,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager; 
+import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Geocoder; 
-import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -65,10 +63,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -117,12 +113,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng selectedBusinessCoordinate;
     String selectedBusinessAddressName;
     String selectedBusinessName;
-    Polyline mPolyline;
+    Polyline mPolyline, mPolyline2;
     Circle mCircle;
     Marker mMarker;
     ItineraryModel ItineraryToAdd;
     ArrayList<NearbyBusinessResponse> allNearbyBusinessResponseList; //Not added yet to Firebase
     int i;
+
+    boolean resultActive;
 
     //GOOGLE MAPS SETUP
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -144,6 +142,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_showBusinessList;
     ImageView setting;
     BusinessDialog businessDialog;
+
+    //RESULTS VARIABLES
+    DirectionResponse directionResponseAddressA;
+    DirectionResponse directionResponseAddressB;
 
 
     //UTILS
@@ -334,7 +336,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions markerOptions;
         Marker marker;
 
-        if (!title.equals("MidPoint_Fine")) {
+        if (resultActive && !title.equals("MidPoint_Fine")) {
+
+            if (title.equals("SelectedBusiness")) {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
+            } else if (markerArrayList.size() == 1) {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
+            } else {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+            }
+
+
+            //Add the new marker to the markerArrayList
+            marker = mMap.addMarker(markerOptions);
+            markerArrayList.add(marker);
+        } else if (!title.equals("MidPoint_Fine")) {
             if (markerArrayList.size() == 1) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
@@ -355,16 +383,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             markerOptions = new MarkerOptions()
                     .position(latLng)
                     .title(title)
+                    .draggable(true)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_middle_point));
             mMarker = mMap.addMarker(markerOptions);
+
             //Add the new marker to the markerArrayList
             markerArrayList.add(mMarker);
         }
 
-
         //Clear the Search Bar text
         autocompleteFragment.setText("");
-
 
         setHints();
         hideSoftKeyboard();
@@ -380,6 +408,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Add Markers Positions in Builder
         for (Marker marker : markerArrayList) {
             builder.include(marker.getPosition());
+
         }
         //Create Latlng Bounds
         LatLngBounds bounds = builder.build();
@@ -518,7 +547,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mCircle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
-                            moveCamera(midPointLatLng, 13);
+                            moveCamera(midPointLatLng, DEFAULT_ZOOM);
                             centerAllMarkers();
 
                         });
@@ -640,6 +669,149 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
+
+    //
+    //
+    //  DRAW RESULT POLYLINES
+    //*****************************************************************************************************************************
+    private void drawResultPolyline(CustomLatLng addressLatLng, CustomLatLng selectedBusinessLatLng, String addressType) {
+        //SET ORIGIN STRING
+        String originCoordinate = addressLatLng.getLatitude() + "," + addressLatLng.getLongitude();
+
+        //SET DESTINATION STRING
+        String destinationCoordinate = selectedBusinessLatLng.getLatitude() + "," + selectedBusinessLatLng.getLongitude();
+
+        //BUILD URL STRING
+        String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
+                .buildUpon()
+                .appendQueryParameter("origin", originCoordinate)
+                .appendQueryParameter("destination", destinationCoordinate)
+                .appendQueryParameter("mode", "walking")
+                .appendQueryParameter("key", getString(R.string.maps_key))
+                .toString();
+
+
+        //MAKE THE REQUEST TO DIRECTION API
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+
+        //HANDLE THE RESPONSE IN THIS CALLBACK()
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    try {
+                        //CREATE JSON OBJECT WITH RESPONSE
+                        JSONObject resultJSON = new JSONObject(Objects.requireNonNull(response.body()).string());
+
+
+                        //TRANSFORM OUR JSON RESPONSE TO AN DirectionResponse Object, which we can use later if needed and easier to traverse
+                        DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
+
+
+                        if (addressType.equals("AddressA")) {
+                            directionResponseAddressA = directionResponseObject;
+                        } else if (addressType.equals("AddressB")) {
+                            directionResponseAddressB = directionResponseObject;
+                        }
+
+                        //EXTRACT ROUTE OBJECT -- LEGS ARRAY -- STEPS ARRAY
+                        Route routeObject = directionResponseObject.getRoutes().get(0);
+                        Leg legsArray = routeObject.getLegs().get(0);
+                        ArrayList<Step> stepssArray = legsArray.getSteps();
+
+
+                        //EXTRACT DISTANCES BETWEEN ORIGIN/DESTINATION AND POYLINE STRING
+                        int total_distance_value = legsArray.getDistance().getValue();
+                        String polyline = routeObject.getOverview_polyline().getPoints();
+
+                        //SET COUNTER TO IDENTIFY INDEX OF THE STEPS WE NEED THE DATA
+                        int distanceCounter = 0;
+                        boolean notPassed = true;
+
+
+                        //ITERATE THROUGH TO CALCULATE MIDDLE DISTANCE POINT
+                        for (int i = 0; i < stepssArray.size(); i++) {
+                            //GET DISTANCE OF STEPS, THIS WILL BE THE INDEX AT WHICH IT WILL BE OVER THE MIDDLE DISTANCE POINT
+                            int step_distance_value_over = stepssArray.get(i).getDistance().getValue();
+
+                            //ADD DISTANCE TO THE COUNTER TO VERIFY AGAINST TOTAL DISTANCE OF ROUTE
+                            distanceCounter += step_distance_value_over;
+
+                            //CHECK IF WE WENT OVER THE MIDDLE DISTANCE POINT
+                            if ((distanceCounter >= total_distance_value / 2) && notPassed) {
+                                //WE NEED TAKE INTO ACCOUNT THAT IF THE LAST STEP IS THE ONE GOING OVER THE MID DISTANCE POINT,
+                                // THERE IS NO ENTRY OF .get(i + 1) IN THE ARRAYLIST. HENCE, WE TAKE THE LAST STEP AS THE MIDDLE POINT
+                                if (i != (stepssArray.size() - 1)) {
+                                    //GET LatLng FOR THE STEPS THAT STEPPED OVER THE MIDDLE DISTANCE POINT
+                                    double latOver = stepssArray.get(i).getStart_location().getLat();
+                                    double lngOver = stepssArray.get(i).getStart_location().getLng();
+
+                                    //GET LatLng FOR THE STEPS RIGHT AFTER THE MIDDLE DISTANCE POINT
+                                    double latAfter = stepssArray.get(i + 1).getStart_location().getLat();
+                                    double lngAfter = stepssArray.get(i + 1).getStart_location().getLng();
+
+
+                                    //DEFINE [START] AND [END] LatLng REFERENCE FOR THE MIDDLE DISTANCE POINT
+                                    LatLng start_mid_point = new LatLng(latOver, lngOver);
+                                    LatLng end_mid_point = new LatLng(latAfter, lngAfter);
+
+
+                                    //CALCULATE MIDDLE FROM THE REFERENCE ABOVE
+                                    midPointLatLng = LatLngBounds.builder().include(start_mid_point).include(end_mid_point).build().getCenter();
+                                } else {
+                                    double midLat = stepssArray.get(i).getStart_location().getLat();
+                                    double midLng = stepssArray.get(i).getStart_location().getLng();
+                                    midPointLatLng = new LatLng(midLat, midLng);
+                                }
+                                //WE FOUND THE MIDDLE POINT, SET TO FALSE TO NOT ENTER THE IF() AGAIN
+                                notPassed = false;
+                            }//END FORLOOP CHECK DISTANCE
+                        }//END ITERATE THROUGH STEPS
+
+
+                        //CREATE A Runnable, TO GET INTO THE MAIN THREAD TO HANDLE UI CHANGES
+                        MapsActivity.this.runOnUiThread(() -> {
+                            //DECODE POLYLINE
+                            List<LatLng> polylineList = PolyUtil.decode(polyline);
+
+                            //DRAW POLYLINE ON MAP
+                            if (addressType.equals("AddressA")) {
+                                mPolyline = mMap.addPolyline(new PolylineOptions()
+                                        .clickable(true)
+                                        .width(15)
+                                        .color(getColor(R.color.blue))
+                                        .addAll(polylineList));
+
+                            } else if (addressType.equals("AddressB")) {
+                                mPolyline2 = mMap.addPolyline(new PolylineOptions()
+                                        .clickable(true)
+                                        .width(15)
+                                        .color(getColor(R.color.green))
+                                        .addAll(polylineList));
+                            }
+
+
+                        });
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            }
+        }); //END  [REQUEST-RESPONSE]
     }
 
     //
@@ -784,42 +956,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMarkerDrag(@NonNull Marker marker) {
                 markerArrayList.get(i).setPosition(marker.getPosition());
-                locationArrayList.set(i, marker.getPosition());
+                if (!Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                    locationArrayList.set(i, marker.getPosition());
+                }
             }
 
             @Override
             public void onMarkerDragEnd(@NonNull Marker marker) {
                 //REPLACE LIST VALUE AT POSITION OF THE MARKER
                 markerArrayList.get(i).setPosition(marker.getPosition());
-                locationArrayList.set(i, marker.getPosition());
+                if (!Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                    locationArrayList.set(i, marker.getPosition());
 
-                //Add to locationAddressName
-                Geocoder geocoder;
-                List<Address> addresses;
-                geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
-                try {
-                    addresses = geocoder.getFromLocation(marker.getPosition().latitude, marker.getPosition().longitude, 1);
-                    String address = addresses.get(0).getAddressLine(0);
-                    locationAddressName.set(i, address);
+                    //Add to locationAddressName
+                    Geocoder geocoder;
+                    List<Address> addresses;
+                    geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                    try {
+                        addresses = geocoder.getFromLocation(marker.getPosition().latitude, marker.getPosition().longitude, 1);
+                        String address = addresses.get(0).getAddressLine(0);
+                        locationAddressName.set(i, address);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-                try {
-                    if (locationArrayList.size() == 2) {
-                        findMiddleDistancePoint();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+
+                    try {
+                        if (locationArrayList.size() == 2) {
+                            findMiddleDistancePoint();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                    midPointLatLng = marker.getPosition();
+                    
+                    if (mPolyline != null) {
+                        mPolyline.remove();
+                    }
+
+                    if (mPolyline2 != null) {
+                        mPolyline2.remove();
+                    }
+
+                    //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
+                    drawResultPolyline(new CustomLatLng(locationArrayList.get(0).latitude, locationArrayList.get(0).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressA");
+                    drawResultPolyline(new CustomLatLng(locationArrayList.get(1).latitude, locationArrayList.get(1).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressB");
+
+
+                    getNearbyBusiness();
                 }
+
+
             }
 
             @Override
             public void onMarkerDragStart(@NonNull Marker marker) {
                 i = markerArrayList.indexOf(marker);
-                resetRoute();
+
+                //EFFACER POLYLINE ET CIRCLE DU MARKEUR QUI SE FAIT BOUGER
+                if (mPolyline != null) {
+                    mPolyline.remove();
+                }
+                if (mCircle != null) {
+                    mCircle.remove();
+                }
             }
         });
 
@@ -859,6 +1061,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //*****************************************************************************************************************************
     private void initView() {
 
+        resultActive = false;
 
         //INITIALIZE PLACES API
         //*************************************************************************************************
@@ -934,7 +1137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which], getApplicationContext());
- 
+
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
                 currentTheme.setTheme(themes[which]);
@@ -1252,6 +1455,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+    //
+    //
+    //RESET MAP FOR RESULT
+    //*****************************************************************************************************************************
+    private void resetResult() {
+        locationArrayList.clear();
+        locationAddressName.clear();
+        markerArrayList.clear();
+        mMap.clear();
+    }
+
     //
     //
     //DATA TRANSFER FROM BUSINESS DIALOG TO MAPSACTIVITY
@@ -1324,9 +1539,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //DISABLE BUTTONS FOR RESULT
         btn_showBusinessList.setVisibility(View.GONE);
 
-        //DISPLAY RESULTS
-        //TODO:: SHOW POLYLINE FROM A TO MID , B TO MID
         //TODO:: DISPLAY PERTINENT DATA
+        resultActive = true;
+
+        //DISPLAY RESULTS
+        resetResult();
+
+        //ADD ORIGIN MARKER
+        addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "AddressA");
+
+        //ADD DESTINATION MARKER
+        addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "AddressB");
+
+        //ADD SELECTED BUSINESS MARKER
+        addMarker(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()), "SelectedBusiness");
+
+        //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
+        drawResultPolyline(ItineraryToAdd.getOrigintLatLng(), ItineraryToAdd.getSelectedBusiness(), "AddressA");
+
+        //DRAW SECOND POLYLINE DESTINATION TO SELECTED BUSINESS
+        drawResultPolyline(ItineraryToAdd.getDestinationLatLng(), ItineraryToAdd.getSelectedBusiness(), "AddressB");
+
 
     }
 
