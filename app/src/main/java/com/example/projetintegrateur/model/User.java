@@ -2,12 +2,17 @@ package com.example.projetintegrateur.model;
 
 import androidx.annotation.NonNull;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
+
 public class User {
 
     private String email;
     private String user_id;
     private String name;
     private String photoUrl;
+    private AppTheme theme;
 
 
     //**************\\
@@ -16,11 +21,12 @@ public class User {
     public User() {
     }
 
-    public User(String email, String user_id, String name, String photoUrl) {
+    public User(String email, String user_id, String name, String photoUrl, AppTheme theme) {
         this.email = email;
         this.user_id = user_id;
         this.name = name;
         this.photoUrl = photoUrl;
+        this.theme = theme;
     }
 
 
@@ -44,6 +50,11 @@ public class User {
         return photoUrl;
     }
 
+    public AppTheme getTheme() {
+        return this.theme;
+    }
+
+
     //**************\\
     //  SETTER       \\
     //*****************************************************************************************************************************
@@ -64,6 +75,12 @@ public class User {
         this.photoUrl = photoUrl;
     }
 
+    public void setTheme(AppTheme theme) {
+        this.theme = theme;
+    }
+
+
+
     @NonNull
     @Override
     public String toString() {
@@ -74,4 +91,6 @@ public class User {
                 ", photoUrl='" + photoUrl + '\'' +
                 '}';
     }
+
+
 }

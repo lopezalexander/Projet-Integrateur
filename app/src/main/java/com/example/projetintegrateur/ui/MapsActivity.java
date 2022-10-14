@@ -195,6 +195,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
         profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
         setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+
     }
 
     //
@@ -1178,6 +1179,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 setting.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 //Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+
+                //[RETRIEVE] CURRENT USER_ID FROM FIREBASE_AUTH ... TO FETCH IT FROM DATABASE IN NEXT STEPS
+                String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
+                //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
+                DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
+
+
+                //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                mFirebaseDB.getReference("Users")
+                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child("theme")
+                        .setValue(currentTheme).addOnCompleteListener(task1 -> {   });
+
+
+
+
             });
             builder.show();
         });
@@ -1384,6 +1401,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //[CREATE] SINGLETON
                     User currentUser2 = task2.getResult().getValue(User.class);
                     ((UserClient) getApplicationContext()).setUser(currentUser2);
+
+                    AppTheme themeFireBase = Objects.requireNonNull(currentUser2).getTheme();
+                    //GET THEME SINGLETON
+                    AppTheme currentTheme = AppTheme.getInstance();
+
+                    currentTheme.setTheme(themeFireBase.getTheme());
+
                     // Toast
                     Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
                 } else {
@@ -1391,6 +1415,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
                 }
             }); //END CREATE SINGLETON
+
+            //                ref.get().addOnCompleteListener(task1 -> {
+//                    if (task1.isSuccessful()) {
+//                        //[CREATE] USER SINGLETON
+//                        User currentUser = task1.getResult().getValue(User.class);
+//
+//                        //SET USER THEME TO SINGLETON THEME
+//                        Objects.requireNonNull(currentUser).setTheme(currentTheme);
+//
+//                        ((UserClient) MapsActivity.this.getApplicationContext()).setUser(currentUser);
+//
+//
+//
+//
+//                    } else {
+//                        //HANDLE ERROR HERE if we cannot retrieve the user data
+//                        Toast.makeText(MapsActivity.this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
+//                    }
+//                });
+
+
         }
 
 

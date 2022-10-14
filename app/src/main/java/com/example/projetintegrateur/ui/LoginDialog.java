@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.projetintegrateur.R;
+import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.facebook.AccessToken;
@@ -257,7 +258,13 @@ public class LoginDialog extends DialogFragment {
 
                                                 //GET THE USER ID AND SET IT TO THE User Object THAT WE WILL INSERT IN THE DATABASE
                                                 String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
-                                                User newUserData = new User(email, currentUserKey, name, null);
+                                                //GET THEME SINGLETON
+                                                AppTheme currentTheme = AppTheme.getInstance();
+
+                                                String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
+
+
+                                                User newUserData = new User(email, currentUserKey, name, photoUrl , currentTheme);
 
 
                                                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
@@ -337,8 +344,15 @@ public class LoginDialog extends DialogFragment {
                                     //[FETCH] THE USER IN DATABASE
                                     ref.get().addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
-                                            //[CREATE] SINGLETON
+                                            //[CREATE] USER SINGLETON
                                             User currentUser = task1.getResult().getValue(User.class);
+
+                                            //GET THEME SINGLETON
+                                            AppTheme currentTheme = AppTheme.getInstance();
+
+                                            //SET USER THEME TO SINGLETON THEME
+                                            Objects.requireNonNull(currentUser).setTheme(currentTheme);
+
                                             ((UserClient) requireActivity().getApplicationContext()).setUser(currentUser);
 
                                             //ALLOW ACCESS TO APP, DISMISS THE LOGIN DIALOG
@@ -391,7 +405,9 @@ public class LoginDialog extends DialogFragment {
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
                                     String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
                                     String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
-                                    User newUserData = new User(email, currentUserKey, name, photoUrl);
+                                    //GET THEME SINGLETON
+                                    AppTheme currentTheme = AppTheme.getInstance();
+                                    User newUserData = new User(email, currentUserKey, name, photoUrl,currentTheme);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")
@@ -471,7 +487,10 @@ public class LoginDialog extends DialogFragment {
                                     String email = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getEmail();
                                     String name = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
                                     String photoUrl = String.valueOf(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getPhotoUrl());
-                                    User newUserData = new User(email, currentUserKey, name, photoUrl);
+                                    //GET THEME SINGLETON
+                                    AppTheme currentTheme = AppTheme.getInstance();
+
+                                    User newUserData = new User(email, currentUserKey, name, photoUrl, currentTheme);
 
                                     //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                                     mFirebaseDB.getReference("Users")
