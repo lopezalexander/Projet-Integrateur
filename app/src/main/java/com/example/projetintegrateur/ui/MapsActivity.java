@@ -840,9 +840,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         //Instantiate GoogleMap
         mMap = googleMap;
-//
-//        AppTheme currentTheme = AppTheme.getInstance();
-//        setMapStyle(currentTheme.getTheme(), MapsActivity.this);
+
+        AppTheme currentTheme = AppTheme.getInstance();
+        setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION

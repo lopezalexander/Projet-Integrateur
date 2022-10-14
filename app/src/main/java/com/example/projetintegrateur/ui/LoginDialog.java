@@ -325,7 +325,7 @@ public class LoginDialog extends DialogFragment {
         String email = email_input.getText().toString().trim();
         String password = password_input.getText().toString().trim();
         String password2 = password2_input.getText().toString().trim();
-        boolean valid = loginValidation(name, email, password, password2);
+        boolean valid = loginValidation(email, password);
 
 
         if (valid) {
@@ -594,6 +594,37 @@ public class LoginDialog extends DialogFragment {
         if (!password.equals(password2)) {
             password2_input.setError("Confirmation du mot de passe ne correspond pas. Resaisissez votre mot de passe.");
             password2_input.requestFocus();
+            return false;
+        }
+
+        //If no error, return TRUE
+        return true;
+    }
+
+    private boolean loginValidation(String email, String password) {
+        //VALIDATIONS
+
+        if (email.isEmpty()) {
+            email_input.setError("Entrez votre courriel!");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            email_input.setError("Votre courriel est incorrect");
+            email_input.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            password_input.setError("Un mot de passe est nécessaire!");
+            password_input.requestFocus();
+            return false;
+        }
+
+        if (password.length() < 6) {
+            password_input.setError("Le mot de passe requiert 6 lettres au minimum!");
+            password_input.requestFocus();
             return false;
         }
 
