@@ -17,6 +17,7 @@ import com.example.projetintegrateur.model.AppTheme;
 import com.example.projetintegrateur.model.User;
 import com.example.projetintegrateur.util.UserClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -27,6 +28,8 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     ConstraintLayout profileLayout;
+
+    public FirebaseDatabase mFirebaseDB;
 
 
     @Override
@@ -48,6 +51,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         profileLayout = findViewById(R.id.constraint_layout_profile);
 
+        //GET REALTIME DATABASE INSTANCE
+        mFirebaseDB = FirebaseDatabase.getInstance();
 
         //HIDE DEFAULT ACTION BAR
         Objects.requireNonNull(getSupportActionBar()).hide();
@@ -133,7 +138,6 @@ public class ProfileActivity extends AppCompatActivity {
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
                 MapsActivity.setMapStyle(themes[which], getApplicationContext());
-                ResultsActivity.setMapStyle(themes[which], getApplicationContext());
                 profileLayout.setBackgroundColor(colors[which]);
                 //STORE COLOR IN SINGLETON
                 AppTheme currentTheme = AppTheme.getInstance();
@@ -142,6 +146,13 @@ public class ProfileActivity extends AppCompatActivity {
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
                 currentTheme.setButtonBg(buttons_Drawables[which]);
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
+
+                //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                mFirebaseDB.getReference("Users")
+                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child("theme")
+                        .setValue(currentTheme).addOnCompleteListener(task1 -> {
+                        });
+
             });
             builder.show();
 

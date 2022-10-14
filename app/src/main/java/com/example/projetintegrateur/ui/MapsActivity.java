@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -173,6 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //GET PERMISSION
             getLocationPermission();
 
+
             //SETUP PLACES AUTOCOMPLETION
             setUpPlacesAutocomplete();
 
@@ -191,11 +193,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         //Get Theme Signleton
-//        AppTheme currentTheme = AppTheme.getInstance();
-//        //Set search bar background color
-//        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-//        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
-//        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+        AppTheme currentTheme = AppTheme.getInstance();
+        //Set search bar background color
+        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
 
     }
 
@@ -546,7 +548,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mCircle = mMap.addCircle(new CircleOptions()
                                     .center(midPointLatLng)
                                     .radius(1000)
-                                    .strokeColor(getColor(R.color.red)));
+                                    .strokeColor(getColor(R.color.blue)));
                             mCircle.setVisible(true);
 
                             //MOVE THE CAMERA ONTO THE MIDPOINT
@@ -843,6 +845,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         AppTheme currentTheme = AppTheme.getInstance();
         setMapStyle(currentTheme.getTheme(), MapsActivity.this);
+
+
 
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
@@ -1176,16 +1180,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
                 currentTheme.setButtonBg(buttons_Drawables[which]);
-                profil.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
-                setting.setBackgroundDrawable(getDrawable(buttons_Drawables[which]));
+
+                Drawable drawable = getDrawable(buttons_Drawables[which]);
+                profil.setBackgroundDrawable(drawable);
+                setting.setBackgroundDrawable(drawable);
+
                 autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
                 //Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
-
-                //[RETRIEVE] CURRENT USER_ID FROM FIREBASE_AUTH ... TO FETCH IT FROM DATABASE IN NEXT STEPS
-                String currentUserKey = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-
-                //[GET REFERENCE] FOR CURRENT_USER FROM DATABASE WITH currentUserKey
-                DatabaseReference ref = mFirebaseDB.getReference("Users").child(currentUserKey);
 
 
                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
@@ -1413,9 +1414,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     currentTheme.setSearchBar_backgroundColor(themeFireBase.getSearchBar_backgroundColor());
                     currentTheme.setButtonBg(themeFireBase.getButtonBg());
                     autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-                    profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
-                    setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
-                    setMapStyle(currentTheme.getTheme(), MapsActivity.this);
+
+                    Drawable drawable = getDrawable(currentTheme.getButtonBg());
+
+                    profil.setBackgroundDrawable(drawable);
+                    setting.setBackgroundDrawable(drawable);
+                    MapsActivity.setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
                     // Toast
                     Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser().getDisplayName()) + "!", Toast.LENGTH_LONG).show();

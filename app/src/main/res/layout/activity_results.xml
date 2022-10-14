@@ -19,13 +19,14 @@
 
 	<ImageView
 		android:id="@+id/ic_gps"
-		android:layout_width="60dp"
-		android:layout_height="60dp"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginEnd="20dp"
-		android:layout_marginBottom="300dp"
+		android:layout_marginBottom="360dp"
 		android:contentDescription="@string/empty_value"
+		android:background="@drawable/top_icon_bg"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_gps_foreground"
 		map:layout_constraintBottom_toBottomOf="@+id/map"
@@ -34,33 +35,68 @@
 
 	<ImageView
 		android:id="@+id/ic_settings2"
-		android:layout_width="60dp"
-		android:layout_height="60dp"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginEnd="20dp"
-		android:layout_marginBottom="250dp"
+		android:layout_marginBottom="300dp"
 		android:contentDescription="@string/empty_value"
+		android:background="@drawable/top_icon_bg"
 		android:scaleType="centerCrop"
-		android:src="@drawable/ic_settings_foreground"
+		android:src="@drawable/ic_settings2_foreground"
 		map:layout_constraintBottom_toBottomOf="@+id/map"
 		map:layout_constraintEnd_toEndOf="parent"
 		/>
 
 	<ImageView
 		android:id="@+id/ic_share"
-		android:layout_width="60dp"
-		android:layout_height="60dp"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
 		android:layout_marginEnd="20dp"
-		android:layout_marginBottom="200dp"
+		android:layout_marginBottom="240dp"
 		android:contentDescription="@string/empty_value"
+		android:background="@drawable/top_icon_bg"
 		android:scaleType="centerCrop"
 		android:src="@drawable/ic_share_foreground"
 		map:layout_constraintBottom_toBottomOf="@+id/map"
 		map:layout_constraintEnd_toEndOf="parent"
 		/>
+
+<!--	<ImageView-->
+<!--		android:id="@+id/ic_gps"-->
+<!--		android:layout_width="50dp"-->
+<!--		android:layout_height="50dp"-->
+<!--		android:layout_alignParentEnd="true"-->
+<!--		android:layout_alignParentBottom="true"-->
+<!--		android:layout_marginStart="-54dp"-->
+<!--		android:layout_marginTop="10dp"-->
+<!--		android:layout_marginEnd="12dp"-->
+<!--		android:layout_marginBottom="360dp"-->
+<!--		android:background="@drawable/top_icon_bg"-->
+<!--		android:contentDescription="@string/empty_value"-->
+<!--		android:scaleType="centerCrop"-->
+<!--		android:src="@drawable/ic_gps_foreground"-->
+<!--		/>-->
+
+<!--	<ImageView-->
+<!--		android:id="@+id/ic_share"-->
+<!--		android:layout_width="50dp"-->
+<!--		android:layout_height="50dp"-->
+<!--		android:layout_alignParentEnd="true"-->
+<!--		android:layout_alignParentBottom="true"-->
+<!--		android:layout_marginStart="-54dp"-->
+<!--		android:layout_marginTop="10dp"-->
+<!--		android:layout_marginEnd="12dp"-->
+<!--		android:layout_marginBottom="280dp"-->
+<!--		android:contentDescription="@string/empty_value"-->
+<!--		android:visibility="invisible"-->
+<!--		android:background="@drawable/top_icon_bg"-->
+<!--		android:scaleType="centerCrop"-->
+<!--		android:src="@drawable/ic_share_foreground"-->
+<!--		/>-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

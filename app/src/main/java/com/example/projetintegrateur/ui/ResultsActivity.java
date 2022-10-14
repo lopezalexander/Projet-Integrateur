@@ -40,6 +40,8 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.PolyUtil;
 import com.squareup.picasso.Picasso;
 
@@ -65,6 +67,9 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     //GOOGLE MAPS SETUP
     private static GoogleMap mMap;
 
+    //REALTIME DATABASE
+    public FirebaseDatabase mFirebaseDB;
+
     //LISTS//VARIABLES
     private ArrayList<Marker> markerArrayList;
     LatLng midPointLatLng;
@@ -88,6 +93,9 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
+
+        //GET REALTIME DATABASE INSTANCE
+        mFirebaseDB = FirebaseDatabase.getInstance();
 
         //INITIALIZE NECESSARY VARIABLE, LIST, ETC
         initView();
@@ -213,6 +221,12 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 currentTheme.setBackgroundColor(colors[which]);
                 currentTheme.setSearchBar_backgroundColor(searchBar_colors[which]);
                 currentTheme.setButtonBg(buttons_Drawables[which]);
+
+                //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
+                mFirebaseDB.getReference("Users")
+                        .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child("theme")
+                        .setValue(currentTheme).addOnCompleteListener(task1 -> {
+                        });
 
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
