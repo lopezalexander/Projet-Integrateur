@@ -144,6 +144,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ImageView btn_showBusinessList;
     ImageView btn_share;
     ImageView setting;
+    ImageView tutorial;
+
     BusinessDialog businessDialog;
 
     //RESULTS VARIABLES
@@ -154,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //UTILS
     ObjectMapper mapper;
     LoginDialog loginDialog;
-
+    TutorialDialog tutorialDialog;
 
     //***********\\
     //  OnCREATE  \\
@@ -1220,6 +1222,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
             builder.show();
         });
+
+
+        tutorial = findViewById(R.id.ic_info);
+        tutorial.setOnClickListener(view -> {
+
+            tutorialDialog = new TutorialDialog();
+            tutorialDialog.setCancelable(false);
+            tutorialDialog.show(getSupportFragmentManager(), "TutorialDialogFragment");
+        });
+
 
 
         // SET OnClickListener to reset search bar and to empty addresses

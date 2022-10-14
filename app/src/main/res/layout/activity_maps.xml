@@ -84,21 +84,37 @@
 		/>
 
 	<ImageView
-	android:id="@+id/ic_share"
-	android:layout_width="40dp"
-	android:layout_height="40dp"
-	android:layout_alignParentEnd="true"
-	android:layout_alignParentBottom="true"
-	android:layout_marginStart="-54dp"
-	android:layout_marginTop="10dp"
-	android:layout_marginEnd="15dp"
-	android:layout_marginBottom="320dp"
-	android:contentDescription="@string/empty_value"
-	android:visibility="invisible"
-	android:background="@drawable/top_icon_bg"
-	android:scaleType="centerCrop"
-	android:src="@drawable/ic_share_foreground"
-	/>
+		android:id="@+id/ic_info"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginStart="-54dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginEnd="15dp"
+		android:layout_marginBottom="320dp"
+		android:layout_toStartOf="@id/ic_gps"
+		android:contentDescription="@string/empty_value"
+		android:background="@drawable/top_icon_bg"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_info2_foreground"/>
+
+	<ImageView
+		android:id="@+id/ic_share"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginStart="-54dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginEnd="15dp"
+		android:layout_marginBottom="260dp"
+		android:contentDescription="@string/empty_value"
+		android:visibility="invisible"
+		android:background="@drawable/top_icon_bg"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_share_foreground"
+		/>
 
 	<ImageView
 		android:id="@+id/ic_show_listview_btn"
@@ -109,7 +125,7 @@
 		android:layout_marginStart="-54dp"
 		android:layout_marginTop="10dp"
 		android:layout_marginEnd="15dp"
-		android:layout_marginBottom="260dp"
+		android:layout_marginBottom="200dp"
 		android:layout_toStartOf="@id/ic_gps"
 		android:contentDescription="@string/empty_value"
 		android:background="@drawable/top_icon_bg"
@@ -117,6 +133,8 @@
 		android:src="@drawable/ic_restaurant2_foreground"
 		android:visibility="invisible"
 		/>
+
+
 
 	<!--<androidx.cardview.widget.CardView-->
 	<!--	android:layout_width="200dp"-->
