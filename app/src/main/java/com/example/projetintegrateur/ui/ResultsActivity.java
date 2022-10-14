@@ -160,6 +160,21 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         //INITIALIZE LIST
         markerArrayList = new ArrayList<>();
 
+        // PRELOAD THE IMAGE OF SELECTED BUSINESS
+        //*************************************************************************************************
+        Thread thread = new Thread(() -> {
+            String photoURLString = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + itineraryData.getPhotoURL() + "&key=" + getString(R.string.maps_key);
+            URL url;
+
+            try {
+                url = new URL(photoURLString);
+                bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
+
         //UTILS --> ObjectMapper to Map JSON response to Model Class
         //*************************************************************************************************
         mapper = new ObjectMapper();
@@ -171,26 +186,6 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
             //CENTER ON MARKERS
             centerAllMarkers();
         });
-
-
-        // PRELOAD THE IMAGE OF SELECTED BUSINESS
-        //*************************************************************************************************
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String photoURLString = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + itineraryData.getPhotoURL() + "&key=" + getString(R.string.maps_key);
-                URL url;
-                try {
-                    url = new URL(photoURLString);
-                    bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
 
 
         // SET OnClickListener for the SETTING BUTTON
@@ -601,11 +596,8 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 address.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
             } else {
                 name.setText(itineraryData.getSelectedBusinessName());
-                photo.setVisibility(View.VISIBLE);
-
-                //SET/DISPLAY PROFILE INFORMATION
-                //*****************************************************************************************************************************
                 photo.setImageBitmap(bitmap);
+                photo.setVisibility(View.VISIBLE);
                 address.setText(itineraryData.getSelectedBusinessAddressName());
             }
 
