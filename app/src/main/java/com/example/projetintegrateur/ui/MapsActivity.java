@@ -339,9 +339,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MarkerOptions markerOptions;
         Marker marker;
 
-        if (resultActive && !title.equals("MidPoint_Fine")) {
+        if (resultActive && !title.equals("Point milieu")) {
 
-            if (title.equals("SelectedBusiness")) {
+            if (title.equals("Destination choisie")) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
@@ -365,17 +365,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Add the new marker to the markerArrayList
             marker = mMap.addMarker(markerOptions);
             markerArrayList.add(marker);
-        } else if (!title.equals("MidPoint_Fine")) {
+        } else if (!title.equals("Point milieu")) {
             if (markerArrayList.size() == 1) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
-                        .title(title)
+                        .title("Location 2")
                         .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
             } else {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
-                        .title(title)
+                        .title("Location 1")
                         .draggable(true)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
             }
@@ -540,7 +540,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     .addAll(polylineList));
 
                             //ADD MIDDLE DISTANCE POINT MARKER
-                            addMarker(midPointLatLng, "MidPoint_Fine");
+                            addMarker(midPointLatLng, "Point milieu");
 
                             //ADD CIRCLE AROUND MIDPOINT
                             mCircle = mMap.addCircle(new CircleOptions()
@@ -719,9 +719,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
 
-                        if (addressType.equals("AddressA")) {
+                        if (addressType.equals("Location 2")) {
                             directionResponseAddressA = directionResponseObject;
-                        } else if (addressType.equals("AddressB")) {
+                        } else if (addressType.equals("Location 1")) {
                             directionResponseAddressB = directionResponseObject;
                         }
 
@@ -786,14 +786,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
 
                             //DRAW POLYLINE ON MAP
-                            if (addressType.equals("AddressA")) {
+                            if (addressType.equals("Location 2")) {
                                 mPolyline = mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
                                         .color(getColor(R.color.blue))
                                         .addAll(polylineList));
 
-                            } else if (addressType.equals("AddressB")) {
+                            } else if (addressType.equals("Location 1")) {
                                 mPolyline2 = mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
@@ -885,7 +885,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-                        if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                        if (Objects.equals(marker.getTitle(), "Point milieu")) {
                             resetRoute();
                             markerArrayList.get(1).remove();
                             markerArrayList.remove(1);
@@ -960,7 +960,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMarkerDrag(@NonNull Marker marker) {
                 markerArrayList.get(i).setPosition(marker.getPosition());
-                if (!Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                if (!Objects.equals(marker.getTitle(), "Point milieu")) {
                     locationArrayList.set(i, marker.getPosition());
                 }
             }
@@ -969,7 +969,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMarkerDragEnd(@NonNull Marker marker) {
                 //REPLACE LIST VALUE AT POSITION OF THE MARKER
                 markerArrayList.get(i).setPosition(marker.getPosition());
-                if (!Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                if (!Objects.equals(marker.getTitle(), "Point milieu")) {
                     locationArrayList.set(i, marker.getPosition());
 
                     //Add to locationAddressName
@@ -993,7 +993,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else if (Objects.equals(marker.getTitle(), "MidPoint_Fine")) {
+                } else if (Objects.equals(marker.getTitle(), "Point milieu")) {
                     midPointLatLng = marker.getPosition();
 
                     if (mPolyline != null) {
@@ -1006,8 +1006,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                     //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
-                    drawResultPolyline(new CustomLatLng(locationArrayList.get(0).latitude, locationArrayList.get(0).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressA");
-                    drawResultPolyline(new CustomLatLng(locationArrayList.get(1).latitude, locationArrayList.get(1).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "AddressB");
+                    drawResultPolyline(new CustomLatLng(locationArrayList.get(0).latitude, locationArrayList.get(0).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "Location 2");
+                    drawResultPolyline(new CustomLatLng(locationArrayList.get(1).latitude, locationArrayList.get(1).longitude), new CustomLatLng(midPointLatLng.latitude, midPointLatLng.longitude), "Location 1");
 
 
                     getNearbyBusiness();
@@ -1514,6 +1514,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mPolyline != null) {
             mPolyline.remove();
         }
+        if (mPolyline2 != null) {
+            mPolyline2.remove();
+        }
         if (mCircle != null) {
             mCircle.remove();
         }
@@ -1617,19 +1620,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         resetResult();
 
         //ADD ORIGIN MARKER
-        addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "AddressA");
+        addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "Location 2");
 
         //ADD DESTINATION MARKER
-        addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "AddressB");
+        addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "Location 1");
 
         //ADD SELECTED BUSINESS MARKER
-        addMarker(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()), "SelectedBusiness");
+        addMarker(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()), "Destination choisie");
 
         //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
-        drawResultPolyline(ItineraryToAdd.getOrigintLatLng(), ItineraryToAdd.getSelectedBusiness(), "AddressA");
+        drawResultPolyline(ItineraryToAdd.getOrigintLatLng(), ItineraryToAdd.getSelectedBusiness(), "Location 2");
 
         //DRAW SECOND POLYLINE DESTINATION TO SELECTED BUSINESS
-        drawResultPolyline(ItineraryToAdd.getDestinationLatLng(), ItineraryToAdd.getSelectedBusiness(), "AddressB");
+        drawResultPolyline(ItineraryToAdd.getDestinationLatLng(), ItineraryToAdd.getSelectedBusiness(), "Location 1");
 
 
     }

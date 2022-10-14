@@ -116,10 +116,10 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     @SuppressLint("PotentialBehaviorOverride")
     private void mapIsReady() {
         //ADD ORIGIN MARKER
-        addMarker(new LatLng(itineraryData.getOrigintLatLng().getLatitude(), itineraryData.getOrigintLatLng().getLongitude()), "AddressA");
+        addMarker(new LatLng(itineraryData.getOrigintLatLng().getLatitude(), itineraryData.getOrigintLatLng().getLongitude()), "Location 1");
 
         //ADD DESTINATION MARKER
-        addMarker(new LatLng(itineraryData.getDestinationLatLng().getLatitude(), itineraryData.getDestinationLatLng().getLongitude()), "AddressB");
+        addMarker(new LatLng(itineraryData.getDestinationLatLng().getLatitude(), itineraryData.getDestinationLatLng().getLongitude()), "Location 2");
 
         //ADD SELECTED BUSINESS MARKER
         addMarker(new LatLng(itineraryData.getSelectedBusiness().getLatitude(), itineraryData.getSelectedBusiness().getLongitude()), "selectedBusiness");
@@ -128,10 +128,10 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         centerAllMarkers();
 
         //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
-        drawPolyline(itineraryData.getOrigintLatLng(), itineraryData.getSelectedBusiness(), "AddressA");
+        drawPolyline(itineraryData.getOrigintLatLng(), itineraryData.getSelectedBusiness(), "Location 1");
 
         //DRAW SECOND POLYLINE DESTINATION TO SELECTED BUSINESS
-        drawPolyline(itineraryData.getDestinationLatLng(), itineraryData.getSelectedBusiness(), "AddressB");
+        drawPolyline(itineraryData.getDestinationLatLng(), itineraryData.getSelectedBusiness(), "Location 2");
 
 
     }
@@ -463,9 +463,9 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                         DirectionResponse directionResponseObject = mapper.readValue(resultJSON.toString(), DirectionResponse.class);
 
 
-                        if (addressType.equals("AddressA")) {
+                        if (addressType.equals("Location 1")) {
                             directionResponseAddressA = directionResponseObject;
-                        } else if (addressType.equals("AddressB")) {
+                        } else if (addressType.equals("Location 2")) {
                             directionResponseAddressB = directionResponseObject;
                         }
 
@@ -530,13 +530,13 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                             List<LatLng> polylineList = PolyUtil.decode(polyline);
 
                             //DRAW POLYLINE ON MAP
-                            if (addressType.equals("AddressA")) {
+                            if (addressType.equals("Location 1")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
                                         .color(getColor(R.color.blue))
                                         .addAll(polylineList));
-                            } else if (addressType.equals("AddressB")) {
+                            } else if (addressType.equals("Location 2")) {
                                 mMap.addPolyline(new PolylineOptions()
                                         .clickable(true)
                                         .width(15)
@@ -610,11 +610,11 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
             TextView address = view.findViewById(R.id.address);
 
-            if (Objects.equals(marker.getTitle(), "AddressA")) {
+            if (Objects.equals(marker.getTitle(), "Location 1")) {
                 name.setText(marker.getTitle());
                 photo.setVisibility(View.GONE);
                 address.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
-            } else if (Objects.equals(marker.getTitle(), "AddressB")) {
+            } else if (Objects.equals(marker.getTitle(), "Location 2")) {
                 name.setText(marker.getTitle());
                 photo.setVisibility(View.GONE);
                 address.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
