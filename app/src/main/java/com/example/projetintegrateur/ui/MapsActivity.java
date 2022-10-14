@@ -113,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng selectedBusinessCoordinate;
     String selectedBusinessAddressName;
     String selectedBusinessName;
+    String selectedBusinessPhoto;
     Polyline mPolyline, mPolyline2;
     Circle mCircle;
     Marker mMarker;
@@ -633,7 +634,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 business.setRating(String.valueOf(uniqueBusiness.getRating())+"★");
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
                                 business.setTypes(uniqueBusiness.getTypes());
-                                
+
                                 if (uniqueBusiness.getPhotos() != null) {
                                     business.setPhotoURL(uniqueBusiness.getPhotos().get(0).photo_reference);
                                 }
@@ -1551,11 +1552,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //DATA TRANSFER FROM BUSINESS DIALOG TO MAPSACTIVITY
     //*****************************************************************************************************************************
     @Override
-    public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName) {
+    public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName, String businessPhoto) {
         //RETRIEVE BUSINESS DATA INFORMATION FROM RECYCLERVIEW --> BUSINESS DIALOG --> MAPSACTIVITY
         this.selectedBusinessCoordinate = businessCoordinate;
         this.selectedBusinessAddressName = businessAddressName;
         this.selectedBusinessName = businessName;
+        this.selectedBusinessPhoto = businessPhoto;
 
         //CREATE ITINERARY OBJECT TO SAVE INTO THE DATABASE
         createItineraryModelObject();
@@ -1584,7 +1586,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 selectedBusinessAddressName,
                 selectedBusinessName,
                 Objects.requireNonNull(mAuth.getCurrentUser()).getUid(),
-                currentDate
+                currentDate,
+                selectedBusinessPhoto
+
         );
 
         //SAVE INTO THE DATABASE
