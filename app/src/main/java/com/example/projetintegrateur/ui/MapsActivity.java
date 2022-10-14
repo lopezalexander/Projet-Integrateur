@@ -349,18 +349,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .title(title)
                         .draggable(false)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_point));
-            } else if (markerArrayList.size() == 1) {
-                markerOptions = new MarkerOptions()
-                        .position(latLng)
-                        .title(title)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
-            } else {
+            } else if (locationArrayList.size() == 0) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
                         .draggable(false)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+            } else {
+                markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
             }
 
 
@@ -890,6 +890,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         if (Objects.equals(marker.getTitle(), "Point milieu")) {
+                            resetRoute();
+                            markerArrayList.get(1).remove();
+                            markerArrayList.remove(1);
+                            locationArrayList.remove(1);
+                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+                            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+                            if (businessDialog.isVisible()) {
+                                businessDialog.dismiss();
+                            }
+                        } else if (Objects.equals(marker.getTitle(), "Destination choisie")) {
                             resetRoute();
                             markerArrayList.get(1).remove();
                             markerArrayList.remove(1);
@@ -1536,7 +1546,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //RESET MAP FOR RESULT
     //*****************************************************************************************************************************
     private void resetResult() {
-//        locationArrayList.clear();
+        locationArrayList.clear();
 //        locationAddressName.clear();
 //        markerArrayList.clear();
         mMap.clear();
@@ -1625,12 +1635,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //ADD ORIGIN MARKER
         addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "Location 2");
+        locationArrayList.add(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()));
+
 
         //ADD DESTINATION MARKER
         addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "Location 1");
+        locationArrayList.add(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()));
 
         //ADD SELECTED BUSINESS MARKER
         addMarker(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()), "Destination choisie");
+        locationArrayList.add(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()));
 
         //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
         drawResultPolyline(ItineraryToAdd.getOrigintLatLng(), ItineraryToAdd.getSelectedBusiness(), "Location 2");
