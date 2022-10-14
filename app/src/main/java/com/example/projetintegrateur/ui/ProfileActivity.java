@@ -33,6 +33,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         AppTheme theme = AppTheme.getInstance();
+        Log.d("PROFILE", theme.getTheme().toString());
+        Log.d("PROFILE", String.valueOf(theme.getBackgroundColor()));
         profileLayout.setBackgroundColor(theme.getBackgroundColor());
     }
 
@@ -130,7 +132,7 @@ public class ProfileActivity extends AppCompatActivity {
             builder.setTitle("Choisissez un thème");
             builder.setItems(themes, (dialog, which) -> {
                 //the user clicked on themes[which]
-                MapsActivity.setMapStyle(themes[which],getApplicationContext());
+                MapsActivity.setMapStyle(themes[which], getApplicationContext());
                 ResultsActivity.setMapStyle(themes[which], getApplicationContext());
                 profileLayout.setBackgroundColor(colors[which]);
                 //STORE COLOR IN SINGLETON
@@ -144,7 +146,6 @@ public class ProfileActivity extends AppCompatActivity {
             builder.show();
 
         });
-
 
 
     }

@@ -191,11 +191,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         //Get Theme Signleton
-        AppTheme currentTheme = AppTheme.getInstance();
-        //Set search bar background color
-        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
-        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
-        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+//        AppTheme currentTheme = AppTheme.getInstance();
+//        //Set search bar background color
+//        autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+//        profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+//        setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
 
     }
 
@@ -631,7 +631,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //SET NAME AND ADDRESS
                                 business.setName(uniqueBusiness.getName());
                                 business.setAddress(uniqueBusiness.getVicinity());
-                                business.setRating(String.valueOf(uniqueBusiness.getRating())+"★");
+                                business.setRating(String.valueOf(uniqueBusiness.getRating()) + "★");
                                 business.setCoordinatesLatlng(new LatLng(uniqueBusiness.getGeometry().getLocation().getLat(), uniqueBusiness.getGeometry().getLocation().getLng()));
                                 business.setTypes(uniqueBusiness.getTypes());
 
@@ -840,9 +840,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap googleMap) {
         //Instantiate GoogleMap
         mMap = googleMap;
-
-
-        setMapStyle("Midnight", MapsActivity.this);
+//
+//        AppTheme currentTheme = AppTheme.getInstance();
+//        setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
 
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
@@ -1091,9 +1091,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btn_share.setOnClickListener(view -> {
             String location;
             if (selectedBusinessCoordinate == null) {
-                location = "https://www.google.com/maps?daddr="+mMarker.getPosition().latitude+","+mMarker.getPosition().longitude+"&amp;ll=";
+                location = "https://www.google.com/maps?daddr=" + mMarker.getPosition().latitude + "," + mMarker.getPosition().longitude + "&amp;ll=";
             } else {
-                location = "https://www.google.com/maps?daddr="+selectedBusinessCoordinate.latitude+","+selectedBusinessCoordinate.longitude+"&amp;ll=";
+                location = "https://www.google.com/maps?daddr=" + selectedBusinessCoordinate.latitude + "," + selectedBusinessCoordinate.longitude + "&amp;ll=";
             }
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -1191,9 +1191,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //INSERT THE USER IN THE FIREBASE REALTIME DATABASE TABLE --> Users
                 mFirebaseDB.getReference("Users")
                         .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid()).child("theme")
-                        .setValue(currentTheme).addOnCompleteListener(task1 -> {   });
-
-
+                        .setValue(currentTheme).addOnCompleteListener(task1 -> {
+                        });
 
 
             });
@@ -1387,6 +1386,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             loginDialog = new LoginDialog();
             loginDialog.setCancelable(false);
             loginDialog.show(getSupportFragmentManager(), "LoginDialogFragment");
+
+
         } else {
             //TODO:: RETRIEVE USER DATA FROM FIREBASE AND RESTORE IT INTO USER SINGLETON
             //THIS IS NEEDED FOR WHEN THE USER CLOSES THE APP AND OPENS IT.. THE SINGLETON USER IS NOT KEPT WHEN THIS FLOW OCCURS,
@@ -1408,6 +1409,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     AppTheme currentTheme = AppTheme.getInstance();
 
                     currentTheme.setTheme(themeFireBase.getTheme());
+                    currentTheme.setBackgroundColor(themeFireBase.getBackgroundColor());
+                    currentTheme.setSearchBar_backgroundColor(themeFireBase.getSearchBar_backgroundColor());
+                    currentTheme.setButtonBg(themeFireBase.getButtonBg());
+                    autocompleteFragment.requireView().setBackgroundColor(currentTheme.getSearchBar_backgroundColor());
+                    profil.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+                    setting.setBackgroundDrawable(getDrawable(currentTheme.getButtonBg()));
+                    setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
                     // Toast
                     Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
@@ -1416,26 +1424,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
                 }
             }); //END CREATE SINGLETON
-
-            //                ref.get().addOnCompleteListener(task1 -> {
-//                    if (task1.isSuccessful()) {
-//                        //[CREATE] USER SINGLETON
-//                        User currentUser = task1.getResult().getValue(User.class);
-//
-//                        //SET USER THEME TO SINGLETON THEME
-//                        Objects.requireNonNull(currentUser).setTheme(currentTheme);
-//
-//                        ((UserClient) MapsActivity.this.getApplicationContext()).setUser(currentUser);
-//
-//
-//
-//
-//                    } else {
-//                        //HANDLE ERROR HERE if we cannot retrieve the user data
-//                        Toast.makeText(MapsActivity.this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
-//                    }
-//                });
-
 
         }
 

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.AppTheme;
@@ -73,6 +74,7 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     //VIEW
     ImageView btn_MapCurrentLocation_GPS;
     ImageView setting;
+    ImageView btn_share;
     Bitmap bitmap;
 
     //UTILS
@@ -215,6 +217,28 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 Log.d(TAG, "onCreate: " + currentTheme.getSearchBar_backgroundColor());
             });
             builder.show();
+        });
+
+
+        // SET OnClickListener for the SHARE BUTTON
+        //*************************************************************************************************
+        btn_share = findViewById(R.id.ic_share);
+        btn_share.setOnClickListener(view -> {
+            String location;
+
+            location = "https://www.google.com/maps?daddr=" + itineraryData.getSelectedBusiness().getLatitude() + "," + itineraryData.getSelectedBusiness().getLongitude() + "&amp;ll=";
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, location);
+            sendIntent.setType("text/plain");
+            sendIntent.setPackage("com.facebook.orca");
+
+            try {
+                startActivity(sendIntent);
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(ResultsActivity.this, "Please Install Facebook Messenger", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

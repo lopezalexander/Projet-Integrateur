@@ -47,5 +47,20 @@
 		map:layout_constraintEnd_toEndOf="parent"
 		/>
 
+	<ImageView
+		android:id="@+id/ic_share"
+		android:layout_width="60dp"
+		android:layout_height="60dp"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentBottom="true"
+		android:layout_marginEnd="20dp"
+		android:layout_marginBottom="200dp"
+		android:contentDescription="@string/empty_value"
+		android:scaleType="centerCrop"
+		android:src="@drawable/ic_share_foreground"
+		map:layout_constraintBottom_toBottomOf="@+id/map"
+		map:layout_constraintEnd_toEndOf="parent"
+		/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
