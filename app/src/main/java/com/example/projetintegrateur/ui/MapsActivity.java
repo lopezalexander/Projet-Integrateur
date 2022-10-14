@@ -1418,7 +1418,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
                     // Toast
-                    Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser()).getDisplayName() + "!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Bienvenue " + Objects.requireNonNull(mAuth.getCurrentUser().getDisplayName()) + "!", Toast.LENGTH_LONG).show();
                 } else {
                     //HANDLE ERROR HERE if we cannot retrieve the user data
                     Toast.makeText(this, "Failed to query your data, please try again!", Toast.LENGTH_LONG).show();
