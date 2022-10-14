@@ -1,5 +1,6 @@
 package com.example.projetintegrateur.model;
 
+import android.media.Image;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -25,10 +26,10 @@ public class ItineraryModel implements Parcelable {
     String selectedBusinessName;
 
     String userID;
-
-
     String currentDate;
 
+
+    String photoURL;
 
     //**************\\
     //  CONSTRUCTOR  \\
@@ -47,7 +48,8 @@ public class ItineraryModel implements Parcelable {
                           String selectedBusinessAddressName,
                           String selectedBusinessName,
                           String userID,
-                          String currentDate) {
+                          String currentDate,
+                          String photoURL) {
         this.origintLatLng = origintLatLng;
         this.originAddressName = originAddressName;
         this.destinationLatLng = destinationLatLng;
@@ -60,6 +62,7 @@ public class ItineraryModel implements Parcelable {
         this.selectedBusinessName = selectedBusinessName;
         this.userID = userID;
         this.currentDate = currentDate;
+        this.photoURL = photoURL;
 
     }
 
@@ -80,6 +83,7 @@ public class ItineraryModel implements Parcelable {
                 ", selectedBusinessName='" + selectedBusinessName + '\'' +
                 ", userID='" + userID + '\'' +
                 ", currentDate='" + currentDate + '\'' +
+                ", photoURL='" + photoURL + '\'' +
                 '}';
     }
 
@@ -134,6 +138,12 @@ public class ItineraryModel implements Parcelable {
         return currentDate;
     }
 
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+
     //**************\\
     //  SETTER       \\
     //*****************************************************************************************************************************
@@ -185,6 +195,9 @@ public class ItineraryModel implements Parcelable {
         this.currentDate = currentDate;
     }
 
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
 
     //******************\\
     //  PARCELABLE       \\
@@ -202,6 +215,7 @@ public class ItineraryModel implements Parcelable {
         selectedBusinessName = in.readString();
         userID = in.readString();
         currentDate = in.readString();
+        photoURL = in.readString();
     }
 
     @Override
@@ -218,6 +232,7 @@ public class ItineraryModel implements Parcelable {
         dest.writeString(selectedBusinessName);
         dest.writeString(userID);
         dest.writeString(currentDate);
+        dest.writeString(photoURL);
     }
 
     @Override

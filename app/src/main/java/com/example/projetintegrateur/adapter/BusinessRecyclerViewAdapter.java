@@ -57,7 +57,8 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
                 LatLng businessCoordinate = businessData.get(position).getCoordinatesLatlng();
                 String businessAddressName = businessData.get(position).getAddress();
                 String businessName = businessData.get(position).getName();
-                mListener.getSelectedBusinnes(businessCoordinate, businessAddressName, businessName);
+                String businessPhoto = businessData.get(position).getPhotoURL();
+                mListener.getSelectedBusinnes(businessCoordinate, businessAddressName, businessName, businessPhoto);
             }
 
         });
@@ -90,6 +91,6 @@ public class BusinessRecyclerViewAdapter extends RecyclerView.Adapter<BusinessRe
     }
 
     public interface DataTransferInterfaceRecycler {
-        void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName);
+        void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName, String businessPhoto);
     }
 }

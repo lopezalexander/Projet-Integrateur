@@ -22,9 +22,23 @@
 
 
 		<TextView
-			android:id="@+id/markerName"
+			android:id="@+id/name"
 			android:layout_width="200dp"
 			android:layout_height="40dp"
+			android:gravity="center"
+			android:textAlignment="center"
+			android:textColor="@color/black"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			/>
+
+		<ImageView
+			android:id="@+id/photo"
+			android:layout_width="200dp"
+			android:layout_height="200dp"
+			android:contentDescription="@string/empty_value"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
@@ -32,19 +46,12 @@
 			/>
 
 		<TextView
-			android:id="@+id/markerName1"
+			android:id="@+id/address"
 			android:layout_width="200dp"
 			android:layout_height="40dp"
-			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent"
-			app:layout_constraintTop_toTopOf="parent"
-			/>
-
-		<TextView
-			android:id="@+id/markerName2"
-			android:layout_width="200dp"
-			android:layout_height="40dp"
+			android:gravity="center"
+			android:textAlignment="center"
+			android:textColor="@color/black"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"

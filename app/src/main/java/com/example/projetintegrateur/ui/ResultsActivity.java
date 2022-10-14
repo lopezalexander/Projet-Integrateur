@@ -9,15 +9,14 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.projetintegrateur.R;
 import com.example.projetintegrateur.model.AppTheme;
@@ -41,11 +40,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -66,11 +67,13 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
     //LISTS//VARIABLES
     private ArrayList<Marker> markerArrayList;
     LatLng midPointLatLng;
-    ImageView btn_MapCurrentLocation_GPS;
     DirectionResponse directionResponseAddressA;
     DirectionResponse directionResponseAddressB;
 
+    //VIEW
+    ImageView btn_MapCurrentLocation_GPS;
     ImageView setting;
+    Bitmap bitmap;
 
     //UTILS
     ObjectMapper mapper;
@@ -168,6 +171,27 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
             //CENTER ON MARKERS
             centerAllMarkers();
         });
+
+
+        // PRELOAD THE IMAGE OF SELECTED BUSINESS
+        //*************************************************************************************************
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String photoURLString = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + itineraryData.getPhotoURL() + "&key=" + getString(R.string.maps_key);
+                URL url;
+                try {
+                    url = new URL(photoURLString);
+                    bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+
 
         // SET OnClickListener for the SETTING BUTTON
         //*************************************************************************************************
@@ -273,6 +297,41 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
                 break;
         }
         //SET STYLE FOR THE MAP
+
+    }
+
+
+    //
+    //
+    //SET MAP STYLE
+    //*****************************************************************************************************************************
+    public static void setMapStyle(String mapStyle, Context context) {
+        switch (mapStyle) {
+            case "Muted Blue":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
+                break;
+            case "Midnight":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
+                break;
+            case "Black and White":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
+                break;
+            case "Ultra Light":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
+                break;
+            case "Blue Essence":
+                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
+                break;
+            case "Default Map":
+                mMap.setMapStyle(new MapStyleOptions("[]"));
+                break;
+        }
+        //SET STYLE FOR THE MAP
+
+    }
+
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {
 
     }
 
@@ -481,11 +540,6 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
         }); //END  [REQUEST-RESPONSE]
     }
 
-    @Override
-    public void onInfoWindowClick(@NonNull Marker marker) {
-
-    }
-
 
     //
     //
@@ -503,20 +557,19 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         // These are both viewgroups containing an ImageView with id "badge" and two TextViews with id
         // "title" and "snippet".
-        private final View mWindow;
+        public final View mWindow;
         private final View mContents;
 
         @SuppressLint("InflateParams")
         CustomInfoWindowAdapter() {
             mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
             mContents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
-
-
         }
 
         @Override
         public View getInfoWindow(@NonNull Marker marker) {
             render(marker, mWindow);
+
             return mWindow;
 //              return null;
         }
@@ -530,57 +583,33 @@ public class ResultsActivity extends FragmentActivity implements OnMapReadyCallb
 
         private void render(Marker marker, View view) {
             // SET DATA HERE TO VIEW ELEMENTS
-            TextView markerName = view.findViewById(R.id.markerName);
-            TextView markerName1 = view.findViewById(R.id.markerName1);
-            TextView markerName2 = view.findViewById(R.id.markerName2);
+            TextView name = view.findViewById(R.id.name);
+            ImageView photo = view.findViewById(R.id.photo);
+
+            String photoURLString = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=" + itineraryData.getPhotoURL() + "&key=" + getString(R.string.maps_key);
+            Picasso.get().load(photoURLString).into(photo);
+
+            TextView address = view.findViewById(R.id.address);
 
             if (Objects.equals(marker.getTitle(), "AddressA")) {
-                markerName.setText(marker.getTitle());
-                markerName1.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
-                markerName2.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
+                name.setText(marker.getTitle());
+                photo.setVisibility(View.GONE);
+                address.setText(directionResponseAddressA.getRoutes().get(0).getLegs().get(0).getStart_address());
             } else if (Objects.equals(marker.getTitle(), "AddressB")) {
-                markerName.setText(marker.getTitle());
-                markerName1.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
-                markerName2.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
+                name.setText(marker.getTitle());
+                photo.setVisibility(View.GONE);
+                address.setText(directionResponseAddressB.getRoutes().get(0).getLegs().get(0).getStart_address());
             } else {
-                markerName.setText(marker.getTitle());
-                markerName1.setText("");
-                markerName2.setText("");
+                name.setText(itineraryData.getSelectedBusinessName());
+                photo.setVisibility(View.VISIBLE);
 
+                //SET/DISPLAY PROFILE INFORMATION
+                //*****************************************************************************************************************************
+                photo.setImageBitmap(bitmap);
+                address.setText(itineraryData.getSelectedBusinessAddressName());
             }
 
-
         }
-    }
-
-
-    //
-    //
-    //SET MAP STYLE
-    //*****************************************************************************************************************************
-    public static void setMapStyle(String mapStyle, Context context) {
-        switch (mapStyle) {
-            case "Muted Blue":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMutedBlue)));
-                break;
-            case "Midnight":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeMidnight)));
-                break;
-            case "Black and White":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlackAndWhite)));
-                break;
-            case "Ultra Light":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeultraLight)));
-                break;
-            case "Blue Essence":
-                mMap.setMapStyle(new MapStyleOptions(context.getString(R.string.mapThemeBlueEssence)));
-                break;
-            case "Default Map":
-                mMap.setMapStyle(new MapStyleOptions("[]"));
-                break;
-        }
-        //SET STYLE FOR THE MAP
-
     }
 
 

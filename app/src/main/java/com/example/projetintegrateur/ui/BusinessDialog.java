@@ -27,6 +27,7 @@ public class BusinessDialog extends BottomSheetDialogFragment implements Busines
     LatLng selectedBusinnesCoordinates;
     String selectedBusinessAddressName;
     String selectedBusinessName;
+    String selectedBusinessPhoto;
     RecyclerView recyclerView;
     BusinessRecyclerViewAdapter adapterFilter;
 
@@ -92,16 +93,17 @@ public class BusinessDialog extends BottomSheetDialogFragment implements Busines
     }
 
     @Override
-    public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName) {
+    public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName, String businessPhoto) {
         selectedBusinnesCoordinates = businessCoordinate;
         selectedBusinessAddressName = businessAddressName;
         selectedBusinessName = businessName;
-        mListener.getSelectedBusinnes(selectedBusinnesCoordinates, selectedBusinessAddressName, businessName);
+        selectedBusinessPhoto = businessPhoto;
+        mListener.getSelectedBusinnes(selectedBusinnesCoordinates, selectedBusinessAddressName, businessName, selectedBusinessPhoto);
 
 
     }
 
     public interface DataTransferInterfaceDialog {
-        public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName);
+        public void getSelectedBusinnes(LatLng businessCoordinate, String businessAddressName, String businessName, String businessPhoto);
     }
 }
