@@ -33,6 +33,7 @@
 	<color name="flutterTheme1">#3785B0</color>
 	<color name="flutterTheme2">#FA7C76</color>
 
+	<color name="ic_launcher_background">#065682</color>
 	<color name="place_autocomplete_search_text">@android:color/holo_red_light</color>
 	<color name="place_autocomplete_search_hint">@android:color/holo_green_light</color>
 </resources>

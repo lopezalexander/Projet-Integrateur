@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "595635584281",
-    "firebase_url": "https://projet-integrateur-3acb7-default-rtdb.firebaseio.com",
-    "project_id": "projet-integrateur-3acb7",
-    "storage_bucket": "projet-integrateur-3acb7.appspot.com"
+    "project_number": "677480011753",
+    "firebase_url": "https://projet-integrateur-38f47-default-rtdb.firebaseio.com",
+    "project_id": "projet-integrateur-38f47",
+    "storage_bucket": "projet-integrateur-38f47.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:595635584281:android:cba57f68835564d3f59988",
+        "mobilesdk_app_id": "1:677480011753:android:0ac7bc9438474ee2c45d78",
         "android_client_info": {
           "package_name": "com.example.projetintegrateur"
         }
       },
       "oauth_client": [
         {
-          "client_id": "595635584281-p70icalqv30pp4tgvqflu52r73copdga.apps.googleusercontent.com",
+          "client_id": "677480011753-4enpk0t505hi7rj8qme3tonreidii48h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.projetintegrateur",
-            "certificate_hash": "71d6b0f4aa2250900cc9ad1214880d6ad5295daa"
+            "certificate_hash": "f3412a571bb4022228bf7e16040111a2d2abddbc"
           }
         },
         {
-          "client_id": "595635584281-db6nr2jaej3l534rip4ab1i763ui290i.apps.googleusercontent.com",
+          "client_id": "677480011753-usf0tpca5jvmd7nfkhlrcn1113q9r87n.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyD6PrRDlkibbaI5RpjhzI7k5CtoOnU3MaY"
+          "current_key": "AIzaSyDDg5uLDJh-kunI1K-5WFvBEmiPemstUMw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "595635584281-db6nr2jaej3l534rip4ab1i763ui290i.apps.googleusercontent.com",
+              "client_id": "677480011753-usf0tpca5jvmd7nfkhlrcn1113q9r87n.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

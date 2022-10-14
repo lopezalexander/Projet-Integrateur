@@ -306,11 +306,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //MoveCamera to LatLng && Add Marker
                             moveCamera(latLng[0], DEFAULT_ZOOM);
-                            addMarker(latLng[0], "Current Location");
+                            if (locationArrayList.size() == 1) {
+                                addMarker(latLng[0], "Location 1");
+                            } else if (locationArrayList.size() == 2) {
+                                addMarker(latLng[0], "Location 2");
+                            }
                         } else {
                             String err = "unable to get current location";
                             Toast.makeText(MapsActivity.this, err, Toast.LENGTH_SHORT).show();
                         }
+
+
                     } else {
 //                        Log.d(TAG, "3) onComplete: current location is null");
                         String err = "unable to get current location";
@@ -349,7 +355,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .title(title)
                         .draggable(false)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_restaurant_point));
-            } else if (locationArrayList.size() == 0) {
+            } else if (title.equals("Location 1")) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
                         .title(title)
@@ -368,18 +374,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             marker = mMap.addMarker(markerOptions);
             markerArrayList.add(marker);
         } else if (!title.equals("Point milieu")) {
-            if (markerArrayList.size() == 1) {
+            if (title.equals("Location 1")) {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
-                        .title("Location 2")
+                        .title(title)
                         .draggable(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
             } else {
                 markerOptions = new MarkerOptions()
                         .position(latLng)
-                        .title("Location 1")
+                        .title(title)
                         .draggable(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person6));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person5));
             }
             //Add the new marker to the markerArrayList
             marker = mMap.addMarker(markerOptions);
@@ -847,8 +853,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setMapStyle(currentTheme.getTheme(), MapsActivity.this);
 
 
-
-
         //GET PERMISSION FOR FINE AND COARSE LOCATION --> USED FOR GEOLOCATION
         if (mLocationPermissionsGranted) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -871,70 +875,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //SET onClickListener on Map Markers
         //*************************************************************************************************
         mMap.setOnMarkerClickListener(marker -> {
-
-            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-
-                        //EFFACER le LatLng de la liste
-                        for (int i = 0; i < locationArrayList.size(); i++) {
-                            if (locationArrayList.get(i).equals(marker.getPosition())) {
-                                locationArrayList.remove(marker.getPosition());
-                                String locationAddressToRemove = locationAddressName.get(i);
-                                locationAddressName.remove(locationAddressToRemove);
-                                markerArrayList.remove(marker);
-                                autocompleteFragment.setText("");
-                                setHints();
-                            }
-
-                        }
-
-                        if (Objects.equals(marker.getTitle(), "Point milieu")) {
-                            resetRoute();
-                            markerArrayList.get(1).remove();
-                            markerArrayList.remove(1);
-                            locationArrayList.remove(1);
-                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-                            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
-                            if (businessDialog.isVisible()) {
-                                businessDialog.dismiss();
-                            }
-                        } else if (Objects.equals(marker.getTitle(), "Destination choisie")) {
-                            resetRoute();
-                            markerArrayList.get(1).remove();
-                            markerArrayList.remove(1);
-                            locationArrayList.remove(1);
-                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-                            btn_SearchBar_GPS.setVisibility(View.VISIBLE);
-                            if (businessDialog.isVisible()) {
-                                businessDialog.dismiss();
-                            }
-                        } else {
-                            //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
-                            autocompleteFragment.requireView().setVisibility(View.VISIBLE);
-                            findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
-                            resetRoute();
-
-                        }
-
-                        //EFFACER MARKER
-                        marker.remove();
-
-
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        break;
-                }
-            };
-
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
-            builder.setMessage("êtes-vous sur de supprimer cette adresse?").setPositiveButton("Oui", dialogClickListener)
-                    .setNegativeButton("Non", dialogClickListener).show();
-
+//            if (!resultActive) {
+//
+//                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+//                    switch (which) {
+//                        case DialogInterface.BUTTON_POSITIVE:
+//
+//                            //EFFACER le LatLng de la liste
+//                            for (int i = 0; i < locationArrayList.size(); i++) {
+//                                if (locationArrayList.get(i).equals(marker.getPosition())) {
+//                                    locationArrayList.remove(marker.getPosition());
+//                                    String locationAddressToRemove = locationAddressName.get(i);
+//                                    locationAddressName.remove(locationAddressToRemove);
+//                                    markerArrayList.remove(marker);
+//                                    autocompleteFragment.setText("");
+//                                    setHints();
+//                                }
+//
+//                            }
+//
+//                            if (Objects.equals(marker.getTitle(), "Point milieu")) {
+//                                resetRoute();
+//                                markerArrayList.get(1).remove();
+//                                markerArrayList.remove(1);
+//                                locationArrayList.remove(1);
+//                                autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+//                                btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+//                                if (businessDialog.isVisible()) {
+//                                    businessDialog.dismiss();
+//                                }
+//                            } else if (Objects.equals(marker.getTitle(), "Destination choisie")) {
+//                                resetRoute();
+//                                markerArrayList.get(1).remove();
+//                                markerArrayList.remove(1);
+//                                locationArrayList.remove(1);
+//                                autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+//                                btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+//                                if (businessDialog.isVisible()) {
+//                                    businessDialog.dismiss();
+//                                }
+//                            } else {
+//                                //REAFFICHER LA BARRE DE RECHERCHE APRES AVOIR EFFACE UNE ADDRESSE
+//                                autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+//                                findViewById(R.id.ic_gps2).setVisibility(View.VISIBLE);
+//                                resetRoute();
+//
+//                            }
+//
+//                            //EFFACER MARKER
+//                            marker.remove();
+//
+//
+//                            break;
+//
+//                        case DialogInterface.BUTTON_NEGATIVE:
+//                            //No button clicked
+//                            break;
+//                    }
+//                };
+//
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+//                builder.setMessage("êtes-vous sur de supprimer cette adresse?").setPositiveButton("Oui", dialogClickListener)
+//                        .setNegativeButton("Non", dialogClickListener).show();
+//
+//            }
+//            return false;
             return false;
+
         });
 
 
@@ -950,7 +958,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         markerArrayList.remove(1);
                         locationArrayList.remove(1);
                         autocompleteFragment.requireView().setVisibility(View.VISIBLE);
+
                         btn_SearchBar_GPS.setVisibility(View.VISIBLE);
+
+
                         if (businessDialog.isVisible()) {
                             businessDialog.dismiss();
                         }
@@ -1277,7 +1288,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //CENTER CAMERA ON THE LOCATION ENTERED
                 moveCamera(Objects.requireNonNull(place.getLatLng()), DEFAULT_ZOOM);
-                addMarker(place.getLatLng(), Objects.requireNonNull(place.getName()));
+                if (locationArrayList.size() == 1) {
+                    addMarker(place.getLatLng(), "Location 1");
+
+                } else if (locationArrayList.size() == 2) {
+
+                    addMarker(place.getLatLng(), "Location 2");
+                }
                 if (locationArrayList.size() > 1) {
                     centerAllMarkers();
                 }
@@ -1515,6 +1532,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (businessDialog != null) {
             businessDialog.dismiss();
         }
+        resultActive = false;
         setHints();
     }
 
@@ -1546,7 +1564,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //RESET MAP FOR RESULT
     //*****************************************************************************************************************************
     private void resetResult() {
-        locationArrayList.clear();
+        //locationArrayList.clear();
 //        locationAddressName.clear();
 //        markerArrayList.clear();
         mMap.clear();
@@ -1634,17 +1652,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         resetResult();
 
         //ADD ORIGIN MARKER
-        addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "Location 2");
-        locationArrayList.add(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()));
+        addMarker(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()), "Location 1");
+        //locationArrayList.add(new LatLng(ItineraryToAdd.getOrigintLatLng().getLatitude(), ItineraryToAdd.getOrigintLatLng().getLongitude()));
 
 
         //ADD DESTINATION MARKER
-        addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "Location 1");
-        locationArrayList.add(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()));
+        addMarker(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()), "Location 2");
+        //locationArrayList.add(new LatLng(ItineraryToAdd.getDestinationLatLng().getLatitude(), ItineraryToAdd.getDestinationLatLng().getLongitude()));
 
         //ADD SELECTED BUSINESS MARKER
         addMarker(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()), "Destination choisie");
-        locationArrayList.add(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()));
+        //locationArrayList.add(new LatLng(ItineraryToAdd.getSelectedBusiness().getLatitude(), ItineraryToAdd.getSelectedBusiness().getLongitude()));
 
         //DRAW FIRST POLYLINE ORIGIN TO SELECTED BUSINESS
         drawResultPolyline(ItineraryToAdd.getOrigintLatLng(), ItineraryToAdd.getSelectedBusiness(), "Location 2");
